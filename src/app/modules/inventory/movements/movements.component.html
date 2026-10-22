@@ -1,0 +1,305 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">TRAZABILIDAD DE EXISTENCIAS</p>
+    <h1>Movimientos</h1>
+    <p class="heading-subtitle">
+      Cada entrada y salida deja una historia clara.
+    </p>
+  </div>
+  <button class="button button-primary" (click)="openCreate()">
+    <i class="pi pi-plus"></i> Registrar movimiento
+  </button>
+</div>
+
+<section class="movement-banner">
+  <div class="movement-banner-mark">
+    <i class="pi pi-arrow-right-arrow-left"></i>
+  </div>
+  <div>
+    <span class="eyebrow">CONTROL DE STOCK</span>
+    <h2>El inventario se actualiza con cada movimiento.</h2>
+    <p>Registra compras, ventas, daños, pérdidas o ajustes manuales.</p>
+  </div>
+  <div class="movement-banner-decoration">
+    <span>IN</span><i class="pi pi-arrow-right"></i><span>OUT</span>
+  </div>
+</section>
+
+<section class="panel catalog-panel">
+  <div class="filter-bar">
+    <div class="filter-title">
+      <span class="panel-icon"><i class="pi pi-history"></i></span
+      ><strong>Historial</strong
+      ><span class="filter-count">{{ movements().length }}</span>
+    </div>
+    <select [(ngModel)]="filterType" (change)="loadMovements()">
+      <option value="">Todos los movimientos</option>
+      @for (entry of labels | keyvalue; track entry.key) {
+        <option [value]="entry.key">{{ entry.value }}</option>
+      }</select
+    ><button
+      class="icon-button filter-refresh"
+      title="Actualizar"
+      (click)="loadMovements()"
+    >
+      <i class="pi pi-refresh"></i>
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-panel">
+      <i class="pi pi-spin pi-spinner"></i><span>Cargando historial…</span>
+    </div>
+  } @else if (movements().length) {
+    <div class="table-scroll">
+      <table class="inventory-table movement-table">
+        <thead>
+          <tr>
+            <th>FECHA</th>
+            <th>TIPO</th>
+            <th>PRODUCTOS</th>
+            <th>OBSERVACIONES</th>
+            <th>ARTÍCULOS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (movement of movements(); track movement.id || movement._id) {
+            <tr>
+              <td data-label="Fecha">
+                <strong>{{
+                  movement.date | date: "d MMM yyyy" : "" : "es-CO"
+                }}</strong
+                ><small class="table-subtext">{{
+                  movement.date | date: "HH:mm"
+                }}</small>
+              </td>
+              <td data-label="Tipo">
+                <span
+                  class="movement-type-pill"
+                  [class.movement-type-pill--in]="isInbound(movement)"
+                  ><i
+                    [class]="
+                      isInbound(movement)
+                        ? 'pi pi-arrow-down-left'
+                        : 'pi pi-arrow-up-right'
+                    "
+                  ></i
+                  >{{ labels[movement.type] || movement.type }}</span
+                >
+              </td>
+              <td data-label="Productos">
+                <div class="movement-products">
+                  @for (
+                    item of movement.items.slice(0, 3);
+                    track item.productId
+                  ) {
+                    <span
+                      >{{ productName(item.productId) }}
+                      <b
+                        >{{ item.direction === "in" ? "+" : "−"
+                        }}{{ item.quantity }}</b
+                      ></span
+                    >
+                  }
+                  @if (movement.items.length > 3) {
+                    <small>+{{ movement.items.length - 3 }} más</small>
+                  }
+                </div>
+              </td>
+              <td class="notes-cell" data-label="Observaciones">
+                {{ movement.notes || "—" }}
+              </td>
+              <td data-label="Artículos">
+                <span class="movement-count"
+                  >{{ movement.items.length }}
+                  {{
+                    movement.items.length === 1 ? "artículo" : "artículos"
+                  }}</span
+                >
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <span>{{ movements().length }} movimientos recientes</span
+      ><span>Las existencias reflejan cada registro</span>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-history"></i></span
+      ><strong>Aún no hay movimientos</strong>
+      <p>
+        Registra la primera compra, venta o ajuste para empezar el historial.
+      </p>
+      <button class="button button-primary button-small" (click)="openCreate()">
+        <i class="pi pi-plus"></i> Registrar movimiento
+      </button>
+    </div>
+  }
+</section>
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
+    <section
+      class="form-dialog movement-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="movement-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">ACTUALIZA LAS EXISTENCIAS</p>
+          <h2 id="movement-dialog-title">Registrar movimiento</h2>
+        </div>
+        <button class="icon-button" (click)="dialogOpen.set(false)">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <form (ngSubmit)="save()" class="dialog-form">
+        <div class="form-grid">
+          <label class="form-field"
+            ><span>Tipo de movimiento <b>*</b></span
+            ><select [(ngModel)]="type" name="type">
+              <option value="purchase">Compra a proveedor · entrada</option>
+              <option value="sale">Venta · salida</option>
+              <option value="damage">Daño · salida</option>
+              <option value="loss">Pérdida · salida</option>
+              <option value="internal_use">Consumo interno · salida</option>
+              <option value="manual_adjustment">
+                Ajuste manual · entrada o salida
+              </option>
+            </select></label
+          ><label class="form-field"
+            ><span>Fecha <b>*</b></span
+            ><input type="date" [(ngModel)]="date" name="date" required
+          /></label>
+        </div>
+        <div class="items-heading">
+          <div>
+            <span class="eyebrow">DETALLE</span
+            ><strong>Productos del movimiento</strong>
+          </div>
+          <button
+            type="button"
+            class="button button-secondary button-small"
+            (click)="addItem()"
+          >
+            <i class="pi pi-plus"></i> Agregar producto
+          </button>
+        </div>
+        <div class="movement-item-list">
+          @for (item of items; track $index) {
+            <div class="movement-item-row">
+              <span class="item-index">{{
+                ($index + 1).toString().padStart(2, "0")
+              }}</span
+              ><label class="form-field item-product"
+                ><span>Producto</span
+                ><select
+                  [(ngModel)]="item.productId"
+                  [name]="'product-' + $index"
+                  required
+                >
+                  <option value="">Selecciona un producto</option>
+                  @for (
+                    product of products();
+                    track product.id || product._id
+                  ) {
+                    <option [ngValue]="product.id || product._id">
+                      {{ product.name }} · {{ product.sku }} ({{
+                        product.stock
+                      }}
+                      disp.)
+                    </option>
+                  }
+                </select></label
+              ><label class="form-field item-quantity"
+                ><span>Cantidad</span
+                ><input
+                  type="number"
+                  min="1"
+                  step="1"
+                  [(ngModel)]="item.quantity"
+                  [name]="'quantity-' + $index"
+                  required /></label
+              ><label class="form-field item-direction"
+                ><span>Dirección</span>
+                @if (type === "manual_adjustment") {
+                  <select
+                    [(ngModel)]="item.direction"
+                    [name]="'direction-' + $index"
+                  >
+                    <option value="in">Entrada +</option>
+                    <option value="out">Salida −</option>
+                  </select>
+                } @else {
+                  <span
+                    class="direction-readonly"
+                    [class.direction-readonly--out]="
+                      itemDirection(item) === 'out'
+                    "
+                    ><i
+                      [class]="
+                        itemDirection(item) === 'in'
+                          ? 'pi pi-arrow-down-left'
+                          : 'pi pi-arrow-up-right'
+                      "
+                    ></i
+                    >{{
+                      itemDirection(item) === "in" ? "Entrada" : "Salida"
+                    }}</span
+                  >
+                }
+              </label>
+              @if (items.length > 1) {
+                <button
+                  type="button"
+                  class="icon-button icon-button--danger item-remove"
+                  title="Quitar artículo"
+                  (click)="removeItem($index)"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <label class="form-field form-field--spaced"
+          ><span>Observaciones</span
+          ><textarea
+            [(ngModel)]="notes"
+            name="notes"
+            rows="3"
+            maxlength="1000"
+            placeholder="Proveedor, motivo del ajuste u otro detalle"
+          ></textarea>
+        </label>
+        <div class="stock-warning">
+          <i class="pi pi-info-circle"></i
+          ><span
+            >El cambio de stock se aplica al confirmar y queda registrado en el
+            historial.</span
+          >
+        </div>
+        <div class="dialog-actions">
+          <button
+            type="button"
+            class="button button-secondary"
+            (click)="dialogOpen.set(false)"
+          >
+            Cancelar</button
+          ><button
+            class="button button-primary"
+            [disabled]="saving() || !products().length"
+          >
+            <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i
+            >{{ saving() ? "Registrando…" : "Confirmar movimiento" }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

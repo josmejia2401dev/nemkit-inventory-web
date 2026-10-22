@@ -1,0 +1,217 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">TU NEGOCIO, EN PERSPECTIVA</p>
+    <h1>{{ greeting }} <span class="heading-spark">✳</span></h1>
+    <p class="heading-subtitle">
+      Esto es lo que está pasando con tu inventario.
+    </p>
+  </div>
+  <button class="button button-secondary" (click)="refresh()">
+    <i class="pi pi-refresh"></i> Actualizar
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel">
+    <i class="pi pi-spin pi-spinner"></i><span>Cargando tu inventario…</span>
+  </div>
+} @else {
+  @if (summary(); as data) {
+    <div class="stat-grid">
+      <article class="stat-card stat-card--green">
+        <div class="stat-top">
+          <span class="stat-icon"><i class="pi pi-box"></i></span
+          ><span class="stat-note">EN CATÁLOGO</span>
+        </div>
+        <strong class="stat-value">{{ data.totalProducts | number }}</strong
+        ><span class="stat-label">Productos activos</span>
+        <a routerLink="/products" class="stat-link"
+          >Ver productos <i class="pi pi-arrow-up-right"></i
+        ></a>
+      </article>
+      <article class="stat-card stat-card--rose">
+        <div class="stat-top">
+          <span class="stat-icon"><i class="pi pi-exclamation-circle"></i></span
+          ><span class="stat-note">REQUIERE ATENCIÓN</span>
+        </div>
+        <strong class="stat-value">{{ data.outOfStock | number }}</strong
+        ><span class="stat-label">Productos agotados</span>
+        <a
+          routerLink="/products"
+          [queryParams]="{ stockState: 'out_of_stock' }"
+          class="stat-link"
+          >Revisar productos <i class="pi pi-arrow-up-right"></i
+        ></a>
+      </article>
+      <article class="stat-card stat-card--amber">
+        <div class="stat-top">
+          <span class="stat-icon"><i class="pi pi-bell"></i></span
+          ><span class="stat-note">POR DEBAJO DEL MÍNIMO</span>
+        </div>
+        <strong class="stat-value">{{ data.lowStock | number }}</strong
+        ><span class="stat-label">Stock bajo</span>
+        <a
+          routerLink="/products"
+          [queryParams]="{ stockState: 'low_stock' }"
+          class="stat-link"
+          >Ver alertas <i class="pi pi-arrow-up-right"></i
+        ></a>
+      </article>
+      <article class="stat-card stat-card--ink">
+        <div class="stat-top">
+          <span class="stat-icon"><i class="pi pi-wallet"></i></span
+          ><span class="stat-note">A PRECIO DE COMPRA</span>
+        </div>
+        <strong class="stat-value stat-value--money">{{
+          currency.format(data.inventoryValue || 0)
+        }}</strong
+        ><span class="stat-label">Valor del inventario</span>
+        <span class="stat-caption">Calculado sobre existencias actuales</span>
+      </article>
+    </div>
+
+    <div class="dashboard-grid">
+      <section class="panel recent-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">ACTIVIDAD RECIENTE</p>
+            <h2>Últimos movimientos</h2>
+          </div>
+          <a routerLink="/movements" class="text-link"
+            >Ver todos <i class="pi pi-arrow-right"></i
+          ></a>
+        </div>
+        @if (data.recentMovements.length) {
+          <div class="movement-list">
+            @for (
+              movement of data.recentMovements;
+              track movement.id || movement._id
+            ) {
+              <article class="movement-row">
+                <span
+                  class="movement-icon"
+                  [class.movement-icon--out]="
+                    movement.type === 'sale' ||
+                    movement.type === 'damage' ||
+                    movement.type === 'loss' ||
+                    movement.type === 'internal_use'
+                  "
+                  ><i
+                    [class]="
+                      movement.type === 'purchase'
+                        ? 'pi pi-arrow-down-left'
+                        : movement.type === 'sale'
+                          ? 'pi pi-arrow-up-right'
+                          : 'pi pi-sync'
+                    "
+                  ></i
+                ></span>
+                <div class="movement-copy">
+                  <strong>{{ movementLabel(movement.type) }}</strong
+                  ><small
+                    >{{ movement.items.length }} productos ·
+                    {{ movement.notes || "Sin observaciones" }}</small
+                  >
+                </div>
+                <time>{{ movement.date | date: "d MMM, HH:mm" }}</time>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <span class="empty-icon"><i class="pi pi-arrows-h"></i></span
+            ><strong>Aún no hay movimientos</strong>
+            <p>Cuando registres entradas o salidas, aparecerán aquí.</p>
+            <a
+              routerLink="/movements"
+              class="button button-primary button-small"
+              >Registrar movimiento</a
+            >
+          </div>
+        }
+      </section>
+
+      <section class="panel top-products-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">ÚLTIMOS 30 DÍAS</p>
+            <h2>Más vendidos</h2>
+          </div>
+          <span class="panel-icon"><i class="pi pi-chart-line"></i></span>
+        </div>
+        @if (data.topSellingProducts.length) {
+          <div class="top-products-list">
+            @for (
+              product of data.topSellingProducts;
+              track product.productId;
+              let index = $index
+            ) {
+              <article class="top-product-row">
+                <span class="rank" [class.rank--first]="index === 0">{{
+                  (index + 1).toString().padStart(2, "0")
+                }}</span
+                ><span class="product-symbol"><i class="pi pi-box"></i></span>
+                <div class="top-product-copy">
+                  <strong>{{ product.name }}</strong
+                  ><small>{{ product.sku }}</small>
+                </div>
+                <div class="sold-count">
+                  <strong>{{ product.unitsSold }}</strong
+                  ><small>unid.</small>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="empty-state empty-state--compact">
+            <span class="empty-icon"><i class="pi pi-chart-bar"></i></span
+            ><strong>Tu ranking aparecerá aquí</strong>
+            <p>Registra ventas para descubrir tus productos estrella.</p>
+          </div>
+        }
+        <a routerLink="/products" class="panel-bottom-link"
+          >Explorar catálogo <i class="pi pi-arrow-right"></i
+        ></a>
+      </section>
+    </div>
+
+    <section class="quick-actions">
+      <div>
+        <p class="eyebrow">SIGUIENTE PASO</p>
+        <h2>¿Qué necesitas hacer?</h2>
+      </div>
+      <a routerLink="/products" class="quick-action"
+        ><span class="quick-action-icon"><i class="pi pi-plus"></i></span
+        ><span
+          ><strong>Agregar producto</strong
+          ><small>Amplía tu catálogo</small></span
+        ><i class="pi pi-arrow-right"></i
+      ></a>
+      <a routerLink="/movements" class="quick-action"
+        ><span class="quick-action-icon quick-action-icon--ochre"
+          ><i class="pi pi-arrow-right-arrow-left"></i></span
+        ><span
+          ><strong>Registrar movimiento</strong
+          ><small>Entrada, venta o ajuste</small></span
+        ><i class="pi pi-arrow-right"></i
+      ></a>
+      <a routerLink="/categories" class="quick-action"
+        ><span class="quick-action-icon quick-action-icon--lavender"
+          ><i class="pi pi-tag"></i></span
+        ><span
+          ><strong>Crear categoría</strong
+          ><small>Organiza tus productos</small></span
+        ><i class="pi pi-arrow-right"></i
+      ></a>
+    </section>
+  } @else {
+    <div class="empty-state panel">
+      <span class="empty-icon"><i class="pi pi-cloud"></i></span
+      ><strong>No pudimos cargar el resumen</strong>
+      <p>Comprueba la conexión con el servidor e inténtalo de nuevo.</p>
+      <button class="button button-primary button-small" (click)="refresh()">
+        Intentar de nuevo
+      </button>
+    </div>
+  }
+}

@@ -1,0 +1,99 @@
+<main class="auth-page">
+  <div class="auth-art">
+    <a routerLink="/login" class="brand brand--light"
+      ><span class="brand-mark"><i class="pi pi-box"></i></span
+      ><span class="brand-copy"
+        ><strong>nemkit</strong><small>INVENTARIO</small></span
+      ></a
+    >
+    <div class="auth-art-copy">
+      <span class="art-kicker"
+        ><i class="pi pi-sparkles"></i> ORDEN PARA CRECER</span
+      >
+      <h1>Tu inventario,<br /><em>en su mejor momento.</em></h1>
+      <p>
+        Una forma más clara de cuidar cada producto, cada movimiento y cada
+        decisión.
+      </p>
+    </div>
+    <div class="art-orbit orbit-one"></div>
+    <div class="art-orbit orbit-two"></div>
+    <div class="art-card art-card--one">
+      <span class="art-card-icon"><i class="pi pi-box"></i></span
+      ><span
+        ><small>PRODUCTOS ACTIVOS</small
+        ><strong>Todo bajo control</strong></span
+      ><i class="pi pi-check-circle art-check"></i>
+    </div>
+    <div class="art-card art-card--two">
+      <span class="mini-bars"><i></i><i></i><i></i><i></i><i></i></span
+      ><span
+        ><small>INVENTARIO</small><strong>Crece con confianza</strong></span
+      >
+    </div>
+    <span class="art-footer">MENOS DUDAS. MÁS VISIBILIDAD.</span>
+  </div>
+  <section class="auth-form-side">
+    <div class="auth-mobile-brand">
+      <a routerLink="/login" class="brand"
+        ><span class="brand-mark"><i class="pi pi-box"></i></span
+        ><span class="brand-copy"
+          ><strong>nemkit</strong><small>INVENTARIO</small></span
+        ></a
+      >
+    </div>
+    <div class="auth-form-wrap">
+      <span class="auth-overline">QUÉ BUENO TENERTE DE VUELTA</span>
+      <h2>Inicia sesión</h2>
+      <p class="auth-lead">Ingresa a tu espacio de inventario.</p>
+      @if (error()) {
+        <p-message severity="error" [text]="error()!" class="auth-message" />
+      }
+      <form (ngSubmit)="onSubmit()" class="auth-form">
+        <label class="field-label" for="email">Correo electrónico</label>
+        <span class="input-wrap"
+          ><i class="pi pi-envelope"></i
+          ><input
+            id="email"
+            pInputText
+            [(ngModel)]="email"
+            name="email"
+            type="email"
+            placeholder="tu@negocio.com"
+            autocomplete="email"
+            required
+        /></span>
+        <label class="field-label" for="password">Contraseña</label>
+        <p-password
+          inputId="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Tu contraseña"
+          autocomplete="current-password"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="auth-password"
+          inputStyleClass="auth-password-input"
+          required
+        />
+        <p-button
+          type="submit"
+          label="Entrar a mi inventario"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          [loading]="loading()"
+          styleClass="auth-submit"
+        />
+      </form>
+      <p class="auth-switch">
+        ¿Primera vez aquí?
+        <a routerLink="/register"
+          >Crea tu cuenta <i class="pi pi-arrow-up-right"></i
+        ></a>
+      </p>
+    </div>
+    <span class="auth-legal"
+      >Un espacio tranquilo para llevar mejor tus cuentas.</span
+    >
+  </section>
+</main>

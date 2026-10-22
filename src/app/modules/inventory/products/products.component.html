@@ -1,0 +1,329 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">CATÁLOGO</p>
+    <h1>Productos</h1>
+    <p class="heading-subtitle">
+      Una vista completa de lo que tienes y cómo se mueve.
+    </p>
+  </div>
+  <button class="button button-primary" (click)="openCreate()">
+    <i class="pi pi-plus"></i> Nuevo producto
+  </button>
+</div>
+
+<section class="panel catalog-panel">
+  <div class="filter-bar">
+    <label class="search-box"
+      ><i class="pi pi-search"></i
+      ><input
+        [(ngModel)]="search"
+        (keyup.enter)="loadProducts()"
+        placeholder="Buscar por nombre, SKU o código…" /><button
+        *ngIf="search"
+        class="clear-search"
+        (click)="search = ''; loadProducts()"
+      >
+        <i class="pi pi-times"></i></button
+    ></label>
+    <select [(ngModel)]="categoryFilter" (change)="loadProducts()">
+      <option value="">Todas las categorías</option>
+      @for (category of categories(); track category.id || category._id) {
+        <option [ngValue]="category.id || category._id">
+          {{ category.name }}
+        </option>
+      }
+    </select>
+    <select [(ngModel)]="stockState" (change)="updateStockFilter()">
+      <option value="">Todos los niveles de stock</option>
+      <option value="out_of_stock">Agotados</option>
+      <option value="low_stock">Stock bajo</option>
+    </select>
+    <select [(ngModel)]="statusFilter" (change)="loadProducts()">
+      <option value="">Todos los estados</option>
+      <option value="active">Activos</option>
+      <option value="inactive" [disabled]="!!stockState">Inactivos</option>
+    </select>
+    <button
+      class="icon-button filter-refresh"
+      title="Actualizar"
+      (click)="loadProducts()"
+    >
+      <i class="pi pi-refresh"></i>
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-panel">
+      <i class="pi pi-spin pi-spinner"></i><span>Cargando productos…</span>
+    </div>
+  } @else if (products().length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>PRODUCTO</th>
+            <th>SKU / CÓDIGO</th>
+            <th>CATEGORÍA</th>
+            <th>PRECIO VENTA</th>
+            <th>STOCK</th>
+            <th>ESTADO</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of products(); track product.id || product._id) {
+            <tr>
+              <td data-label="Producto">
+                <div class="product-cell">
+                  <span class="product-thumb">
+                    @if (product.image?.url) {
+                      <img [src]="product.image?.url" [alt]="product.name" />
+                    } @else {
+                      <i class="pi pi-box"></i>
+                    }</span
+                  ><span
+                    ><strong>{{ product.name }}</strong
+                    ><small>{{
+                      product.description || "Sin descripción"
+                    }}</small></span
+                  >
+                </div>
+              </td>
+              <td data-label="SKU / código">
+                <strong class="sku-code">{{ product.sku }}</strong
+                ><small class="table-subtext">{{
+                  product.barcode || "—"
+                }}</small>
+              </td>
+              <td data-label="Categoría">
+                {{ categoryName(product.categoryId) }}
+              </td>
+              <td class="price-cell" data-label="Precio de venta">
+                {{
+                  product.salePrice
+                    | currency: "COP" : "symbol-narrow" : "1.0-0" : "es-CO"
+                }}
+              </td>
+              <td data-label="Stock">
+                <span
+                  class="stock-value"
+                  [class.stock-value--low]="
+                    product.stock <= product.minimumStock
+                  "
+                  >{{ product.stock }}</span
+                ><small class="table-subtext"
+                  >mín. {{ product.minimumStock }}</small
+                >
+              </td>
+              <td data-label="Estado">
+                <span
+                  class="status-pill"
+                  [class.status-pill--off]="product.status === 'inactive'"
+                  ><i></i
+                  >{{
+                    product.status === "active" ? "Activo" : "Inactivo"
+                  }}</span
+                >
+              </td>
+              <td data-label="Acciones">
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    title="Editar"
+                    (click)="openEdit(product)"
+                  >
+                    <i class="pi pi-pencil"></i></button
+                  ><button
+                    class="icon-button icon-button--danger"
+                    title="Eliminar"
+                    (click)="remove(product)"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <span>{{ products().length }} productos encontrados</span
+      ><span>El stock cambia al registrar movimientos</span>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-box"></i></span
+      ><strong>{{
+        search || categoryFilter || statusFilter || stockState
+          ? "No hay resultados"
+          : "Tu catálogo comienza aquí"
+      }}</strong>
+      <p>
+        {{
+          search || categoryFilter || statusFilter || stockState
+            ? "Prueba con otros filtros o una búsqueda diferente."
+            : "Agrega tus productos para mantener existencias, costos y precios en un solo lugar."
+        }}
+      </p>
+      @if (!search && !categoryFilter && !statusFilter && !stockState) {
+        <button
+          class="button button-primary button-small"
+          (click)="openCreate()"
+        >
+          <i class="pi pi-plus"></i> Crear primer producto
+        </button>
+      }
+    </div>
+  }
+</section>
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="closeDialog()">
+    <section
+      class="form-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="product-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">CATÁLOGO</p>
+          <h2 id="product-dialog-title">
+            {{ editingId ? "Editar producto" : "Nuevo producto" }}
+          </h2>
+        </div>
+        <button class="icon-button" (click)="closeDialog()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <form (ngSubmit)="save()" class="dialog-form">
+        <div class="form-grid">
+          <label class="form-field form-field--wide"
+            ><span>Nombre del producto <b>*</b></span
+            ><input
+              [(ngModel)]="form.name"
+              name="name"
+              placeholder="Ej. Café molido 500 g"
+              required
+          /></label>
+          <label class="form-field"
+            ><span>SKU <b>*</b></span
+            ><input
+              [(ngModel)]="form.sku"
+              name="sku"
+              placeholder="CAF-001"
+              required
+          /></label>
+          <label class="form-field"
+            ><span>Código de barras</span
+            ><input
+              [(ngModel)]="form.barcode"
+              name="barcode"
+              placeholder="Opcional"
+          /></label>
+          <label class="form-field"
+            ><span>Categoría <b>*</b></span
+            ><select [(ngModel)]="form.categoryId" name="categoryId" required>
+              <option value="">Selecciona una categoría</option>
+              @for (
+                category of categories();
+                track category.id || category._id
+              ) {
+                <option [ngValue]="category.id || category._id">
+                  {{ category.name }}
+                </option>
+              }
+            </select></label
+          >
+          <label class="form-field"
+            ><span>Estado</span
+            ><select [(ngModel)]="form.status" name="status">
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select></label
+          >
+          <label class="form-field"
+            ><span>Precio de compra <b>*</b></span>
+            <div class="money-input">
+              <span>$</span
+              ><input
+                type="number"
+                min="0"
+                step="1"
+                [(ngModel)]="form.purchasePrice"
+                name="purchasePrice"
+                required
+              /></div
+          ></label>
+          <label class="form-field"
+            ><span>Precio de venta <b>*</b></span>
+            <div class="money-input">
+              <span>$</span
+              ><input
+                type="number"
+                min="0"
+                step="1"
+                [(ngModel)]="form.salePrice"
+                name="salePrice"
+                required
+              /></div
+          ></label>
+          <label class="form-field"
+            ><span>Stock mínimo</span
+            ><input
+              type="number"
+              min="0"
+              step="1"
+              [(ngModel)]="form.minimumStock"
+              name="minimumStock"
+          /></label>
+          <label class="form-field"
+            ><span>Imagen (URL)</span
+            ><input
+              type="url"
+              [(ngModel)]="form.image"
+              name="image"
+              placeholder="https://…"
+          /></label>
+          <label class="form-field form-field--wide"
+            ><span>Descripción</span
+            ><textarea
+              [(ngModel)]="form.description"
+              name="description"
+              rows="3"
+              placeholder="Detalles que te ayuden a identificarlo"
+            ></textarea>
+          </label>
+        </div>
+        <p class="form-hint">
+          <i class="pi pi-info-circle"></i> Las existencias se inicializan en
+          cero. Registra una entrada para agregar stock.
+        </p>
+        <div class="dialog-actions">
+          <button
+            type="button"
+            class="button button-secondary"
+            (click)="closeDialog()"
+          >
+            Cancelar</button
+          ><button
+            type="submit"
+            class="button button-primary"
+            [disabled]="saving()"
+          >
+            <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i
+            >{{
+              saving()
+                ? "Guardando…"
+                : editingId
+                  ? "Guardar cambios"
+                  : "Crear producto"
+            }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

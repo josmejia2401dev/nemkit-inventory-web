@@ -1,0 +1,122 @@
+<div class="app-shell">
+  @if (sidebarOpen()) {
+    <button
+      class="sidebar-backdrop"
+      aria-label="Cerrar menú"
+      (click)="closeSidebar()"
+    ></button>
+  }
+
+  <aside
+    id="inventory-sidebar"
+    class="sidebar"
+    [class.sidebar--open]="sidebarOpen()"
+  >
+    <a routerLink="/dashboard" class="brand" (click)="closeSidebar()">
+      <span class="brand-mark"><i class="pi pi-box"></i></span>
+      <span class="brand-copy"
+        ><strong>nemkit</strong><small>INVENTARIO</small></span
+      >
+    </a>
+
+    <div class="workspace-label">ESPACIO DE TRABAJO</div>
+    <nav class="side-nav">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="nav-link--active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+          class="nav-link"
+          (click)="closeSidebar()"
+        >
+          <i [class]="item.icon"></i><span>{{ item.label }}</span>
+          @if (item.path === "/products") {
+            <span class="nav-arrow">↗</span>
+          }
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-bottom">
+      <app-inventory-status-message />
+      <div class="user-row">
+        <a
+          routerLink="/profile"
+          class="user-profile-link"
+          aria-label="Ver y editar mi perfil"
+          (click)="closeSidebar()"
+        >
+          <span class="avatar">{{
+            (user()?.fullName || user()?.email || "U").slice(0, 1).toUpperCase()
+          }}</span>
+          <span class="user-copy"
+            ><strong>{{ user()?.fullName || "Mi cuenta" }}</strong
+            ><small>{{ user()?.email }}</small></span
+          >
+        </a>
+        <button
+          class="icon-button logout-button"
+          title="Cerrar sesión"
+          (click)="logout()"
+        >
+          <i class="pi pi-sign-out"></i>
+        </button>
+      </div>
+      <app-backend-status-tag pollProfile="relaxed" />
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <button
+        class="icon-button mobile-menu"
+        [attr.aria-label]="sidebarOpen() ? 'Cerrar menú' : 'Abrir menú'"
+        [attr.aria-expanded]="sidebarOpen()"
+        aria-controls="inventory-sidebar"
+        (click)="toggleSidebar()"
+      >
+        <i class="pi pi-bars"></i>
+      </button>
+      <div class="breadcrumb">
+        <span>Inventario</span><i class="pi pi-angle-right"></i
+        ><strong>{{ currentPage }}</strong>
+      </div>
+      <div class="topbar-actions">
+        <span class="today-label"
+          ><i class="pi pi-calendar"></i>
+          {{ today | date: "EEEE, d MMMM" }}</span
+        >
+        <a
+          routerLink="/profile"
+          class="topbar-avatar"
+          title="Mi perfil"
+          aria-label="Ver y editar mi perfil"
+        >
+          {{
+            (user()?.fullName || user()?.email || "U").slice(0, 1).toUpperCase()
+          }}
+        </a>
+      </div>
+    </header>
+    <section class="page-content"><router-outlet /></section>
+    <footer class="page-footer">
+      <span>© 2026 Nemkit Inventory</span
+      ><span>Inventario claro. Decisiones seguras.</span>
+    </footer>
+  </main>
+
+  <nav class="mobile-tab-bar" aria-label="Navegación principal">
+    @for (item of navItems; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="mobile-tab--active"
+        [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+        [attr.aria-label]="item.label"
+        (click)="closeSidebar()"
+      >
+        <i [class]="item.icon" aria-hidden="true"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</div>

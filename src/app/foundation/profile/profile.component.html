@@ -1,0 +1,294 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">TU ESPACIO</p>
+    <h1>Mi perfil</h1>
+    <p class="heading-subtitle">
+      Administra tus datos personales y la seguridad de tu cuenta.
+    </p>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel panel">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>Cargando perfil…</span>
+  </div>
+} @else {
+  @if (profile(); as user) {
+    <div class="profile-grid">
+      <div class="profile-main-column">
+        <section class="panel profile-card">
+          <div class="profile-hero">
+            <span class="profile-avatar">
+              {{ user.fullName.charAt(0).toUpperCase() }}
+            </span>
+            <div class="profile-identity">
+              <span class="eyebrow">CUENTA PERSONAL</span>
+              <h2>{{ user.fullName }}</h2>
+              <p>{{ user.email }}</p>
+            </div>
+            <span class="profile-verified">
+              <i class="pi pi-check-circle"></i>
+              Activa
+            </span>
+          </div>
+
+          <form (ngSubmit)="saveProfile()" class="profile-form">
+            <div class="section-heading">
+              <div>
+                <h3>Información personal</h3>
+                <p>Estos datos se usan en tu cuenta y tus registros.</p>
+              </div>
+              <span class="section-mark"><i class="pi pi-user-edit"></i></span>
+            </div>
+
+            <label class="form-field">
+              <span>Nombre completo</span>
+              <input
+                [(ngModel)]="editName"
+                name="fullName"
+                autocomplete="name"
+                required
+                minlength="2"
+                maxlength="120"
+              />
+            </label>
+
+            <label class="form-field profile-field-spaced">
+              <span>Correo electrónico</span>
+              <input
+                [(ngModel)]="editEmail"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+                maxlength="254"
+              />
+            </label>
+
+            <div class="profile-form-footer">
+              <span
+                ><i class="pi pi-info-circle"></i> Guarda para aplicar los
+                cambios.</span
+              >
+              <button class="button button-primary" [disabled]="savingProfile()">
+                <i
+                  [class]="
+                    savingProfile() ? 'pi pi-spin pi-spinner' : 'pi pi-check'
+                  "
+                ></i>
+                {{ savingProfile() ? "Guardando…" : "Guardar cambios" }}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel security-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">PROTECCIÓN DE LA CUENTA</p>
+              <h3>Seguridad</h3>
+              <p>Mantén tu contraseña privada y actualizada.</p>
+            </div>
+            <span class="section-mark section-mark--gold">
+              <i class="pi pi-shield"></i>
+            </span>
+          </div>
+          <div class="security-details">
+            <div class="security-detail">
+              <small>Último acceso</small>
+              <strong>
+                {{ user.security.lastLoginAt ? (user.security.lastLoginAt | date: "d MMM y, HH:mm") : "Sin registros" }}
+              </strong>
+            </div>
+            <div class="security-detail">
+              <small>Último bloqueo</small>
+              <strong>
+                {{ user.security.lastLockedAt ? (user.security.lastLockedAt | date: "d MMM y, HH:mm") : "Nunca" }}
+              </strong>
+            </div>
+            <div class="security-detail">
+              <small>Intentos fallidos actuales</small>
+              <strong [class.security-warning]="user.security.loginAttempts > 0">
+                {{ user.security.loginAttempts }}
+              </strong>
+            </div>
+            <div class="security-detail">
+              <small>Estado del acceso</small>
+              <strong [class.security-warning]="user.security.lockedUntil">
+                {{ user.security.lockedUntil ? ("Bloqueada hasta " + (user.security.lockedUntil | date: "d MMM y, HH:mm")) : "Sin bloqueo" }}
+              </strong>
+            </div>
+            <div class="security-detail">
+              <small>Cambio de contraseña requerido</small>
+              <strong>{{ user.security.mustChangePassword ? "Sí" : "No" }}</strong>
+            </div>
+          </div>
+          <div class="password-row">
+            <span class="password-icon"><i class="pi pi-lock"></i></span>
+            <div>
+              <strong>Contraseña</strong>
+              <small>Actualiza tu contraseña cuando lo necesites.</small>
+            </div>
+            <button
+              class="button button-secondary"
+              (click)="openPasswordDialog()"
+            >
+              Cambiar contraseña
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="profile-side-column">
+        <section class="panel account-card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">DETALLES</p>
+              <h3>Tu cuenta</h3>
+            </div>
+            <span class="section-mark"><i class="pi pi-id-card"></i></span>
+          </div>
+
+          <div class="account-detail">
+            <span class="account-detail-icon"
+              ><i class="pi pi-hashtag"></i
+            ></span>
+            <div>
+              <small>ID de usuario</small>
+              <strong class="profile-id">{{ user.id }}</strong>
+            </div>
+          </div>
+
+          <div class="account-detail">
+            <span class="account-detail-icon account-detail-icon--ochre">
+              <i class="pi pi-users"></i>
+            </span>
+            <div>
+              <small>Roles</small>
+              <span class="role-list">
+                @for (role of user.roles; track role) {
+                  <span class="role-pill">{{ role }}</span>
+                }
+              </span>
+            </div>
+          </div>
+
+          <div class="account-detail">
+            <span class="account-detail-icon account-detail-icon--lavender">
+              <i class="pi pi-calendar"></i>
+            </span>
+            <div>
+              <small>Miembro desde</small>
+              <strong>{{ user.createdAt | date: "d MMMM y" }}</strong>
+            </div>
+          </div>
+
+          <div class="account-detail">
+            <span class="account-detail-icon"><i class="pi pi-sync"></i></span>
+            <div>
+              <small>Última actualización</small>
+              <strong>{{ user.updatedAt | date: "d MMM y, HH:mm" }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="profile-note">
+          <span><i class="pi pi-sparkles"></i></span>
+          <div>
+            <strong>Todo en un solo lugar</strong>
+            <p>Tu perfil identifica tus movimientos y cambios de inventario.</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  } @else {
+    <section class="panel">
+      <div class="empty-state">
+        <span class="empty-icon"><i class="pi pi-user"></i></span>
+        <strong>No pudimos cargar tu perfil</strong>
+        <p>Comprueba la conexión e inténtalo de nuevo.</p>
+        <button
+          class="button button-primary button-small"
+          (click)="loadProfile()"
+        >
+          Intentar de nuevo
+        </button>
+      </div>
+    </section>
+  }
+}
+
+@if (passwordDialogVisible()) {
+  <div class="dialog-backdrop" (click)="closePasswordDialog()">
+    <section
+      class="form-dialog form-dialog--narrow"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="password-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">PROTECCIÓN DE LA CUENTA</p>
+          <h2 id="password-dialog-title">Cambiar contraseña</h2>
+        </div>
+        <button class="icon-button" (click)="closePasswordDialog()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="changePassword()" class="dialog-form">
+        <label class="form-field">
+          <span>Contraseña actual</span>
+          <input
+            [(ngModel)]="currentPassword"
+            name="currentPassword"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </label>
+        <label class="form-field profile-field-spaced">
+          <span>Nueva contraseña</span>
+          <input
+            [(ngModel)]="newPassword"
+            name="newPassword"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="6"
+          />
+        </label>
+        <label class="form-field profile-field-spaced">
+          <span>Confirmar nueva contraseña</span>
+          <input
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="6"
+          />
+        </label>
+
+        <div class="dialog-actions">
+          <button
+            type="button"
+            class="button button-secondary"
+            (click)="closePasswordDialog()"
+          >
+            Cancelar
+          </button>
+          <button class="button button-primary" [disabled]="savingPassword()">
+            <i
+              [class]="savingPassword() ? 'pi pi-spin pi-spinner' : 'pi pi-lock'"
+            ></i>
+            {{ savingPassword() ? "Actualizando…" : "Actualizar contraseña" }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

@@ -1,0 +1,147 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ORGANIZA TU CATÁLOGO</p>
+    <h1>Categorías</h1>
+    <p class="heading-subtitle">
+      Agrupa tus productos para encontrar cada cosa en su lugar.
+    </p>
+  </div>
+  <button class="button button-primary" (click)="openCreate()">
+    <i class="pi pi-plus"></i> Nueva categoría
+  </button>
+</div>
+
+<div class="category-intro">
+  <div class="category-intro-icon"><i class="pi pi-th-large"></i></div>
+  <div>
+    <strong>{{ categories().length }} categorías</strong>
+    <p>Una buena organización empieza por grupos claros.</p>
+  </div>
+  <span class="category-decoration">01 / 04</span>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel panel">
+    <i class="pi pi-spin pi-spinner"></i><span>Cargando categorías…</span>
+  </div>
+} @else if (categories().length) {
+  <div class="category-grid">
+    @for (
+      category of categories();
+      track category.id || category._id;
+      let index = $index
+    ) {
+      <article class="category-card">
+        <div class="category-card-top">
+          <span
+            class="category-icon"
+            [class]="'category-icon category-icon--' + (index % 4)"
+            ><i
+              [class]="
+                index % 4 === 0
+                  ? 'pi pi-shopping-bag'
+                  : index % 4 === 1
+                    ? 'pi pi-pencil'
+                    : index % 4 === 2
+                      ? 'pi pi-bolt'
+                      : 'pi pi-wrench'
+              "
+            ></i></span
+          ><span class="category-index">{{
+            (index + 1).toString().padStart(2, "0")
+          }}</span>
+        </div>
+        <h2>{{ category.name }}</h2>
+        <p>
+          {{
+            category.description ||
+              "Sin descripción. Agrega un detalle para reconocer esta categoría."
+          }}
+        </p>
+        <div class="category-card-bottom">
+          <span>Grupo de productos</span>
+          <div class="row-actions">
+            <button
+              class="icon-button"
+              title="Editar"
+              (click)="openEdit(category)"
+            >
+              <i class="pi pi-pencil"></i></button
+            ><button
+              class="icon-button icon-button--danger"
+              title="Eliminar"
+              (click)="remove(category)"
+            >
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+} @else {
+  <section class="panel">
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-tag"></i></span
+      ><strong>Organiza tus productos por categoría</strong>
+      <p>Empieza con grupos como Abarrotes, Papelería o Electrónica.</p>
+      <button class="button button-primary button-small" (click)="openCreate()">
+        <i class="pi pi-plus"></i> Crear primera categoría
+      </button>
+    </div>
+  </section>
+}
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
+    <section
+      class="form-dialog form-dialog--narrow"
+      role="dialog"
+      aria-modal="true"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">ORGANIZACIÓN</p>
+          <h2>{{ editingId ? "Editar categoría" : "Nueva categoría" }}</h2>
+        </div>
+        <button class="icon-button" (click)="dialogOpen.set(false)">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+      <form (ngSubmit)="save()" class="dialog-form">
+        <label class="form-field"
+          ><span>Nombre <b>*</b></span
+          ><input
+            [(ngModel)]="name"
+            name="name"
+            placeholder="Ej. Abarrotes"
+            required
+            minlength="2"
+            maxlength="100" /></label
+        ><label class="form-field form-field--spaced"
+          ><span>Descripción</span
+          ><textarea
+            [(ngModel)]="description"
+            name="description"
+            rows="4"
+            maxlength="500"
+            placeholder="¿Qué tipo de productos reúne?"
+          ></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button
+            type="button"
+            class="button button-secondary"
+            (click)="dialogOpen.set(false)"
+          >
+            Cancelar</button
+          ><button class="button button-primary" [disabled]="saving()">
+            <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i
+            >{{ saving() ? "Guardando…" : "Guardar categoría" }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

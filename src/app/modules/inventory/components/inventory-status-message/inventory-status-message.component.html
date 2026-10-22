@@ -1,0 +1,51 @@
+@let currentNotice = notice();
+@switch (currentNotice.type) {
+  @case ("loading") {
+    <div class="sidebar-tip sidebar-tip--muted">
+      <span class="tip-icon"><i class="pi pi-spin pi-spinner"></i></span>
+      <strong>Revisando inventario</strong>
+      <p>Consultando los niveles de existencias.</p>
+    </div>
+  }
+  @case ("out-of-stock") {
+    <a
+      class="sidebar-tip sidebar-tip--alert"
+      routerLink="/products"
+      [queryParams]="{ stockState: 'out_of_stock' }"
+    >
+      <span class="tip-icon"><i class="pi pi-exclamation-triangle"></i></span>
+      <strong>{{ currentNotice.count }} productos agotados</strong>
+      <p>Hay productos activos sin existencias.</p>
+      <span class="sidebar-tip-action">Revisar productos <i class="pi pi-arrow-right"></i></span>
+    </a>
+  }
+  @case ("low-stock") {
+    <a
+      class="sidebar-tip sidebar-tip--warning"
+      routerLink="/products"
+      [queryParams]="{ stockState: 'low_stock' }"
+    >
+      <span class="tip-icon"><i class="pi pi-exclamation-circle"></i></span>
+      <strong>{{ currentNotice.count }} productos con stock bajo</strong>
+      <p>Las existencias están en el mínimo o por debajo.</p>
+      <span class="sidebar-tip-action">Revisar productos <i class="pi pi-arrow-right"></i></span>
+    </a>
+  }
+  @case ("healthy") {
+    <div class="sidebar-tip sidebar-tip--healthy">
+      <span class="tip-icon"><i class="pi pi-check-circle"></i></span>
+      <strong>Todo en orden</strong>
+      <p>No hay productos agotados ni alertas de stock bajo.</p>
+    </div>
+  }
+  @default {
+    <div class="sidebar-tip sidebar-tip--muted">
+      <span class="tip-icon"><i class="pi pi-info-circle"></i></span>
+      <strong>Estado no disponible</strong>
+      <p>No pudimos consultar las existencias.</p>
+      <button class="sidebar-tip-action" type="button" (click)="refresh()">
+        Reintentar <i class="pi pi-refresh"></i>
+      </button>
+    </div>
+  }
+}
