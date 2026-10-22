@@ -19,6 +19,9 @@ export class CategoriesComponent implements OnInit {
 
   categories = signal<InventoryCategory[]>([]);
   loading = signal(true);
+  page = signal(1);
+  pageCount = signal(1);
+  categoryCount = signal(0);
   dialogOpen = signal(false);
   saving = signal(false);
   editingId: number | null = null;
@@ -32,14 +35,23 @@ export class CategoriesComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.inventory
-      .list<InventoryCategory>("/categories", { limit: 100 })
+      .list<InventoryCategory>("/categories", { page: this.page(), limit: 20 })
       .subscribe({
         next: (response) => {
           this.categories.set(response.data ?? []);
+          this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.categoryCount.set(response.pagination?.total ?? response.data.length);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),
       });
+  }
+
+  changePage(direction: -1 | 1): void {
+    const nextPage = this.page() + direction;
+    if (nextPage < 1 || nextPage > this.pageCount()) return;
+    this.page.set(nextPage);
+    this.load();
   }
 
   openCreate(): void {

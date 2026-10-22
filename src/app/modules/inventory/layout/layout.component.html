@@ -33,6 +33,9 @@
           @if (item.path === "/products") {
             <span class="nav-arrow">↗</span>
           }
+          @if (item.path === "/alerts" && alertCount()) {
+            <span class="nav-count">{{ alertCount() > 99 ? "99+" : alertCount() }}</span>
+          }
         </a>
       }
     </nav>
@@ -51,7 +54,7 @@
           }}</span>
           <span class="user-copy"
             ><strong>{{ user()?.fullName || "Mi cuenta" }}</strong
-            ><small>{{ user()?.email }}</small></span
+            ><small>Mi perfil · {{ user()?.email }}</small></span
           >
         </a>
         <button
@@ -86,6 +89,10 @@
           ><i class="pi pi-calendar"></i>
           {{ today | date: "EEEE, d MMMM" }}</span
         >
+        <a routerLink="/alerts" class="alert-bell" [attr.aria-label]="alertCount() ? alertCount() + ' alertas de stock' : 'Alertas de stock'" title="Alertas de stock">
+          <i class="pi pi-bell"></i>
+          @if (alertCount()) { <span>{{ alertCount() > 99 ? "99+" : alertCount() }}</span> }
+        </a>
         <a
           routerLink="/profile"
           class="topbar-avatar"
@@ -106,7 +113,7 @@
   </main>
 
   <nav class="mobile-tab-bar" aria-label="Navegación principal">
-    @for (item of navItems; track item.path) {
+    @for (item of mobileNavItems; track item.path) {
       <a
         [routerLink]="item.path"
         routerLinkActive="mobile-tab--active"

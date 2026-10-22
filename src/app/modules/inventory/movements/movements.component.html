@@ -18,7 +18,7 @@
   <div>
     <span class="eyebrow">CONTROL DE STOCK</span>
     <h2>El inventario se actualiza con cada movimiento.</h2>
-    <p>Registra compras, ventas, daños, pérdidas o ajustes manuales.</p>
+      <p>Las compras y ventas se registran en sus módulos; aquí gestionas daños, pérdidas y ajustes.</p>
   </div>
   <div class="movement-banner-decoration">
     <span>IN</span><i class="pi pi-arrow-right"></i><span>OUT</span>
@@ -30,7 +30,7 @@
     <div class="filter-title">
       <span class="panel-icon"><i class="pi pi-history"></i></span
       ><strong>Historial</strong
-      ><span class="filter-count">{{ movements().length }}</span>
+      ><span class="filter-count">{{ movementCount() }}</span>
     </div>
     <select [(ngModel)]="filterType" (change)="loadMovements()">
       <option value="">Todos los movimientos</option>
@@ -91,10 +91,10 @@
                 <div class="movement-products">
                   @for (
                     item of movement.items.slice(0, 3);
-                    track item.productId
+                    track $index
                   ) {
                     <span
-                      >{{ productName(item.productId) }}
+                      >{{ movementItemName(item) }}
                       <b
                         >{{ item.direction === "in" ? "+" : "−"
                         }}{{ item.quantity }}</b
@@ -123,15 +123,16 @@
       </table>
     </div>
     <div class="table-footer">
-      <span>{{ movements().length }} movimientos recientes</span
-      ><span>Las existencias reflejan cada registro</span>
+      <span>{{ movementCount() }} movimientos · página {{ page() }} de {{ pageCount() }}</span>
+      <span class="table-pagination-actions"><button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button><button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button></span>
+      <span>Las existencias reflejan cada registro</span>
     </div>
   } @else {
     <div class="empty-state">
       <span class="empty-icon"><i class="pi pi-history"></i></span
       ><strong>Aún no hay movimientos</strong>
       <p>
-        Registra la primera compra, venta o ajuste para empezar el historial.
+        Registra una compra, una venta o un ajuste para empezar el historial.
       </p>
       <button class="button button-primary button-small" (click)="openCreate()">
         <i class="pi pi-plus"></i> Registrar movimiento
@@ -163,8 +164,6 @@
           <label class="form-field"
             ><span>Tipo de movimiento <b>*</b></span
             ><select [(ngModel)]="type" name="type">
-              <option value="purchase">Compra a proveedor · entrada</option>
-              <option value="sale">Venta · salida</option>
               <option value="damage">Daño · salida</option>
               <option value="loss">Pérdida · salida</option>
               <option value="internal_use">Consumo interno · salida</option>
@@ -190,6 +189,7 @@
             <i class="pi pi-plus"></i> Agregar producto
           </button>
         </div>
+        <div class="product-picker-search"><input [(ngModel)]="productSearch" name="productSearch" (keyup.enter)="searchProducts()" placeholder="Buscar producto por nombre, SKU o código" aria-label="Buscar productos" /><button type="button" class="button button-secondary button-small" (click)="searchProducts()">Buscar producto</button></div>
         <div class="movement-item-list">
           @for (item of items; track $index) {
             <div class="movement-item-row">

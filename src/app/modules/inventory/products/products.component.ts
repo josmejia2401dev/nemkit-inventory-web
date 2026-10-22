@@ -9,6 +9,7 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { formatCurrency } from "../../../shared/utils/currency.util";
 
 @Component({
   selector: "app-products",
@@ -26,6 +27,9 @@ export class ProductsComponent implements OnInit {
   products = signal<InventoryProduct[]>([]);
   categories = signal<InventoryCategory[]>([]);
   loading = signal(true);
+  page = signal(1);
+  pageCount = signal(1);
+  productCount = signal(0);
   dialogOpen = signal(false);
   saving = signal(false);
   editingId: number | null = null;
@@ -33,6 +37,7 @@ export class ProductsComponent implements OnInit {
   categoryFilter: number | "" = "";
   statusFilter = "";
   stockState = "";
+  specificProductId: number | "" = "";
   form = this.emptyForm();
 
   ngOnInit(): void {
@@ -44,6 +49,11 @@ export class ProductsComponent implements OnInit {
         this.stockState = ["out_of_stock", "low_stock"].includes(stockState)
           ? stockState
           : "";
+        const productId = Number(params.get("productId"));
+        this.specificProductId = Number.isSafeInteger(productId) && productId > 0
+          ? productId
+          : "";
+        this.page.set(1);
         if (this.stockState) {
           this.search = "";
           this.categoryFilter = "";
@@ -54,9 +64,10 @@ export class ProductsComponent implements OnInit {
   }
 
   updateStockFilter(): void {
+    this.page.set(1);
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { stockState: this.stockState || null },
+      queryParams: { stockState: this.stockState || null, productId: null },
       queryParamsHandling: "merge",
     });
   }
@@ -69,23 +80,59 @@ export class ProductsComponent implements OnInit {
         categoryId: this.categoryFilter || undefined,
         status: this.statusFilter || undefined,
         stockState: this.stockState || undefined,
-        limit: 100,
+        productId: this.specificProductId || undefined,
+        page: this.page(),
+        limit: 20,
       })
       .subscribe({
         next: (response) => {
           this.products.set(response.data ?? []);
+          this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.productCount.set(response.pagination?.total ?? response.data.length);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),
       });
   }
 
-  loadCategories(): void {
-    this.inventory
-      .list<InventoryCategory>("/categories", { limit: 100 })
-      .subscribe({
-        next: (response) => this.categories.set(response.data ?? []),
+  changePage(direction: -1 | 1): void {
+    const nextPage = this.page() + direction;
+    if (nextPage < 1 || nextPage > this.pageCount()) return;
+    this.page.set(nextPage);
+    this.loadProducts();
+  }
+
+  applyFilters(): void {
+    if (this.specificProductId) {
+      this.specificProductId = "";
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { productId: null },
+        queryParamsHandling: "merge",
       });
+      return;
+    }
+    this.page.set(1);
+    this.loadProducts();
+  }
+
+  clearProductFocus(): void {
+    this.specificProductId = "";
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { productId: null },
+      queryParamsHandling: "merge",
+    });
+  }
+
+  formatMoney(value: number): string {
+    return formatCurrency(value);
+  }
+
+  loadCategories(): void {
+    this.inventory.listAll<InventoryCategory>("/categories").subscribe({
+      next: (categories) => this.categories.set(categories),
+    });
   }
 
   categoryName(id: number): string {

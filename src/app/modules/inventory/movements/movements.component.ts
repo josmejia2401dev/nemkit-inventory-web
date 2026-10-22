@@ -30,9 +30,12 @@ export class MovementsComponent implements OnInit {
   movements = signal<InventoryMovement[]>([]);
   products = signal<InventoryProduct[]>([]);
   loading = signal(true);
+  page = signal(1);
+  pageCount = signal(1);
+  movementCount = signal(0);
   dialogOpen = signal(false);
   saving = signal(false);
-  type = "purchase";
+  type = "manual_adjustment";
   notes = "";
   date = new Date().toISOString().slice(0, 10);
   items: Array<{
@@ -41,6 +44,7 @@ export class MovementsComponent implements OnInit {
     direction: "in" | "out";
   }> = [this.emptyItem()];
   filterType = "";
+  productSearch = "";
   labels = MOVEMENT_LABELS;
 
   ngOnInit(): void {
@@ -50,30 +54,61 @@ export class MovementsComponent implements OnInit {
 
   loadProducts(): void {
     this.inventory
-      .list<InventoryProduct>("/products", { limit: 100, status: "active" })
+      .list<InventoryProduct>("/products", {
+        limit: 100,
+        status: "active",
+        search: this.productSearch.trim() || undefined,
+      })
       .subscribe({
-        next: (response) => this.products.set(response.data ?? []),
+        next: (response) => {
+          const selectedIds = new Set(this.items.map((item) => Number(item.productId)).filter(Boolean));
+          const selectedProducts = this.products().filter((product) => selectedIds.has(product.id ?? product._id ?? 0));
+          const productsById = new Map<number, InventoryProduct>();
+          for (const product of [...selectedProducts, ...(response.data ?? [])]) {
+            productsById.set(product.id ?? product._id ?? 0, product);
+          }
+          this.products.set([...productsById.values()]);
+        },
       });
   }
 
+  searchProducts(): void {
+    this.loadProducts();
+  }
+
   loadMovements(): void {
+    this.page.set(1);
+    this.fetchMovements();
+  }
+
+  private fetchMovements(): void {
     this.loading.set(true);
     this.inventory
       .list<InventoryMovement>("/movements", {
-        limit: 100,
+        page: this.page(),
+        limit: 20,
         type: this.filterType || undefined,
       })
       .subscribe({
         next: (response) => {
           this.movements.set(response.data ?? []);
+          this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.movementCount.set(response.pagination?.total ?? response.data.length);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),
       });
   }
 
+  changePage(direction: -1 | 1): void {
+    const nextPage = this.page() + direction;
+    if (nextPage < 1 || nextPage > this.pageCount()) return;
+    this.page.set(nextPage);
+    this.fetchMovements();
+  }
+
   openCreate(): void {
-    this.type = "purchase";
+    this.type = "manual_adjustment";
     this.notes = "";
     this.date = new Date().toISOString().slice(0, 10);
     this.items = [this.emptyItem()];
@@ -102,6 +137,10 @@ export class MovementsComponent implements OnInit {
         (product) => (product.id ?? product._id) === productId,
       )?.name ?? `Producto #${productId}`
     );
+  }
+
+  movementItemName(item: { productId: number; name?: string }): string {
+    return item.name || this.productName(item.productId);
   }
 
   itemDirection(item: { direction: "in" | "out" }): "in" | "out" {

@@ -1,0 +1,58 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">RELACIONES COMERCIALES</p>
+    <h1>{{ title }}</h1>
+    <p class="heading-subtitle">Mantén a mano los datos de las personas y negocios con los que trabajas.</p>
+  </div>
+  <button class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo {{ singular }}</button>
+</div>
+
+<section class="panel catalog-panel">
+  <div class="filter-bar">
+    <div class="filter-title"><span class="panel-icon"><i [class]="isSupplier ? 'pi pi-truck' : 'pi pi-users'"></i></span><strong>{{ title }}</strong><span class="filter-count">{{ contacts().length }}</span></div>
+    <input class="contact-search" [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Buscar por nombre, documento o correo" aria-label="Buscar contactos" />
+    <button class="icon-button filter-refresh" title="Buscar" (click)="applySearch()"><i class="pi pi-search"></i></button>
+  </div>
+  @if (loading()) {
+    <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando {{ title.toLowerCase() }}…</span></div>
+  } @else if (contacts().length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead><tr><th>NOMBRE</th><th>DOCUMENTO</th><th>TELÉFONO</th><th>CORREO</th>@if (isSupplier) { <th>DIRECCIÓN</th> }<th></th></tr></thead>
+        <tbody>
+          @for (contact of contacts(); track contact.id || contact._id) {
+            <tr>
+              <td data-label="Nombre"><strong>{{ contact.name }}</strong></td>
+              <td data-label="Documento">{{ contact.document || "—" }}</td>
+              <td data-label="Teléfono">{{ contact.phone || "—" }}</td>
+              <td data-label="Correo">{{ contact.email || "—" }}</td>
+              @if (isSupplier) { <td data-label="Dirección">{{ contact.address || "—" }}</td> }
+              <td class="row-actions-cell"><div class="row-actions"><button class="icon-button" title="Editar" (click)="openEdit(contact)"><i class="pi pi-pencil"></i></button><button class="icon-button icon-button--danger" title="Eliminar" (click)="remove(contact)"><i class="pi pi-trash"></i></button></div></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer"><span>{{ contactCount() }} registros · página {{ page() }} de {{ pageCount() }}</span><span class="table-pagination-actions"><button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button><button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button></span></div>
+  } @else {
+    <div class="empty-state"><span class="empty-icon"><i [class]="isSupplier ? 'pi pi-truck' : 'pi pi-users'"></i></span><strong>Aún no tienes {{ title.toLowerCase() }}</strong><p>Agrega tu primer {{ singular }} para usarlo en los documentos comerciales.</p><button class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Crear {{ singular }}</button></div>
+  }
+</section>
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
+    <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="dialog-heading"><div><p class="eyebrow">RELACIONES COMERCIALES</p><h2>{{ editingId ? "Editar" : "Nuevo" }} {{ singular }}</h2></div><button class="icon-button" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button></div>
+      <form (ngSubmit)="save()" class="dialog-form">
+        <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="form.name" name="name" required minlength="2" maxlength="160" autocomplete="organization" /></label>
+        <div class="form-grid">
+          <label class="form-field"><span>NIT / Documento</span><input [(ngModel)]="form.document" name="document" maxlength="40" /></label>
+          <label class="form-field"><span>Teléfono</span><input [(ngModel)]="form.phone" name="phone" type="tel" maxlength="40" /></label>
+          <label class="form-field form-field--wide"><span>Correo</span><input [(ngModel)]="form.email" name="email" type="email" maxlength="254" autocomplete="email" /></label>
+          @if (isSupplier) { <label class="form-field form-field--wide"><span>Dirección</span><input [(ngModel)]="form.address" name="address" maxlength="300" autocomplete="street-address" /></label> }
+        </div>
+        <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button><button class="button button-primary" [disabled]="saving()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Guardar" }}</button></div>
+      </form>
+    </section>
+  </div>
+}

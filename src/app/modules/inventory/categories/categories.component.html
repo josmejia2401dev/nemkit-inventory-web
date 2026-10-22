@@ -14,7 +14,7 @@
 <div class="category-intro">
   <div class="category-intro-icon"><i class="pi pi-th-large"></i></div>
   <div>
-    <strong>{{ categories().length }} categorías</strong>
+    <strong>{{ categoryCount() }} categorías</strong>
     <p>Una buena organización empieza por grupos claros.</p>
   </div>
   <span class="category-decoration">01 / 04</span>
@@ -79,6 +79,7 @@
       </article>
     }
   </div>
+  <div class="table-pagination-actions"><button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button><span>Página {{ page() }} de {{ pageCount() }}</span><button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button></div>
 } @else {
   <section class="panel">
     <div class="empty-state">

@@ -13,19 +13,20 @@
 
 <section class="panel catalog-panel">
   <div class="filter-bar">
+    @if (specificProductId) { <button class="button button-secondary button-small" (click)="clearProductFocus()">Quitar filtro del producto</button> }
     <label class="search-box"
       ><i class="pi pi-search"></i
       ><input
         [(ngModel)]="search"
-        (keyup.enter)="loadProducts()"
+        (keyup.enter)="applyFilters()"
         placeholder="Buscar por nombre, SKU o código…" /><button
         *ngIf="search"
         class="clear-search"
-        (click)="search = ''; loadProducts()"
+        (click)="search = ''; applyFilters()"
       >
         <i class="pi pi-times"></i></button
     ></label>
-    <select [(ngModel)]="categoryFilter" (change)="loadProducts()">
+    <select [(ngModel)]="categoryFilter" (change)="applyFilters()">
       <option value="">Todas las categorías</option>
       @for (category of categories(); track category.id || category._id) {
         <option [ngValue]="category.id || category._id">
@@ -38,7 +39,7 @@
       <option value="out_of_stock">Agotados</option>
       <option value="low_stock">Stock bajo</option>
     </select>
-    <select [(ngModel)]="statusFilter" (change)="loadProducts()">
+    <select [(ngModel)]="statusFilter" (change)="applyFilters()">
       <option value="">Todos los estados</option>
       <option value="active">Activos</option>
       <option value="inactive" [disabled]="!!stockState">Inactivos</option>
@@ -46,7 +47,7 @@
     <button
       class="icon-button filter-refresh"
       title="Actualizar"
-      (click)="loadProducts()"
+      (click)="applyFilters()"
     >
       <i class="pi pi-refresh"></i>
     </button>
@@ -99,10 +100,7 @@
                 {{ categoryName(product.categoryId) }}
               </td>
               <td class="price-cell" data-label="Precio de venta">
-                {{
-                  product.salePrice
-                    | currency: "COP" : "symbol-narrow" : "1.0-0" : "es-CO"
-                }}
+                {{ formatMoney(product.salePrice) }}
               </td>
               <td data-label="Stock">
                 <span
@@ -148,8 +146,9 @@
       </table>
     </div>
     <div class="table-footer">
-      <span>{{ products().length }} productos encontrados</span
-      ><span>El stock cambia al registrar movimientos</span>
+      <span>{{ productCount() }} productos · página {{ page() }} de {{ pageCount() }}</span>
+      <span class="table-pagination-actions"><button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button><button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button></span>
+      <span>El stock cambia al registrar movimientos</span>
     </div>
   } @else {
     <div class="empty-state">

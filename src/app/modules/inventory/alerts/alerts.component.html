@@ -1,0 +1,34 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ATENCIÓN DE EXISTENCIAS</p>
+    <h1>Alertas de stock</h1>
+    <p class="heading-subtitle">Revisa los productos agotados o por debajo de su mínimo.</p>
+  </div>
+  <button class="button button-secondary" (click)="refresh()"><i class="pi pi-refresh"></i> Actualizar</button>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Revisando existencias…</span></div>
+} @else {
+  @if (alerts(); as data) {
+  <div class="stat-grid alert-stat-grid">
+    <article class="stat-card stat-card--rose"><div class="stat-top"><span class="stat-icon"><i class="pi pi-times-circle"></i></span><span class="stat-note">SIN EXISTENCIAS</span></div><strong class="stat-value">{{ data.outOfStock | number }}</strong><span class="stat-label">Productos agotados</span></article>
+    <article class="stat-card stat-card--amber"><div class="stat-top"><span class="stat-icon"><i class="pi pi-exclamation-triangle"></i></span><span class="stat-note">REABASTECER</span></div><strong class="stat-value">{{ data.lowStock | number }}</strong><span class="stat-label">Productos con stock bajo</span></article>
+  </div>
+
+  <section class="panel catalog-panel">
+    <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i class="pi pi-bell"></i></span><strong>Productos que requieren atención</strong><span class="filter-count">{{ data.products.length }}</span></div></div>
+    @if (data.products.length) {
+      <div class="table-scroll"><table class="inventory-table"><thead><tr><th>PRODUCTO</th><th>CATEGORÍA</th><th>STOCK ACTUAL</th><th>STOCK MÍNIMO</th><th>ESTADO</th><th></th></tr></thead><tbody>
+        @for (product of data.products; track product.id) {
+          <tr><td data-label="Producto"><strong>{{ product.name }}</strong><small class="table-subtext">{{ product.sku }}</small></td><td data-label="Categoría">{{ product.categoryName || "—" }}</td><td data-label="Stock actual"><strong>{{ product.stock }}</strong></td><td data-label="Stock mínimo">{{ product.minimumStock }}</td><td data-label="Estado"><span class="alert-state" [class.alert-state--empty]="product.state === 'out_of_stock'"><i [class]="product.state === 'out_of_stock' ? 'pi pi-times-circle' : 'pi pi-exclamation-triangle'"></i>{{ product.state === "out_of_stock" ? "Agotado" : "Stock bajo" }}</span></td><td data-label="Acción"><a class="button button-secondary button-small" [routerLink]="'/products'" [queryParams]="{ stockState: product.state, productId: product.id }">Ver producto</a></td></tr>
+        }
+      </tbody></table></div>
+    } @else {
+      <div class="empty-state"><span class="empty-icon"><i class="pi pi-check-circle"></i></span><strong>Todo el stock está en nivel suficiente</strong><p>Cuando un producto llegue a su mínimo, aparecerá aquí.</p><a routerLink="/products" class="button button-primary button-small">Ver productos</a></div>
+    }
+  </section>
+  } @else {
+    <div class="empty-state panel"><strong>No pudimos consultar las alertas</strong><p>Comprueba la conexión con el servidor e inténtalo de nuevo.</p><button class="button button-primary button-small" (click)="refresh()">Intentar de nuevo</button></div>
+  }
+}

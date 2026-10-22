@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { Observable, Subject, tap } from "rxjs";
+import { EMPTY, Observable, Subject, expand, reduce, tap } from "rxjs";
 import { environment } from "../../../environments/environment";
 
 export interface InventoryProduct {
@@ -27,6 +27,41 @@ export interface InventoryCategory {
   description?: string;
 }
 
+export interface InventoryContact {
+  id?: number;
+  _id?: number;
+  name: string;
+  document?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+}
+
+export interface InventoryDocumentItem {
+  productId: number;
+  sku: string;
+  name: string;
+  quantity: number;
+  unitCost?: number;
+  unitPrice?: number;
+  lineTotal: number;
+}
+
+export interface InventoryDocument {
+  id: number;
+  _id?: number;
+  supplierId?: number;
+  supplierSnapshot?: InventoryContact;
+  customerId?: number | null;
+  customerSnapshot?: InventoryContact;
+  movementId: number;
+  date: string;
+  status: "completed";
+  notes?: string;
+  items: InventoryDocumentItem[];
+  total: number;
+}
+
 export interface InventoryMovement {
   id: number;
   _id?: number;
@@ -35,6 +70,8 @@ export interface InventoryMovement {
   notes?: string;
   items: Array<{
     productId: number;
+    name?: string;
+    sku?: string;
     quantity: number;
     direction: "in" | "out";
     unitCost?: number;
@@ -53,6 +90,62 @@ export interface InventoryDashboardSummary {
     name: string;
     sku: string;
     unitsSold: number;
+  }>;
+}
+
+export interface InventoryStockAlert {
+  id: number;
+  name: string;
+  sku: string;
+  stock: number;
+  minimumStock: number;
+  categoryName: string;
+  state: "out_of_stock" | "low_stock";
+}
+
+export interface InventoryStockAlerts {
+  outOfStock: number;
+  lowStock: number;
+  products: InventoryStockAlert[];
+}
+
+export interface InventoryReportProduct {
+  id: number;
+  sku: string;
+  name: string;
+  categoryName: string;
+  status: "active" | "inactive";
+  stock: number;
+  minimumStock: number;
+  purchasePrice: number;
+  salePrice: number;
+  inventoryCost: number;
+  potentialSales: number;
+}
+
+export interface InventoryReportMovement extends InventoryMovement {
+  type: string;
+  notes: string;
+  items: Array<{
+    productId: number;
+    name: string;
+    sku: string;
+    quantity: number;
+    direction: "in" | "out";
+    unitCost?: number;
+    unitPrice?: number;
+  }>;
+}
+
+export interface InventorySalesReport {
+  groupBy: "day" | "week" | "month";
+  totals: { salesCount: number; unitsSold: number; revenue: number; grossProfit: number };
+  periods: Array<{
+    periodStart: string;
+    salesCount: number;
+    unitsSold: number;
+    revenue: number;
+    grossProfit: number;
   }>;
 }
 
@@ -106,6 +199,23 @@ export class InventoryService {
     return this.http.get<PageResult<T>>(`${this.baseUrl}${path}`, {
       params: httpParams,
     });
+  }
+
+  listAll<T>(
+    path: string,
+    params?: Record<string, string | number | undefined>,
+  ): Observable<T[]> {
+    const firstPage = this.list<T>(path, { ...params, page: 1, limit: 100 });
+    return firstPage.pipe(
+      expand((response) => {
+        const currentPage = response.pagination?.page ?? 1;
+        const totalPages = response.pagination?.totalPages ?? 1;
+        return currentPage < totalPages
+          ? this.list<T>(path, { ...params, page: currentPage + 1, limit: 100 })
+          : EMPTY;
+      }),
+      reduce((items, response) => items.concat(response.data ?? []), [] as T[]),
+    );
   }
 
   post<T>(
