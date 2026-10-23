@@ -36,15 +36,25 @@
               } @else if (order.paymentStatus === "paid") {
                 <p class="kitchen-payment kitchen-payment--paid"><i class="pi pi-check-circle"></i> Pagado</p>
               }
+
+              <!-- Acción principal del cocinero: avanzar el estado, botón grande para tocar rápido -->
+              @if (next(order); as n) {
+                <button class="kitchen-advance" (click)="advance(order)">
+                  <i [class]="n.icon"></i><span>{{ n.label }}</span>
+                </button>
+              }
+
               <div class="kitchen-card-foot">
                 <small>{{ order.employeeSnapshot?.name || "—" }}</small>
                 <span class="kitchen-card-actions">
-                  <button class="button-link-danger" (click)="openCancel(order)" title="Cancelar pedido"><i class="pi pi-ban"></i> Cancelar</button>
-                  @if (order.paymentStatus === "pending") {
-                    <button class="button button-secondary button-small" (click)="pay(order)"><i class="pi pi-dollar"></i> Cobrar</button>
+                  @if (order.kitchenStatus !== "ready") {
+                    <button class="kitchen-mini" (click)="serve(order)" title="Marcar como servido">✓ Servir</button>
                   }
-                  @if (next(order); as n) {
-                    <button class="button button-primary button-small" (click)="advance(order)">{{ n.label }}</button>
+                  @if (canCharge && order.paymentStatus === "pending") {
+                    <button class="kitchen-mini kitchen-mini--pay" (click)="pay(order)" title="Cobrar"><i class="pi pi-dollar"></i> Cobrar</button>
+                  }
+                  @if (canCharge) {
+                    <button class="kitchen-mini kitchen-mini--danger" (click)="openCancel(order)" title="Cancelar pedido"><i class="pi pi-ban"></i></button>
                   }
                 </span>
               </div>

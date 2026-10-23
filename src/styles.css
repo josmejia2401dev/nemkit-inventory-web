@@ -1546,10 +1546,15 @@ a { color: inherit; text-decoration: none; }
 
 /* Dashboard: secciones ampliadas (clientes, domicilios, equipo) */
 .dashboard-extra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; align-items: start; }
-.dashboard-extra-grid > .panel { display: flex; flex-direction: column; }
+/* El .panel base no trae padding (lo ponen sus hijos como .panel-heading). Estas
+   tarjetas usan report-title-row/report-summary, que no lo traen, así que el
+   contenido quedaba pegado a los bordes. Les damos padding propio. */
+.dashboard-extra-grid > .panel { display: flex; flex-direction: column; padding: 20px 21px; }
 /* Dentro de estos paneles (más angostos que la página de reportes) el resumen
    de 4 métricas se acomoda en 2×2 para que no quede apretado ni desalineado. */
 .dashboard-extra-grid .report-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 0; }
+.dashboard-extra-grid .report-title-row { margin-bottom: 14px; }
+.dashboard-extra-grid .table-scroll { margin: 0 -21px -20px; }
 .dashboard-extra-grid .report-summary strong { font-size: clamp(16px, 2vw, 20px); }
 .dashboard-extra-grid .report-summary small { font-size: 10px; }
 
@@ -1591,9 +1596,22 @@ a { color: inherit; text-decoration: none; }
 .kitchen-payment { display: inline-flex; align-items: center; gap: 5px; margin: 10px 0 0; padding: 5px 9px; border-radius: 99px; font-size: 11px; font-weight: 650; }
 .kitchen-payment--pending { color: #946200; background: #fff5e0; }
 .kitchen-payment--paid { color: #397453; background: #edf5ee; }
-.kitchen-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(36,65,52,.07); }
+/* Acción principal del cocinero: botón grande, fácil de tocar con prisa */
+.kitchen-advance { display: flex; width: 100%; align-items: center; justify-content: center; gap: 9px; margin-top: 12px; padding: 13px; border: 0; border-radius: 11px; background: #276650; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .15s ease, transform .1s ease; }
+.kitchen-advance:hover { background: #1c5140; }
+.kitchen-advance:active { transform: scale(.98); }
+.kitchen-advance i { font-size: 15px; }
+.kitchen-col--pending .kitchen-advance { background: #b98a2e; }
+.kitchen-col--pending .kitchen-advance:hover { background: #9d7526; }
+.kitchen-col--ready .kitchen-advance { background: #2f7c52; }
+.kitchen-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(36,65,52,.07); }
 .kitchen-card-foot small { color: #a0aaa3; font-size: 10px; }
 .kitchen-card-actions { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.kitchen-mini { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid rgba(36,65,52,.16); border-radius: 8px; background: #fff; color: #53675b; font-size: 11px; font-weight: 650; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.kitchen-mini:hover { background: #f4f7f1; }
+.kitchen-mini--pay { border-color: #cfe0d4; color: #2f7c52; }
+.kitchen-mini--danger { border-color: #eecdc9; color: #b4453b; }
+.kitchen-mini--danger:hover { background: #fdecea; }
 .kitchen-empty { padding: 20px; text-align: center; color: #b4bdb5; font-size: 12px; }
 .auth-select { width: 100%; border: 0; outline: 0; background: transparent; font-size: 14px; color: #27402f; }
 @media (max-width: 860px) {

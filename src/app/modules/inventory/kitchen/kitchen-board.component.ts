@@ -5,6 +5,7 @@ import { interval } from "rxjs";
 import { InventoryService } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
+import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 import {
   CancelOrderDialogComponent,
@@ -33,10 +34,10 @@ const STATUS_LABELS: Record<KitchenStatus, string> = {
   served: "Servido",
 };
 
-const NEXT: Record<KitchenStatus, { status: KitchenStatus; label: string } | null> = {
-  pending: { status: "preparing", label: "Empezar a preparar" },
-  preparing: { status: "ready", label: "Marcar listo" },
-  ready: { status: "served", label: "Marcar servido" },
+const NEXT: Record<KitchenStatus, { status: KitchenStatus; label: string; icon: string } | null> = {
+  pending: { status: "preparing", label: "Empezar a preparar", icon: "pi pi-play" },
+  preparing: { status: "ready", label: "Marcar listo", icon: "pi pi-check" },
+  ready: { status: "served", label: "Marcar servido", icon: "pi pi-flag" },
   served: null,
 };
 
@@ -50,10 +51,17 @@ export class KitchenBoardComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
+  private store = inject(AuthStore);
   private destroyRef = inject(DestroyRef);
 
   readonly columns: KitchenStatus[] = ["pending", "preparing", "ready"];
   readonly statusLabels = STATUS_LABELS;
+
+  /** El cocinero solo prepara: no cobra ni cancela (eso es de mesero/caja). */
+  get canCharge(): boolean {
+    const roles: string[] = this.store.user()?.roles ?? [];
+    return roles.some((r) => ["CASHIER", "SELLER", "WAITER", "ADMIN", "SUPERADMIN"].includes(r));
+  }
 
   orders = signal<KitchenOrder[]>([]);
   loading = signal(true);
@@ -89,10 +97,24 @@ export class KitchenBoardComponent implements OnInit {
   advance(order: KitchenOrder): void {
     const n = NEXT[order.kitchenStatus];
     if (!n) return;
-    this.inventory.put(`/kitchen/${order.id}`, { kitchenStatus: n.status }).subscribe({
+    this.setStatus(order, n.status, STATUS_LABELS[n.status]);
+  }
+
+  /** Atajo: marcar el pedido como servido directamente (cocina rápida). */
+  serve(order: KitchenOrder): void {
+    if (order.kitchenStatus === "served") return;
+    this.setStatus(order, "served", STATUS_LABELS.served);
+  }
+
+  private setStatus(order: KitchenOrder, status: KitchenStatus, label: string): void {
+    this.inventory.put(`/kitchen/${order.id}`, { kitchenStatus: status }).subscribe({
       next: () => {
-        this.notifications.success(`Pedido #${order.id}`, `Ahora: ${STATUS_LABELS[n.status]}.`);
+        this.notifications.success(`Pedido #${order.id}`, `Ahora: ${label}.`);
         this.load(true);
+      },
+      error: (err) => {
+        const detail = err?.error?.message || "No se pudo cambiar el estado.";
+        this.notifications.error("No se pudo actualizar", detail);
       },
     });
   }
