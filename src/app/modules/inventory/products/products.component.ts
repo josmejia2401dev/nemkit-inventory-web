@@ -254,7 +254,8 @@ export class ProductsComponent implements OnInit {
       barcode: this.form.barcode.trim(),
       name: this.form.name.trim(),
       description: this.form.description.trim(),
-      purchasePrice: Number(this.form.purchasePrice),
+      // Precio de compra opcional: si queda vacío, se envía 0.
+      purchasePrice: Number(this.form.purchasePrice) || 0,
       salePrice: Number(this.form.salePrice),
       minimumStock: Number(this.form.minimumStock),
       status: this.form.status,

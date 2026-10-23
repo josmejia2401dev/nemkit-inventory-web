@@ -29,7 +29,10 @@
           <td data-label="Total"><strong>{{ formatMoney(document.total) }}</strong></td>
           <td data-label="Estado">
             @if (isSale && document.status === "void") {
-              <span class="document-status document-status--void"><i class="pi pi-ban"></i> Anulada</span>
+              <span class="document-status document-status--void"><i class="pi pi-ban"></i> Cancelada</span>
+              @if (document.voidReason || document.voidNote) {
+                <small class="table-subtext">{{ cancelReasonLabel(document.voidReason) }}{{ document.voidNote ? (document.voidReason ? " · " : "") + document.voidNote : "" }}</small>
+              }
             } @else if (isSale && document.paymentStatus === "pending") {
               <span class="document-status document-status--pending"><i class="pi pi-clock"></i> Por cobrar</span>
             } @else {
@@ -39,6 +42,9 @@
           <td data-label="Acciones">
             @if (isPending(document)) {
               <button class="button button-primary button-small" title="Registrar cobro" (click)="pay(document)"><i class="pi pi-dollar"></i> Cobrar</button>
+            }
+            @if (canCancel(document)) {
+              <button class="button-link-danger" title="Cancelar pedido" (click)="openCancel(document)"><i class="pi pi-ban"></i> Cancelar</button>
             }
             <button class="icon-button" title="Ver detalle e imprimir" aria-label="Ver detalle e imprimir" (click)="openDocument(document)"><i class="pi pi-eye"></i></button>
           </td>
@@ -116,7 +122,7 @@
         <div class="transaction-items">
           @for (item of items; track $index) {
             <div class="transaction-item">
-              <label class="form-field transaction-product"><span>Producto</span><select [(ngModel)]="item.productId" [name]="'product-' + $index" (ngModelChange)="productChanged(item)" required><option value="">Selecciona producto</option>@for (product of products(); track product.id || product._id) { <option [ngValue]="product.id || product._id" [disabled]="isSale && product.stock < 1">{{ product.name }} · {{ product.sku }} · {{ product.stock }} disp.</option> }</select></label>
+              <label class="form-field transaction-product"><span>Producto</span><select [(ngModel)]="item.productId" [name]="'product-' + $index" (ngModelChange)="productChanged(item)" required><option value="">Selecciona producto</option>@for (product of products(); track product.id || product._id) { <option [ngValue]="product.id || product._id" [disabled]="isSale && product.type !== 'prepared' && product.stock < 1">{{ product.name }} · {{ product.sku }}{{ product.type === "prepared" ? " · Plato" : " · " + product.stock + " disp." }}</option> }</select></label>
               <label class="form-field transaction-quantity"><span>Cantidad</span><input type="number" min="1" step="1" [(ngModel)]="item.quantity" [name]="'quantity-' + $index" required /></label>
               <label class="form-field transaction-price"><span>{{ isSale ? "Precio unitario" : "Costo unitario" }}</span><input type="number" min="0" step="0.01" [(ngModel)]="item.amount" [name]="'amount-' + $index" required />@if (isSale) { @if (productFor(item); as product) { <small class="price-guidance">Costo {{ formatMoney(product.purchasePrice) }} · Catálogo {{ formatMoney(product.salePrice) }}</small><strong class="price-margin" [class.price-margin--negative]="(margin(item) ?? 0) < 0">Margen bruto {{ formatMoney(margin(item) ?? 0) }} @if (marginPercent(item) !== null) { ({{ marginPercent(item) | number: "1.0-1" }}%) }</strong> } }</label>
               <div class="transaction-line-total"><small>Subtotal</small><strong>{{ formatMoney(lineTotal(item)) }}</strong></div>
@@ -155,4 +161,12 @@
       <div class="dialog-actions receipt-screen-actions"><button class="button button-secondary" (click)="closeDocument()">Cerrar</button><button class="button button-primary" (click)="printDocument()"><i class="pi pi-print"></i> Imprimir / Guardar PDF</button></div>
     </section>
   </div>
+}
+
+@if (cancellingDocument(); as document) {
+  <app-cancel-order-dialog
+    [title]="'Cancelar pedido #' + (document.id || document._id)"
+    (confirm)="confirmCancel($event)"
+    (cancel)="cancellingDocument.set(null)"
+  />
 }

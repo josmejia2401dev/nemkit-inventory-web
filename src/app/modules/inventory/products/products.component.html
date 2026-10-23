@@ -258,7 +258,7 @@
             </select></label
           >
           <label class="form-field"
-            ><span>Precio de compra <b>*</b></span>
+            ><span>Precio de compra <small class="field-optional">(opcional)</small></span>
             <div class="money-input">
               <span>$</span
               ><input
@@ -267,9 +267,11 @@
                 step="1"
                 [(ngModel)]="form.purchasePrice"
                 name="purchasePrice"
-                required
-              /></div
-          ></label>
+              /></div>
+            @if (form.type === "prepared") {
+              <small class="field-hint-inline">Los platos no se compran: su costo sale de la receta.</small>
+            }</label
+          >
           <label class="form-field"
             ><span>Precio de venta <b>*</b></span>
             <div class="money-input">
