@@ -54,7 +54,11 @@ export class FeedbackComponent {
         this.type = "bug";
         this.notifications.success("Reporte enviado", "Gracias por ayudarnos a mejorar.");
       },
-      error: () => this.saving.set(false),
+      error: (err) => {
+        this.saving.set(false);
+        const detail = err?.error?.message || "No se pudo enviar el reporte. Intenta de nuevo.";
+        this.notifications.error("No se pudo enviar", detail);
+      },
     });
   }
 

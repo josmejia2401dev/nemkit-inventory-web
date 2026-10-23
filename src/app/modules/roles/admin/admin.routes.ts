@@ -67,12 +67,6 @@ export const adminRoutes: Routes = [
         path: "tables",
         loadComponent: () => import("../../inventory/tables/tables.component").then((m) => m.TablesComponent),
       },
-      {
-        // Bandeja global de reportes: solo el super admin.
-        path: "feedback-inbox",
-        canActivate: [roleGuard(["SUPERADMIN"])],
-        loadComponent: () => import("../../inventory/feedback/feedback-inbox.component").then((m) => m.FeedbackInboxComponent),
-      },
       ...foundationProfileRoutes,
       ...foundationFeedbackRoutes,
     ],

@@ -16,7 +16,7 @@ export type AppRole =
   | "USER";
 
 const ROLE_HOME: Record<string, string> = {
-  SUPERADMIN: "/admin",
+  SUPERADMIN: "/superadmin",
   ADMIN: "/admin",
   CASHIER: "/cashier",
   SELLER: "/seller",

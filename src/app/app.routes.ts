@@ -1,6 +1,7 @@
 import { Routes } from "@angular/router";
 import { foundationAuthRoutes } from "./foundation/auth/auth.routes";
 import { rootRedirectGuard } from "./core/guards/root-redirect.guard";
+import { superadminRoutes } from "./modules/roles/superadmin/superadmin.routes";
 import { adminRoutes } from "./modules/roles/admin/admin.routes";
 import { cashierRoutes } from "./modules/roles/cashier/cashier.routes";
 import { sellerRoutes } from "./modules/roles/seller/seller.routes";
@@ -12,6 +13,7 @@ import { cookRoutes } from "./modules/roles/cook/cook.routes";
 export const routes: Routes = [
   ...foundationAuthRoutes,
   // Cada bloque de rol vive bajo su propio prefijo y está protegido por roleGuard.
+  ...superadminRoutes,
   ...adminRoutes,
   ...cashierRoutes,
   ...sellerRoutes,

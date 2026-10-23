@@ -33,11 +33,6 @@ export class AdminShellComponent {
     { path: "/admin/employees", label: "Empleados", icon: "pi pi-id-card" },
   ];
 
-  private get isSuperAdmin(): boolean {
-    const roles: string[] = this.store.user()?.roles ?? [];
-    return roles.includes("SUPERADMIN");
-  }
-
   navItems: NavItem[] = this.buildNav();
 
   private buildNav(): NavItem[] {
@@ -45,10 +40,6 @@ export class AdminShellComponent {
     // "Mesas" solo tiene sentido en restaurantes.
     if (this.store.company()?.businessType === "restaurant") {
       items.push({ path: "/admin/tables", label: "Mesas", icon: "pi pi-stop" });
-    }
-    // Bandeja global de reportes de usuarios: exclusiva del super admin.
-    if (this.isSuperAdmin) {
-      items.push({ path: "/admin/feedback-inbox", label: "Reportes de usuarios", icon: "pi pi-inbox" });
     }
     return items;
   }
