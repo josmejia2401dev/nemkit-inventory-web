@@ -16,17 +16,36 @@ import { formatCurrency } from "../../../shared/utils/currency.util";
 const STATUS_LABELS: Record<DeliveryStatus, string> = {
   pending: "Pendiente",
   preparing: "Preparando",
-  on_route: "En ruta",
+  ready: "Listo para recoger",
+  picked_up: "Recogido",
+  on_route: "En camino",
   delivered: "Entregado",
   cancelled: "Cancelado",
 };
 
+/**
+ * Siguiente estado en la FASE DE REPARTO (lo que puede hacer el domiciliario).
+ * pending/preparing los dicta la cocina, por eso no tienen "siguiente" aquí: el
+ * domiciliario espera a que la cocina marque "listo para recoger".
+ */
 const NEXT_STATUS: Record<DeliveryStatus, DeliveryStatus | null> = {
-  pending: "preparing",
-  preparing: "on_route",
+  // En tienda (sin cocina) el domiciliario recoge desde 'pending'. En
+  // restaurante normalmente lo hace al llegar a 'ready', pero puede recoger
+  // antes si quiere. En todos los casos el siguiente paso es "recogido".
+  pending: "picked_up",
+  preparing: "picked_up",
+  ready: "picked_up",
+  picked_up: "on_route",
   on_route: "delivered",
   delivered: null,
   cancelled: null,
+};
+
+/** Etiqueta del botón para avanzar al siguiente estado de reparto. */
+const NEXT_ACTION_LABELS: Partial<Record<DeliveryStatus, string>> = {
+  picked_up: "Marcar recogido",
+  on_route: "Salir en camino",
+  delivered: "Marcar entregado",
 };
 
 @Component({
@@ -52,7 +71,9 @@ export class DeliveriesComponent implements OnInit {
     { value: "", label: "Todos" },
     { value: "pending", label: "Pendientes" },
     { value: "preparing", label: "Preparando" },
-    { value: "on_route", label: "En ruta" },
+    { value: "ready", label: "Listos" },
+    { value: "picked_up", label: "Recogidos" },
+    { value: "on_route", label: "En camino" },
     { value: "delivered", label: "Entregados" },
     { value: "cancelled", label: "Cancelados" },
   ];
@@ -83,7 +104,13 @@ export class DeliveriesComponent implements OnInit {
 
   nextStatusLabel(status: DeliveryStatus): string | null {
     const next = NEXT_STATUS[status];
-    return next ? STATUS_LABELS[next] : null;
+    return next ? (NEXT_ACTION_LABELS[next] ?? STATUS_LABELS[next]) : null;
+  }
+
+  /** En restaurante, mostrar que la cocina está trabajando el pedido. */
+  isInKitchenPhase(status: DeliveryStatus): boolean {
+    const isRestaurant = this.store.company()?.businessType === "restaurant";
+    return isRestaurant && (status === "pending" || status === "preparing");
   }
 
   money(value: number | undefined): string {
@@ -140,8 +167,8 @@ export class DeliveriesComponent implements OnInit {
   advance(delivery: InventoryDelivery): void {
     const next = NEXT_STATUS[delivery.status];
     if (!next) return;
-    if (next === "on_route" && !delivery.courierId) {
-      this.notifications.warn("Asigna un domiciliario", "Antes de poner el pedido en ruta.");
+    if ((next === "picked_up" || next === "on_route") && !delivery.courierId) {
+      this.notifications.warn("Asigna un domiciliario", "Antes de recoger o despachar el pedido.");
       return;
     }
     this.changeStatus(delivery, next);

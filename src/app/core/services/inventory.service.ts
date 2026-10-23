@@ -118,6 +118,8 @@ export interface InventoryDocumentItem {
 export type DeliveryStatus =
   | "pending"
   | "preparing"
+  | "ready"
+  | "picked_up"
   | "on_route"
   | "delivered"
   | "cancelled";
@@ -144,6 +146,8 @@ export interface InventoryDelivery {
   courierId?: number | null;
   courierSnapshot?: { name?: string };
   timeline?: {
+    readyAt?: string | null;
+    pickedUpAt?: string | null;
     dispatchedAt?: string | null;
     deliveredAt?: string | null;
     cancelledAt?: string | null;

@@ -41,6 +41,9 @@
                   }
                 </select>
               }
+              @if (isInKitchenPhase(delivery.status)) {
+                <small class="delivery-waiting"><i class="pi pi-clock"></i> La cocina está preparando el pedido</small>
+              }
               @if (nextStatusLabel(delivery.status)) {
                 <button class="button button-primary button-small" (click)="advance(delivery)"><i class="pi pi-arrow-right"></i> {{ nextStatusLabel(delivery.status) }}</button>
               }

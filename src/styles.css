@@ -1537,9 +1537,12 @@ a { color: inherit; text-decoration: none; }
 .delivery-card-actions { margin-top: auto; padding: 12px 14px; border-top: 1px solid rgba(36,65,52,.07); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .delivery-courier-select { flex: 1 1 100%; min-height: 34px; border: 1px solid rgba(36,65,52,.14); border-radius: 8px; padding: 0 8px; font-size: 12px; }
 .delivery-delivered-at { color: #a0aaa3; font-size: 10px; }
+.delivery-waiting { display: inline-flex; align-items: center; gap: 5px; color: #8a7636; font-size: 10px; font-weight: 600; }
 .delivery-draft-total { display: flex; justify-content: space-between; align-items: center; margin: 14px 0; padding-top: 12px; border-top: 1px solid rgba(36,65,52,.08); font-size: 14px; }
 .status-pill--pending { color: #8a7636; background: #f6f0dd; }
 .status-pill--preparing { color: #5b6672; background: #e7ebef; }
+.status-pill--ready { color: #2f7c52; background: #e3f1e8; }
+.status-pill--picked_up { color: #7a5aa0; background: #efe8f6; }
 .status-pill--on_route { color: #2f5a86; background: #dceaf6; }
 .status-pill--delivered { color: #397453; background: #edf5ee; }
 .status-pill--cancelled { color: #a85a4a; background: #f6e6e1; }
