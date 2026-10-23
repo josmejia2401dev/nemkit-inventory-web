@@ -38,6 +38,15 @@
     </nav>
 
     <div class="sidebar-bottom">
+      <a
+        [routerLink]="reportPath"
+        routerLinkActive="report-link--active"
+        class="report-link"
+        aria-label="Reportar un problema"
+        (click)="closeSidebar()"
+      >
+        <i class="pi pi-flag"></i><span>Reportar un problema</span>
+      </a>
       <div class="user-row">
         <a
           [routerLink]="profilePath"

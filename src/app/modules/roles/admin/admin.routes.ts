@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { AdminShellComponent } from "./admin-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
+import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
 
 export const adminRoutes: Routes = [
   {
@@ -66,7 +67,14 @@ export const adminRoutes: Routes = [
         path: "tables",
         loadComponent: () => import("../../inventory/tables/tables.component").then((m) => m.TablesComponent),
       },
+      {
+        // Bandeja global de reportes: solo el super admin.
+        path: "feedback-inbox",
+        canActivate: [roleGuard(["SUPERADMIN"])],
+        loadComponent: () => import("../../inventory/feedback/feedback-inbox.component").then((m) => m.FeedbackInboxComponent),
+      },
       ...foundationProfileRoutes,
+      ...foundationFeedbackRoutes,
     ],
   },
 ];

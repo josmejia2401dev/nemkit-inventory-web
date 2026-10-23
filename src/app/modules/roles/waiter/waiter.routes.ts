@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { WaiterShellComponent } from "./waiter-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
+import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
 
 export const waiterRoutes: Routes = [
   {
@@ -33,6 +34,7 @@ export const waiterRoutes: Routes = [
         loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
       },
       ...foundationProfileRoutes,
+      ...foundationFeedbackRoutes,
     ],
   },
 ];

@@ -1,0 +1,48 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">AYÚDANOS A MEJORAR</p>
+    <h1>Reportar un problema</h1>
+    <p class="heading-subtitle">Cuéntanos sobre un error, un hallazgo o una idea. Tu reporte llega directo al equipo.</p>
+  </div>
+</div>
+
+<section class="panel feedback-panel">
+  @if (sent()) {
+    <div class="feedback-sent">
+      <span class="feedback-sent-icon"><i class="pi pi-check-circle"></i></span>
+      <strong>¡Reporte enviado!</strong>
+      <p>Gracias por tomarte el tiempo. Lo revisaremos pronto.</p>
+      <button class="button button-secondary" (click)="reset()"><i class="pi pi-plus"></i> Enviar otro</button>
+    </div>
+  } @else {
+    <form (ngSubmit)="submit()" class="dialog-form">
+      <label class="form-field">
+        <span>Tipo de reporte</span>
+        <div class="feedback-types">
+          @for (option of types; track option.value) {
+            <button type="button" class="feedback-type" [class.feedback-type--active]="type === option.value" (click)="type = option.value">
+              <i [class]="option.icon"></i><span>{{ option.label }}</span>
+            </button>
+          }
+        </div>
+      </label>
+
+      <label class="form-field">
+        <span>Título <b>*</b></span>
+        <input [(ngModel)]="title" name="title" maxlength="160" required placeholder="Ej. No puedo guardar una venta" />
+      </label>
+
+      <label class="form-field">
+        <span>Descripción <b>*</b></span>
+        <textarea [(ngModel)]="description" name="description" rows="6" maxlength="4000" required placeholder="¿Qué pasó? ¿Qué esperabas que pasara? Pasos para reproducirlo si aplica."></textarea>
+        <small class="field-hint-inline">{{ description.length }}/4000</small>
+      </label>
+
+      <div class="dialog-actions">
+        <button class="button button-primary" [disabled]="saving()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-send'"></i>{{ saving() ? "Enviando…" : "Enviar reporte" }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { WarehouseShellComponent } from "./warehouse-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
+import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
 
 export const warehouseRoutes: Routes = [
   {
@@ -41,6 +42,7 @@ export const warehouseRoutes: Routes = [
         loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
       },
       ...foundationProfileRoutes,
+      ...foundationFeedbackRoutes,
     ],
   },
 ];

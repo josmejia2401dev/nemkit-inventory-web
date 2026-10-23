@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { CourierShellComponent } from "./courier-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
+import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
 
 export const courierRoutes: Routes = [
   {
@@ -22,6 +23,7 @@ export const courierRoutes: Routes = [
           import("../../inventory/deliveries/deliveries.component").then((m) => m.DeliveriesComponent),
       },
       ...foundationProfileRoutes,
+      ...foundationFeedbackRoutes,
     ],
   },
 ];

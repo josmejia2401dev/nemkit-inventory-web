@@ -54,6 +54,8 @@ export class LayoutComponent implements OnInit {
   @Input() alertsPath = "/alerts";
   /** Ruta del perfil del rol. */
   @Input() profilePath = "/profile";
+  /** Ruta del formulario para reportar un problema (transversal). */
+  @Input() reportPath = "/feedback";
 
   sidebarOpen = signal(false);
   alertCount = signal(0);
@@ -85,6 +87,8 @@ export class LayoutComponent implements OnInit {
     const segments = this.router.url.split("/").filter(Boolean);
     const last = segments[segments.length - 1] ?? "";
     if (last === "profile") return "Mi perfil";
+    if (last === "feedback") return "Reportar un problema";
+    if (last === "feedback-inbox") return "Reportes de usuarios";
     return this.navItems.find((item) => item.path.endsWith(last))?.label ?? "Resumen";
   }
 

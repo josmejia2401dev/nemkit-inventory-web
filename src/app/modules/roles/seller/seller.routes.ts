@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { SellerShellComponent } from "./seller-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
+import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
 
 export const sellerRoutes: Routes = [
   {
@@ -29,6 +30,7 @@ export const sellerRoutes: Routes = [
         loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
       },
       ...foundationProfileRoutes,
+      ...foundationFeedbackRoutes,
     ],
   },
 ];

@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { CashierShellComponent } from "./cashier-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
+import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
 
 export const cashierRoutes: Routes = [
   {
@@ -29,6 +30,7 @@ export const cashierRoutes: Routes = [
         loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
       },
       ...foundationProfileRoutes,
+      ...foundationFeedbackRoutes,
     ],
   },
 ];

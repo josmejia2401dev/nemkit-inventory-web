@@ -1,0 +1,74 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">SUPER ADMIN</p>
+    <h1>Reportes de usuarios</h1>
+    <p class="heading-subtitle">Bugs, hallazgos y sugerencias enviados desde todas las empresas.</p>
+  </div>
+  <button class="button button-secondary" (click)="load()"><i class="pi pi-refresh"></i> Actualizar</button>
+</div>
+
+<section class="panel">
+  <div class="filter-bar">
+    <div class="filter-title"><span class="panel-icon"><i class="pi pi-inbox"></i></span><strong>Bandeja</strong><span class="filter-count">{{ items().length }}</span></div>
+    <div class="feedback-filters">
+      <input [(ngModel)]="search" name="search" (keyup.enter)="load()" placeholder="Buscar por título o descripción" aria-label="Buscar reportes" />
+      <select [(ngModel)]="statusFilter" name="statusFilter" (ngModelChange)="load()" aria-label="Filtrar por estado">
+        <option value="">Todos los estados</option>
+        @for (status of statuses; track status) { <option [value]="status">{{ statusLabels[status] }}</option> }
+      </select>
+      <select [(ngModel)]="typeFilter" name="typeFilter" (ngModelChange)="load()" aria-label="Filtrar por tipo">
+        <option value="">Todos los tipos</option>
+        <option value="bug">Error</option>
+        <option value="suggestion">Sugerencia</option>
+        <option value="other">Otro</option>
+      </select>
+      <button class="button button-secondary button-small" (click)="load()"><i class="pi pi-search"></i> Buscar</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando reportes…</span></div>
+  } @else if (items().length) {
+    <div class="table-scroll"><table class="inventory-table">
+      <thead><tr><th>TIPO</th><th>TÍTULO</th><th>REPORTADO POR</th><th>FECHA</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
+      <tbody>@for (item of items(); track item.id || item._id) {
+        <tr>
+          <td data-label="Tipo"><span class="feedback-tag feedback-tag--{{ item.type }}"><i [class]="typeIcon(item.type)"></i> {{ typeLabels[item.type] }}</span></td>
+          <td data-label="Título"><strong>{{ item.title }}</strong></td>
+          <td data-label="Reportado por"><span>{{ item.userSnapshot?.fullName || item.userSnapshot?.email || "—" }}</span>@if (item.userSnapshot?.companyName) { <small class="table-subtext">{{ item.userSnapshot?.companyName }}</small> }</td>
+          <td data-label="Fecha">{{ item.createdAt | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</td>
+          <td data-label="Estado"><span class="feedback-status feedback-status--{{ item.status }}">{{ statusLabels[item.status] }}</span></td>
+          <td data-label="Acciones"><button class="icon-button" title="Ver detalle" aria-label="Ver detalle" (click)="open(item)"><i class="pi pi-eye"></i></button></td>
+        </tr>
+      }</tbody>
+    </table></div>
+  } @else {
+    <div class="empty-state"><span class="empty-icon"><i class="pi pi-inbox"></i></span><strong>Sin reportes</strong><p>Cuando los usuarios envíen bugs o sugerencias, aparecerán aquí.</p></div>
+  }
+</section>
+
+@if (selected(); as item) {
+  <div class="dialog-backdrop" (click)="close()">
+    <section class="form-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">{{ typeLabels[item.type] }} · #{{ item.id || item._id }}</p><h2>{{ item.title }}</h2></div>
+        <button class="icon-button" (click)="close()"><i class="pi pi-times"></i></button>
+      </div>
+      <div class="feedback-detail">
+        <div class="feedback-detail-meta">
+          <span><i class="pi pi-user"></i> {{ item.userSnapshot?.fullName || item.userSnapshot?.email || "—" }}</span>
+          @if (item.userSnapshot?.companyName) { <span><i class="pi pi-building"></i> {{ item.userSnapshot?.companyName }}</span> }
+          <span><i class="pi pi-calendar"></i> {{ item.createdAt | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</span>
+        </div>
+        <p class="feedback-detail-body">{{ item.description }}</p>
+        <div class="feedback-detail-status">
+          <span>Estado:</span>
+          @for (status of statuses; track status) {
+            <button class="button button-small" [class.button-primary]="item.status === status" [class.button-secondary]="item.status !== status" (click)="changeStatus(item, status)">{{ statusLabels[status] }}</button>
+          }
+        </div>
+      </div>
+      <div class="dialog-actions"><button class="button button-secondary" (click)="close()">Cerrar</button></div>
+    </section>
+  </div>
+}
