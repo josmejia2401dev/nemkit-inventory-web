@@ -23,22 +23,11 @@ const STATUS_LABELS: Record<DeliveryStatus, string> = {
   cancelled: "Cancelado",
 };
 
-/**
- * Siguiente estado en la FASE DE REPARTO (lo que puede hacer el domiciliario).
- * pending/preparing los dicta la cocina, por eso no tienen "siguiente" aquí: el
- * domiciliario espera a que la cocina marque "listo para recoger".
- */
-const NEXT_STATUS: Record<DeliveryStatus, DeliveryStatus | null> = {
-  // En tienda (sin cocina) el domiciliario recoge desde 'pending'. En
-  // restaurante normalmente lo hace al llegar a 'ready', pero puede recoger
-  // antes si quiere. En todos los casos el siguiente paso es "recogido".
-  pending: "picked_up",
-  preparing: "picked_up",
+/** Siguiente paso de reparto una vez el domiciliario tiene el pedido. */
+const REPARTO_NEXT: Partial<Record<DeliveryStatus, DeliveryStatus>> = {
   ready: "picked_up",
   picked_up: "on_route",
   on_route: "delivered",
-  delivered: null,
-  cancelled: null,
 };
 
 /** Etiqueta del botón para avanzar al siguiente estado de reparto. */
@@ -102,15 +91,27 @@ export class DeliveriesComponent implements OnInit {
     return STATUS_LABELS[status];
   }
 
-  nextStatusLabel(status: DeliveryStatus): string | null {
-    const next = NEXT_STATUS[status];
+  /**
+   * Siguiente estado que puede fijar el domiciliario para este pedido.
+   * - Restaurante (fromKitchen): solo puede recoger cuando la cocina marca
+   *   "listo". En pending/preparing no hay acción (espera a la cocina).
+   * - Tienda (sin cocina): puede recoger directamente desde "pending".
+   */
+  private nextStatusFor(delivery: InventoryDelivery): DeliveryStatus | null {
+    const s = delivery.status;
+    if (REPARTO_NEXT[s]) return REPARTO_NEXT[s]!;
+    if (!delivery.fromKitchen && (s === "pending" || s === "preparing")) return "picked_up";
+    return null;
+  }
+
+  nextStatusLabel(delivery: InventoryDelivery): string | null {
+    const next = this.nextStatusFor(delivery);
     return next ? (NEXT_ACTION_LABELS[next] ?? STATUS_LABELS[next]) : null;
   }
 
-  /** En restaurante, mostrar que la cocina está trabajando el pedido. */
-  isInKitchenPhase(status: DeliveryStatus): boolean {
-    const isRestaurant = this.store.company()?.businessType === "restaurant";
-    return isRestaurant && (status === "pending" || status === "preparing");
+  /** En restaurante, el pedido sigue en cocina y el domiciliario debe esperar. */
+  isWaitingForKitchen(delivery: InventoryDelivery): boolean {
+    return !!delivery.fromKitchen && (delivery.status === "pending" || delivery.status === "preparing");
   }
 
   money(value: number | undefined): string {
@@ -165,7 +166,7 @@ export class DeliveriesComponent implements OnInit {
   }
 
   advance(delivery: InventoryDelivery): void {
-    const next = NEXT_STATUS[delivery.status];
+    const next = this.nextStatusFor(delivery);
     if (!next) return;
     if ((next === "picked_up" || next === "on_route") && !delivery.courierId) {
       this.notifications.warn("Asigna un domiciliario", "Antes de recoger o despachar el pedido.");

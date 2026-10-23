@@ -41,11 +41,11 @@
                   }
                 </select>
               }
-              @if (isInKitchenPhase(delivery.status)) {
-                <small class="delivery-waiting"><i class="pi pi-clock"></i> La cocina está preparando el pedido</small>
+              @if (isWaitingForKitchen(delivery)) {
+                <small class="delivery-waiting"><i class="pi pi-clock"></i> Esperando a que la cocina marque "listo"</small>
               }
-              @if (nextStatusLabel(delivery.status)) {
-                <button class="button button-primary button-small" (click)="advance(delivery)"><i class="pi pi-arrow-right"></i> {{ nextStatusLabel(delivery.status) }}</button>
+              @if (nextStatusLabel(delivery); as nextLabel) {
+                <button class="button button-primary button-small" (click)="advance(delivery)"><i class="pi pi-arrow-right"></i> {{ nextLabel }}</button>
               }
               <button class="button button-secondary button-small" (click)="cancel(delivery)">Cancelar</button>
             } @else if (delivery.status === "delivered") {

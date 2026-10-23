@@ -128,6 +128,8 @@ export interface InventoryDelivery {
   id: number;
   _id?: number;
   saleId?: number | null;
+  // Restaurante: el pedido pasa por cocina (solo se recoge cuando está "listo").
+  fromKitchen?: boolean;
   customerId: number;
   customerSnapshot: { name: string; phone?: string };
   address: string;
