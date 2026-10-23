@@ -241,14 +241,9 @@ export class ProductsComponent implements OnInit {
     const isPrepared = this.form.type === "prepared";
     let recipe: Array<{ ingredientId: number; quantity: number }> | undefined;
     if (isPrepared) {
+      // La receta es opcional: si el restaurante no define insumos, el plato se
+      // guarda igual (la venta no descontará insumos). Solo enviamos los válidos.
       const valid = this.form.recipe.filter((ri) => ri.ingredientId && Number(ri.quantity) > 0);
-      if (!valid.length) {
-        this.notifications.warn(
-          "Falta la receta",
-          "Un plato necesita al menos un insumo con cantidad.",
-        );
-        return;
-      }
       recipe = valid.map((ri) => ({ ingredientId: Number(ri.ingredientId), quantity: Number(ri.quantity) }));
     }
 

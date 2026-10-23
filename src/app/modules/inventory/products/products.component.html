@@ -314,11 +314,11 @@
         @if (form.type === "prepared") {
           <div class="recipe-editor">
             <div class="items-heading">
-              <div><span class="eyebrow">RECETA</span><strong>Insumos del plato</strong></div>
+              <div><span class="eyebrow">RECETA · OPCIONAL</span><strong>Insumos del plato</strong></div>
               <button type="button" class="button button-secondary button-small" (click)="addRecipeItem()"><i class="pi pi-plus"></i> Agregar insumo</button>
             </div>
             @if (!form.recipe.length) {
-              <p class="form-hint"><i class="pi pi-info-circle"></i> Agrega los insumos que consume este plato. Al venderlo se descontarán del stock.</p>
+              <p class="form-hint"><i class="pi pi-info-circle"></i> Opcional. Si agregas insumos, al vender el plato se descontarán del stock. Si lo dejas vacío, el plato se vende sin descontar insumos.</p>
             }
             @for (ri of form.recipe; track $index) {
               <div class="recipe-row">
