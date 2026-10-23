@@ -1,0 +1,121 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">EQUIPO DE TRABAJO</p>
+    <h1>Empleados</h1>
+    <p class="heading-subtitle">Registra a tu equipo y asígnale un cargo para operar ventas, compras y domicilios.</p>
+  </div>
+  <button class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo empleado</button>
+</div>
+
+<section class="panel catalog-panel">
+  <div class="filter-bar">
+    <div class="filter-title"><span class="panel-icon"><i class="pi pi-id-card"></i></span><strong>Empleados</strong><span class="filter-count">{{ employees().length }}</span></div>
+    <select class="contact-search" [(ngModel)]="roleFilter" (change)="applySearch()" aria-label="Filtrar por cargo">
+      <option value="">Todos los cargos</option>
+      @for (option of roleOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+    <input class="contact-search" [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Buscar por nombre, documento o correo" aria-label="Buscar empleados" />
+    <button class="icon-button filter-refresh" title="Buscar" (click)="applySearch()"><i class="pi pi-search"></i></button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando empleados…</span></div>
+  } @else if (employees().length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr><th>NOMBRE</th><th>DOCUMENTO</th><th>CARGO</th><th>TELÉFONO</th><th>CORREO</th><th>ESTADO</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (employee of employees(); track employee.id || employee._id) {
+            <tr>
+              <td data-label="Nombre"><strong>{{ employee.name }}</strong></td>
+              <td data-label="Documento">{{ employee.documentType }} {{ employee.documentNumber || "—" }}</td>
+              <td data-label="Cargo">{{ roleLabel(employee.role) }}</td>
+              <td data-label="Teléfono">{{ employee.phone || "—" }}</td>
+              <td data-label="Correo">{{ employee.email || "—" }}</td>
+              <td data-label="Estado">
+                <span class="status-pill" [class.status-pill--off]="employee.status === 'inactive'">
+                  {{ employee.status === 'inactive' ? 'Inactivo' : 'Activo' }}
+                </span>
+              </td>
+              <td class="row-actions-cell">
+                <div class="row-actions">
+                  <button class="icon-button" title="Editar" (click)="openEdit(employee)"><i class="pi pi-pencil"></i></button>
+                  <button class="icon-button icon-button--danger" title="Eliminar" (click)="remove(employee)"><i class="pi pi-trash"></i></button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <span>{{ employeeCount() }} registros · página {{ page() }} de {{ pageCount() }}</span>
+      <span class="table-pagination-actions">
+        <button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button>
+        <button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button>
+      </span>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-id-card"></i></span>
+      <strong>Aún no tienes empleados</strong>
+      <p>Agrega a tu primer colaborador y asígnale un cargo.</p>
+      <button class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Crear empleado</button>
+    </div>
+  }
+</section>
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
+    <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">EQUIPO DE TRABAJO</p><h2>{{ editingId ? "Editar" : "Nuevo" }} empleado</h2></div>
+        <button class="icon-button" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button>
+      </div>
+      <form (ngSubmit)="save()" class="dialog-form">
+        <label class="form-field"><span>Nombre completo <b>*</b></span><input [(ngModel)]="form.name" name="name" required minlength="2" maxlength="160" autocomplete="name" /></label>
+        <div class="form-grid">
+          <label class="form-field"><span>Tipo de documento</span>
+            <select [(ngModel)]="form.documentType" name="documentType">
+              @for (option of documentTypeOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-field"><span>Número de documento</span><input [(ngModel)]="form.documentNumber" name="documentNumber" maxlength="40" /></label>
+          <label class="form-field"><span>Cargo <b>*</b></span>
+            <select [(ngModel)]="form.role" name="role" required>
+              <option value="" disabled>Selecciona un cargo</option>
+              @for (option of roleOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-field"><span>Estado</span>
+            <select [(ngModel)]="form.status" name="status">
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select>
+          </label>
+          <label class="form-field"><span>Teléfono</span><input [(ngModel)]="form.phone" name="phone" type="tel" maxlength="40" autocomplete="tel" /></label>
+          <label class="form-field"><span>Fecha de ingreso</span><input [(ngModel)]="form.hireDate" name="hireDate" type="date" /></label>
+          <label class="form-field form-field--wide"><span>Correo @if (!editingId) { <b>*</b> }</span><input [(ngModel)]="form.email" name="email" type="email" maxlength="254" autocomplete="email" [required]="!editingId" [disabled]="!!editingId" /></label>
+          @if (!editingId) {
+            <label class="form-field form-field--wide"><span>Contraseña de acceso <b>*</b></span><input [(ngModel)]="form.password" name="password" type="password" minlength="6" maxlength="128" autocomplete="new-password" required /></label>
+          }
+        </div>
+        @if (!editingId) {
+          <p class="form-hint"><i class="pi pi-info-circle"></i> Con este correo y contraseña el empleado podrá iniciar sesión. Queda activo de inmediato.</p>
+        }
+        <div class="dialog-actions">
+          <button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button>
+          <button class="button button-primary" [disabled]="saving()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Guardar" }}</button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

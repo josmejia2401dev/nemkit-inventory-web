@@ -27,6 +27,7 @@ export class RegisterComponent {
   private router = inject(Router);
 
   fullName = "";
+  companyName = "";
   email = "";
   password = "";
   error = signal<string | null>(null);
@@ -38,6 +39,7 @@ export class RegisterComponent {
     this.api
       .post<any>("/auth/register", {
         fullName: this.fullName,
+        companyName: this.companyName,
         email: this.email,
         password: this.password,
       })
@@ -47,6 +49,7 @@ export class RegisterComponent {
             response.data.user,
             response.data.accessToken,
             response.data.refreshToken,
+            response.data.company,
           );
           this.loading.set(false);
           this.router.navigate(["/dashboard"]);

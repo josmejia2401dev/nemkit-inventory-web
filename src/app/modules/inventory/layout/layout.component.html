@@ -15,7 +15,7 @@
     <a routerLink="/dashboard" class="brand" (click)="closeSidebar()">
       <span class="brand-mark"><i class="pi pi-box"></i></span>
       <span class="brand-copy"
-        ><strong>nemkit</strong><small>INVENTARIO</small></span
+        ><strong>{{ company()?.name || "nemkit" }}</strong><small>INVENTARIO</small></span
       >
     </a>
 
@@ -41,7 +41,6 @@
     </nav>
 
     <div class="sidebar-bottom">
-      <app-inventory-status-message />
       <div class="user-row">
         <a
           routerLink="/profile"

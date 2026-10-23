@@ -1,0 +1,83 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">LOGÍSTICA Y ENTREGAS</p>
+    <h1>Domicilios</h1>
+    <p class="heading-subtitle">Los domicilios se crean al registrar una venta con entrega. Aquí los gestionas: asigna domiciliarios y sigue cada entrega.</p>
+  </div>
+</div>
+
+<section class="panel catalog-panel">
+  <div class="delivery-status-tabs" role="tablist" aria-label="Filtrar por estado">
+    @for (filter of statusFilters; track filter.value) {
+      <button [class.delivery-status-tab--active]="statusFilter === filter.value" (click)="applyFilter(filter.value)">{{ filter.label }}</button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando domicilios…</span></div>
+  } @else if (deliveries().length) {
+    <div class="delivery-grid">
+      @for (delivery of deliveries(); track delivery.id) {
+        <article class="delivery-card">
+          <header class="delivery-card-head">
+            <div><strong>#{{ delivery.id }}</strong><small>{{ delivery.createdAt | date: "d MMM, HH:mm" : "" : "es-CO" }}</small></div>
+            <span class="status-pill status-pill--{{ delivery.status }}">{{ statusLabel(delivery.status) }}</span>
+          </header>
+
+          <div class="delivery-card-body">
+            <p class="delivery-customer"><i class="pi pi-user"></i> <strong>{{ delivery.customerSnapshot.name }}</strong>@if (delivery.customerSnapshot.phone) { <span>· {{ delivery.customerSnapshot.phone }}</span> }</p>
+            <p class="delivery-address"><i class="pi pi-map-marker"></i> {{ delivery.address }}</p>
+            <p class="delivery-meta"><span>{{ delivery.items.length }} {{ delivery.items.length === 1 ? "producto" : "productos" }}</span><strong>{{ money(delivery.total) }}</strong></p>
+            <p class="delivery-courier"><i class="pi pi-send"></i> {{ delivery.courierSnapshot?.name || "Sin domiciliario" }}</p>
+          </div>
+
+          <footer class="delivery-card-actions">
+            @if (delivery.status !== "delivered" && delivery.status !== "cancelled") {
+              <select class="delivery-courier-select" [ngModel]="delivery.courierId ?? ''" (ngModelChange)="assignCourier(delivery, $event)" aria-label="Asignar domiciliario">
+                <option value="">Asignar domiciliario</option>
+                @for (courier of couriers(); track courier.id || courier._id) {
+                  <option [ngValue]="courier.id || courier._id">{{ courier.name }}</option>
+                }
+              </select>
+              @if (nextStatusLabel(delivery.status)) {
+                <button class="button button-primary button-small" (click)="advance(delivery)"><i class="pi pi-arrow-right"></i> {{ nextStatusLabel(delivery.status) }}</button>
+              }
+              <button class="button button-secondary button-small" (click)="cancel(delivery)">Cancelar</button>
+            } @else if (delivery.status === "delivered") {
+              <button class="button button-secondary button-small" (click)="openProof(delivery)"><i class="pi pi-camera"></i> Evidencia</button>
+              <button class="button button-secondary button-small" (click)="voidDelivery(delivery)"><i class="pi pi-undo"></i> Anular</button>
+              @if (delivery.timeline?.deliveredAt) { <small class="delivery-delivered-at">Entregado {{ delivery.timeline?.deliveredAt | date: "d MMM, HH:mm" : "" : "es-CO" }}</small> }
+            }
+          </footer>
+        </article>
+      }
+    </div>
+    <div class="table-footer">
+      <span>{{ deliveryCount() }} domicilios · página {{ page() }} de {{ pageCount() }}</span>
+      <span class="table-pagination-actions">
+        <button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button>
+        <button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button>
+      </span>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-send"></i></span>
+      <strong>Aún no hay domicilios</strong>
+      <p>Registra una venta marcando "Entrega a domicilio" y aparecerá aquí.</p>
+      <a routerLink="/sales" class="button button-primary button-small"><i class="pi pi-receipt"></i> Ir a ventas</a>
+    </div>
+  }
+</section>
+
+@if (proofOpen() && proofDelivery(); as delivery) {
+  <div class="dialog-backdrop" (click)="proofOpen.set(false)">
+    <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" aria-label="Evidencia de entrega" (click)="$event.stopPropagation()">
+      <div class="dialog-heading"><div><p class="eyebrow">EVIDENCIA DE ENTREGA</p><h2>Domicilio #{{ delivery.id }}</h2></div><button class="icon-button" (click)="proofOpen.set(false)"><i class="pi pi-times"></i></button></div>
+      <form (ngSubmit)="saveProof()" class="dialog-form">
+        <label class="form-field"><span>Foto (URL)</span><input [(ngModel)]="proofPhotoUrl" name="proofPhotoUrl" type="url" maxlength="2048" placeholder="https://…" /></label>
+        <label class="form-field"><span>Observación</span><textarea [(ngModel)]="proofObservation" name="proofObservation" rows="3" maxlength="1000" placeholder="Quién recibió, estado del pedido, etc."></textarea></label>
+        <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="proofOpen.set(false)">Cerrar</button><button class="button button-primary"><i class="pi pi-check"></i> Guardar evidencia</button></div>
+      </form>
+    </section>
+  </div>
+}

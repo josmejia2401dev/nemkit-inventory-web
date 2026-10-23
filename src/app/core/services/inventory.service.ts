@@ -27,6 +27,8 @@ export interface InventoryCategory {
   description?: string;
 }
 
+export type LoyaltyTier = "bronze" | "silver" | "gold" | "platinum";
+
 export interface InventoryContact {
   id?: number;
   _id?: number;
@@ -35,6 +37,53 @@ export interface InventoryContact {
   phone?: string;
   email?: string;
   address?: string;
+  birthDate?: string | null;
+  loyaltyTier?: LoyaltyTier;
+  stats?: {
+    totalSpent?: number;
+    purchaseCount?: number;
+    firstPurchaseAt?: string | null;
+    lastPurchaseAt?: string | null;
+  };
+}
+
+export interface CustomerProfile {
+  customer: InventoryContact;
+  history: {
+    data: Array<{
+      id: number;
+      date: string;
+      total: number;
+      items: InventoryDocumentItem[];
+      employeeSnapshot?: { name?: string };
+    }>;
+    pagination: { page: number; limit: number; total: number; totalPages: number };
+  };
+}
+
+export type EmployeeRole =
+  | "admin"
+  | "cashier"
+  | "seller"
+  | "courier"
+  | "warehouse"
+  | "waiter";
+
+export type DocumentType = "CC" | "CE" | "NIT" | "PAS" | "TI";
+
+export interface InventoryEmployee {
+  id?: number;
+  _id?: number;
+  name: string;
+  documentType?: DocumentType;
+  documentNumber?: string;
+  phone?: string;
+  email?: string;
+  role: EmployeeRole;
+  hireDate?: string;
+  status?: "active" | "inactive";
+  photo?: { url?: string; storageKey?: string };
+  linkedUserId?: number | null;
 }
 
 export interface InventoryDocumentItem {
@@ -47,6 +96,47 @@ export interface InventoryDocumentItem {
   lineTotal: number;
 }
 
+export type DeliveryStatus =
+  | "pending"
+  | "preparing"
+  | "on_route"
+  | "delivered"
+  | "cancelled";
+
+export interface InventoryDelivery {
+  id: number;
+  _id?: number;
+  saleId?: number | null;
+  customerId: number;
+  customerSnapshot: { name: string; phone?: string };
+  address: string;
+  location?: { lat?: number | null; lng?: number | null };
+  items: Array<{
+    productId: number;
+    sku: string;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    lineTotal: number;
+  }>;
+  total: number;
+  notes?: string;
+  status: DeliveryStatus;
+  courierId?: number | null;
+  courierSnapshot?: { name?: string };
+  timeline?: {
+    dispatchedAt?: string | null;
+    deliveredAt?: string | null;
+    cancelledAt?: string | null;
+  };
+  proof?: {
+    photo?: { url?: string };
+    signature?: { url?: string };
+    observation?: string;
+  };
+  createdAt?: string;
+}
+
 export interface InventoryDocument {
   id: number;
   _id?: number;
@@ -54,6 +144,8 @@ export interface InventoryDocument {
   supplierSnapshot?: InventoryContact;
   customerId?: number | null;
   customerSnapshot?: InventoryContact;
+  employeeId?: number | null;
+  employeeSnapshot?: { name?: string };
   movementId: number;
   date: string;
   status: "completed";
@@ -68,6 +160,8 @@ export interface InventoryMovement {
   date: string;
   type: string;
   notes?: string;
+  employeeId?: number | null;
+  employeeSnapshot?: { name?: string };
   items: Array<{
     productId: number;
     name?: string;
@@ -91,6 +185,21 @@ export interface InventoryDashboardSummary {
     sku: string;
     unitsSold: number;
   }>;
+  customers?: { total: number; new: number; frequent: number; vip: number };
+  topEmployees?: Array<{
+    employeeId: number;
+    employeeName: string;
+    salesCount: number;
+    revenue: number;
+  }>;
+  deliveries?: {
+    pending: number;
+    preparing: number;
+    onRoute: number;
+    delivered: number;
+    cancelled: number;
+    avgDeliveryMinutes: number | null;
+  };
 }
 
 export interface InventoryStockAlert {
@@ -147,6 +256,27 @@ export interface InventorySalesReport {
     revenue: number;
     grossProfit: number;
   }>;
+}
+
+export interface InventorySalesByEmployeeRow {
+  employeeId: number | null;
+  employeeName: string;
+  salesCount: number;
+  unitsSold: number;
+  revenue: number;
+  grossProfit: number;
+}
+
+export interface InventorySalesByEmployeeReport {
+  generatedAt: string;
+  totals: {
+    employeeCount: number;
+    salesCount: number;
+    unitsSold: number;
+    revenue: number;
+    grossProfit: number;
+  };
+  employees: InventorySalesByEmployeeRow[];
 }
 
 export interface PageResult<T> {

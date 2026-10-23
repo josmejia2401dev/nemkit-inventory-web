@@ -3,10 +3,13 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import {
+  CustomerProfile,
   InventoryContact,
+  LoyaltyTier,
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { formatCurrency } from "../../../shared/utils/currency.util";
 
 type ContactKind = "suppliers" | "customers";
 
@@ -32,6 +35,19 @@ export class ContactsComponent implements OnInit {
   editingId: number | null = null;
   search = "";
   form = this.emptyForm();
+
+  // Búsqueda rápida y perfil 360° (solo clientes)
+  lookupTerm = "";
+  lookupLoading = signal(false);
+  profile = signal<CustomerProfile | null>(null);
+  profileOpen = signal(false);
+
+  readonly tierLabels: Record<LoyaltyTier, string> = {
+    bronze: "Bronce",
+    silver: "Plata",
+    gold: "Oro",
+    platinum: "Platino",
+  };
 
   get isSupplier(): boolean {
     return this.kind === "suppliers";
@@ -107,8 +123,8 @@ export class ContactsComponent implements OnInit {
       document: this.form.document.trim(),
       phone: this.form.phone.trim(),
       email: this.form.email.trim(),
+      address: this.form.address.trim(),
     };
-    if (this.isSupplier) body["address"] = this.form.address.trim();
     this.saving.set(true);
     const request = this.editingId
       ? this.inventory.put<InventoryContact>(`/${this.kind}/${this.editingId}`, body)
@@ -133,6 +149,54 @@ export class ContactsComponent implements OnInit {
         this.load();
       },
     });
+  }
+
+  lookup(): void {
+    const term = this.lookupTerm.trim();
+    if (!term) {
+      this.notifications.warn("Escribe un celular o documento", "Para identificar al cliente.");
+      return;
+    }
+    this.lookupLoading.set(true);
+    this.inventory.get<InventoryContact | null>("/customers/lookup", { term }).subscribe({
+      next: (response) => {
+        this.lookupLoading.set(false);
+        if (!response.data) {
+          this.notifications.info("Sin resultados", "No encontramos un cliente con ese dato.");
+          return;
+        }
+        this.openProfile(response.data);
+      },
+      error: () => this.lookupLoading.set(false),
+    });
+  }
+
+  openProfile(customer: InventoryContact): void {
+    const id = customer.id ?? customer._id;
+    if (!id) return;
+    this.inventory.get<CustomerProfile>(`/customers/${id}/profile`).subscribe({
+      next: (response) => {
+        this.profile.set(response.data);
+        this.profileOpen.set(true);
+      },
+    });
+  }
+
+  closeProfile(): void {
+    this.profileOpen.set(false);
+    this.profile.set(null);
+  }
+
+  tierLabel(tier?: LoyaltyTier): string {
+    return tier ? this.tierLabels[tier] : "Bronce";
+  }
+
+  tierStars(tier?: LoyaltyTier): number {
+    return { bronze: 1, silver: 2, gold: 3, platinum: 4 }[tier ?? "bronze"];
+  }
+
+  money(value?: number): string {
+    return formatCurrency(value ?? 0);
   }
 
   private emptyForm() {

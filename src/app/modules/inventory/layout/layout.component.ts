@@ -11,7 +11,6 @@ import {
 import { filter } from "rxjs";
 import { AuthStore } from "../../../core/store/auth.store";
 import { BackendStatusTagComponent } from "../../../shared/components/backend-status-tag/backend-status-tag.component";
-import { InventoryStatusMessageComponent } from "../components/inventory-status-message/inventory-status-message.component";
 import { InventoryService, InventoryStockAlerts } from "../../../core/services/inventory.service";
 
 @Component({
@@ -23,7 +22,6 @@ import { InventoryService, InventoryStockAlerts } from "../../../core/services/i
     RouterLink,
     RouterLinkActive,
     BackendStatusTagComponent,
-    InventoryStatusMessageComponent,
   ],
   templateUrl: "./layout.component.html",
 })
@@ -36,6 +34,7 @@ export class LayoutComponent implements OnInit {
   sidebarOpen = signal(false);
   alertCount = signal(0);
   user = this.store.user;
+  company = this.store.company;
   today = new Date();
 
   ngOnInit(): void {
@@ -60,26 +59,34 @@ export class LayoutComponent implements OnInit {
     );
   }
 
-  navItems = [
-    { path: "/dashboard", label: "Resumen", icon: "pi pi-chart-pie" },
-    { path: "/alerts", label: "Alertas", icon: "pi pi-bell" },
-    { path: "/reports", label: "Reportes", icon: "pi pi-chart-bar" },
-    { path: "/products", label: "Productos", icon: "pi pi-box" },
-    { path: "/purchases", label: "Compras", icon: "pi pi-truck" },
-    { path: "/sales", label: "Ventas", icon: "pi pi-receipt" },
-    { path: "/categories", label: "Categorías", icon: "pi pi-tag" },
-    {
-      path: "/movements",
-      label: "Movimientos",
-      icon: "pi pi-arrow-right-arrow-left",
-    },
-    { path: "/suppliers", label: "Proveedores", icon: "pi pi-building" },
-    { path: "/customers", label: "Clientes", icon: "pi pi-users" },
+  // ADMIN y SUPERADMIN ven todo. Los demás roles ven solo lo relevante a su cargo.
+  // El backend es quien autoriza de verdad; esto es únicamente UX.
+  private allNavItems = [
+    { path: "/dashboard", label: "Resumen", icon: "pi pi-chart-pie", roles: ["ADMIN", "CASHIER", "SELLER", "COURIER", "WAREHOUSE", "WAITER"] },
+    { path: "/alerts", label: "Alertas", icon: "pi pi-bell", roles: ["ADMIN", "WAREHOUSE"] },
+    { path: "/reports", label: "Reportes", icon: "pi pi-chart-bar", roles: ["ADMIN"] },
+    { path: "/products", label: "Productos", icon: "pi pi-box", roles: ["ADMIN", "CASHIER", "SELLER", "WAREHOUSE"] },
+    { path: "/purchases", label: "Compras", icon: "pi pi-truck", roles: ["ADMIN", "WAREHOUSE"] },
+    { path: "/sales", label: "Ventas", icon: "pi pi-receipt", roles: ["ADMIN", "CASHIER", "SELLER", "WAITER"] },
+    { path: "/deliveries", label: "Domicilios", icon: "pi pi-send", roles: ["ADMIN", "CASHIER", "SELLER", "COURIER", "WAITER"] },
+    { path: "/categories", label: "Categorías", icon: "pi pi-tag", roles: ["ADMIN", "WAREHOUSE"] },
+    { path: "/movements", label: "Movimientos", icon: "pi pi-arrow-right-arrow-left", roles: ["ADMIN", "WAREHOUSE"] },
+    { path: "/suppliers", label: "Proveedores", icon: "pi pi-building", roles: ["ADMIN", "WAREHOUSE"] },
+    { path: "/customers", label: "Clientes", icon: "pi pi-users", roles: ["ADMIN", "CASHIER", "SELLER", "WAITER"] },
+    { path: "/employees", label: "Empleados", icon: "pi pi-id-card", roles: ["ADMIN"] },
   ];
 
-  mobileNavItems = this.navItems.filter((item) =>
-    ["/dashboard", "/products", "/purchases", "/sales"].includes(item.path),
-  );
+  navItems = this.allNavItems.filter((item) => this.canSee(item.roles));
+
+  mobileNavItems = this.navItems
+    .filter((item) => ["/dashboard", "/products", "/sales", "/deliveries"].includes(item.path))
+    .slice(0, 4);
+
+  private canSee(allowedRoles: string[]): boolean {
+    const roles: string[] = this.store.user()?.roles ?? [];
+    if (roles.includes("SUPERADMIN") || roles.includes("ADMIN")) return true;
+    return allowedRoles.some((role) => roles.includes(role));
+  }
 
   toggleSidebar(): void {
     this.sidebarOpen.update((value) => !value);

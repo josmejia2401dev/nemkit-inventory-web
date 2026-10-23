@@ -2,6 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import {
+  InventoryEmployee,
   InventoryMovement,
   InventoryProduct,
   InventoryService,
@@ -29,6 +30,7 @@ export class MovementsComponent implements OnInit {
 
   movements = signal<InventoryMovement[]>([]);
   products = signal<InventoryProduct[]>([]);
+  employees = signal<InventoryEmployee[]>([]);
   loading = signal(true);
   page = signal(1);
   pageCount = signal(1);
@@ -37,6 +39,7 @@ export class MovementsComponent implements OnInit {
   saving = signal(false);
   type = "manual_adjustment";
   notes = "";
+  selectedEmployeeId: number | "" = "";
   date = new Date().toISOString().slice(0, 10);
   items: Array<{
     productId: number | "";
@@ -50,6 +53,13 @@ export class MovementsComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadMovements();
+    this.loadEmployees();
+  }
+
+  loadEmployees(): void {
+    this.inventory
+      .list<InventoryEmployee>("/employees", { limit: 100, status: "active" })
+      .subscribe({ next: (response) => this.employees.set(response.data ?? []) });
   }
 
   loadProducts(): void {
@@ -110,6 +120,7 @@ export class MovementsComponent implements OnInit {
   openCreate(): void {
     this.type = "manual_adjustment";
     this.notes = "";
+    this.selectedEmployeeId = "";
     this.date = new Date().toISOString().slice(0, 10);
     this.items = [this.emptyItem()];
     this.dialogOpen.set(true);
@@ -166,10 +177,11 @@ export class MovementsComponent implements OnInit {
       return;
     }
 
-    const body = {
+    const body: Record<string, unknown> = {
       type: this.type,
       date: new Date(`${this.date}T12:00:00`).toISOString(),
       notes: this.notes.trim(),
+      ...(this.selectedEmployeeId ? { employeeId: Number(this.selectedEmployeeId) } : {}),
       items: this.items.map((item) => ({
         productId: Number(item.productId),
         quantity: Number(item.quantity),

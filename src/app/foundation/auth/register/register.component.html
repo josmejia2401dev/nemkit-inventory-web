@@ -58,6 +58,18 @@
             required
             minlength="2"
         /></span>
+        <label class="field-label" for="companyName">Nombre de tu empresa</label>
+        <span class="input-wrap"
+          ><i class="pi pi-building"></i
+          ><input
+            id="companyName"
+            pInputText
+            [(ngModel)]="companyName"
+            name="companyName"
+            placeholder="Mi negocio"
+            autocomplete="organization"
+            maxlength="160"
+        /></span>
         <label class="field-label" for="email">Correo electrónico</label>
         <span class="input-wrap"
           ><i class="pi pi-envelope"></i

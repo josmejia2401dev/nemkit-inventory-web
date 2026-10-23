@@ -7,6 +7,16 @@
   <button class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo {{ singular }}</button>
 </div>
 
+@if (!isSupplier) {
+  <section class="panel customer-lookup">
+    <div class="customer-lookup-head"><span class="panel-icon"><i class="pi pi-id-card"></i></span><div><strong>Identificar cliente</strong><small>Escribe el celular o documento para ver su perfil al instante.</small></div></div>
+    <div class="customer-lookup-bar">
+      <input [(ngModel)]="lookupTerm" (keyup.enter)="lookup()" placeholder="Celular o documento" aria-label="Celular o documento del cliente" inputmode="numeric" />
+      <button class="button button-primary" [disabled]="lookupLoading()" (click)="lookup()"><i [class]="lookupLoading() ? 'pi pi-spin pi-spinner' : 'pi pi-search'"></i> Buscar cliente</button>
+    </div>
+  </section>
+}
+
 <section class="panel catalog-panel">
   <div class="filter-bar">
     <div class="filter-title"><span class="panel-icon"><i [class]="isSupplier ? 'pi pi-truck' : 'pi pi-users'"></i></span><strong>{{ title }}</strong><span class="filter-count">{{ contacts().length }}</span></div>
@@ -27,7 +37,7 @@
               <td data-label="Teléfono">{{ contact.phone || "—" }}</td>
               <td data-label="Correo">{{ contact.email || "—" }}</td>
               @if (isSupplier) { <td data-label="Dirección">{{ contact.address || "—" }}</td> }
-              <td class="row-actions-cell"><div class="row-actions"><button class="icon-button" title="Editar" (click)="openEdit(contact)"><i class="pi pi-pencil"></i></button><button class="icon-button icon-button--danger" title="Eliminar" (click)="remove(contact)"><i class="pi pi-trash"></i></button></div></td>
+              <td class="row-actions-cell"><div class="row-actions">@if (!isSupplier) { <button class="icon-button" title="Ver perfil" (click)="openProfile(contact)"><i class="pi pi-user"></i></button> }<button class="icon-button" title="Editar" (click)="openEdit(contact)"><i class="pi pi-pencil"></i></button><button class="icon-button icon-button--danger" title="Eliminar" (click)="remove(contact)"><i class="pi pi-trash"></i></button></div></td>
             </tr>
           }
         </tbody>
@@ -49,10 +59,56 @@
           <label class="form-field"><span>NIT / Documento</span><input [(ngModel)]="form.document" name="document" maxlength="40" /></label>
           <label class="form-field"><span>Teléfono</span><input [(ngModel)]="form.phone" name="phone" type="tel" maxlength="40" /></label>
           <label class="form-field form-field--wide"><span>Correo</span><input [(ngModel)]="form.email" name="email" type="email" maxlength="254" autocomplete="email" /></label>
-          @if (isSupplier) { <label class="form-field form-field--wide"><span>Dirección</span><input [(ngModel)]="form.address" name="address" maxlength="300" autocomplete="street-address" /></label> }
+          <label class="form-field form-field--wide"><span>Dirección @if (!isSupplier) { <small class="field-hint-inline">· para domicilios</small> }</span><input [(ngModel)]="form.address" name="address" maxlength="300" autocomplete="street-address" [placeholder]="isSupplier ? '' : 'Opcional · se usará como dirección de entrega'" /></label>
         </div>
         <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button><button class="button button-primary" [disabled]="saving()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Guardar" }}</button></div>
       </form>
+    </section>
+  </div>
+}
+
+@if (profileOpen() && profile(); as data) {
+  <div class="dialog-backdrop" (click)="closeProfile()">
+    <section class="form-dialog" role="dialog" aria-modal="true" aria-label="Perfil del cliente" (click)="$event.stopPropagation()">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">PERFIL DEL CLIENTE</p><h2>{{ data.customer.name }}</h2></div>
+        <button class="icon-button" (click)="closeProfile()"><i class="pi pi-times"></i></button>
+      </div>
+
+      <div class="customer-profile-tier">
+        <span class="loyalty-badge loyalty-badge--{{ data.customer.loyaltyTier || 'bronze' }}">
+          @for (star of [].constructor(tierStars(data.customer.loyaltyTier)); track $index) { <i class="pi pi-star-fill"></i> }
+          {{ tierLabel(data.customer.loyaltyTier) }}
+        </span>
+        @if (data.customer.phone) { <span class="customer-profile-contact"><i class="pi pi-phone"></i> {{ data.customer.phone }}</span> }
+        @if (data.customer.document) { <span class="customer-profile-contact"><i class="pi pi-id-card"></i> {{ data.customer.document }}</span> }
+      </div>
+
+      <div class="report-summary">
+        <article><small>Total comprado</small><strong>{{ money(data.customer.stats?.totalSpent) }}</strong></article>
+        <article><small>Compras</small><strong>{{ data.customer.stats?.purchaseCount || 0 }}</strong></article>
+        <article><small>Última compra</small><strong>{{ data.customer.stats?.lastPurchaseAt ? (data.customer.stats?.lastPurchaseAt | date: "d MMM yyyy" : "" : "es-CO") : "—" }}</strong></article>
+        <article><small>Cliente desde</small><strong>{{ data.customer.stats?.firstPurchaseAt ? (data.customer.stats?.firstPurchaseAt | date: "MMM yyyy" : "" : "es-CO") : "—" }}</strong></article>
+      </div>
+
+      <div class="items-heading"><div><span class="eyebrow">HISTORIAL</span><strong>Compras recientes</strong></div></div>
+      @if (data.history.data.length) {
+        <div class="table-scroll"><table class="inventory-table">
+          <thead><tr><th>PEDIDO</th><th>FECHA</th><th>ARTÍCULOS</th><th>TOTAL</th></tr></thead>
+          <tbody>@for (sale of data.history.data; track sale.id) {
+            <tr>
+              <td data-label="Pedido"><strong>#{{ sale.id }}</strong></td>
+              <td data-label="Fecha">{{ sale.date | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</td>
+              <td data-label="Artículos">{{ sale.items.length }} {{ sale.items.length === 1 ? "producto" : "productos" }}</td>
+              <td data-label="Total"><strong>{{ money(sale.total) }}</strong></td>
+            </tr>
+          }</tbody>
+        </table></div>
+      } @else {
+        <div class="empty-state"><strong>Sin compras registradas</strong><p>Cuando este cliente compre, verás aquí su historial.</p></div>
+      }
+
+      <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="closeProfile()">Cerrar</button></div>
     </section>
   </div>
 }

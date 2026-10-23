@@ -48,13 +48,29 @@
             <div class="form-field contact-picker">
               <div class="contact-picker-heading"><span>Cliente <b>*</b></span><button type="button" class="text-button" (click)="toggleCustomerForm()"><i class="pi pi-user-plus"></i>{{ customerFormOpen() ? "Cancelar" : "Registrar cliente" }}</button></div>
               <input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" placeholder="Buscar cliente por nombre, documento o correo" aria-label="Buscar clientes" /><button type="button" class="button button-secondary button-small" (click)="searchContacts()">Buscar</button>
-              <select [(ngModel)]="selectedContactId" name="contactId" required><option value="">Selecciona un cliente</option>@for (contact of contacts(); track contact.id || contact._id) { <option [ngValue]="contact.id || contact._id">{{ contact.name }}{{ contact.document ? " · " + contact.document : "" }}</option> }</select>
+              <select [(ngModel)]="selectedContactId" name="contactId" (ngModelChange)="contactChanged()" required><option value="">Selecciona un cliente</option>@for (contact of contacts(); track contact.id || contact._id) { <option [ngValue]="contact.id || contact._id">{{ contact.name }}{{ contact.document ? " · " + contact.document : "" }}</option> }</select>
             </div>
           } @else {
             <div class="form-field"><span>Proveedor <b>*</b></span><div class="product-picker-search"><input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" placeholder="Buscar proveedor" /><button type="button" class="button button-secondary button-small" (click)="searchContacts()">Buscar</button></div><select [(ngModel)]="selectedContactId" name="contactId" required><option value="">Selecciona proveedor</option>@for (contact of contacts(); track contact.id || contact._id) { <option [ngValue]="contact.id || contact._id">{{ contact.name }}{{ contact.document ? " · " + contact.document : "" }}</option> }</select></div>
           }
           <label class="form-field"><span>Fecha <b>*</b></span><input type="date" [(ngModel)]="date" name="date" required /></label>
+          <label class="form-field"><span>{{ employeeLabel }}</span><select [(ngModel)]="selectedEmployeeId" name="employeeId"><option value="">Sin asignar</option>@for (employee of employees(); track employee.id || employee._id) { <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option> }</select></label>
         </div>
+
+        @if (isSale) {
+          <label class="delivery-check">
+            <input type="checkbox" [(ngModel)]="isDelivery" name="isDelivery" />
+            <span><strong>Entrega a domicilio</strong><small>Marca si este pedido se envía. Se creará el domicilio asociado.</small></span>
+          </label>
+          @if (isDelivery) {
+            <div class="form-grid delivery-fields">
+              <label class="form-field form-field--wide"><span>Dirección de entrega <b>*</b></span><input [(ngModel)]="deliveryAddress" name="deliveryAddress" maxlength="300" autocomplete="street-address" placeholder="Se autocompleta con la del cliente" /></label>
+              <label class="form-field"><span>Domiciliario</span><select [(ngModel)]="selectedCourierId" name="courierId"><option value="">Asignar luego</option>@for (courier of couriers(); track courier.id || courier._id) { <option [ngValue]="courier.id || courier._id">{{ courier.name }}</option> }</select></label>
+              <label class="form-field"><span>Latitud</span><input type="number" step="any" [(ngModel)]="deliveryLat" name="deliveryLat" placeholder="4.6097" /></label>
+              <label class="form-field"><span>Longitud</span><input type="number" step="any" [(ngModel)]="deliveryLng" name="deliveryLng" placeholder="-74.0817" /></label>
+            </div>
+          }
+        }
         @if (isSale && customerFormOpen()) {
           <div class="customer-quick-form">
             <div><strong>Nuevo cliente</strong><small>Se guardará y quedará seleccionado en esta venta.</small></div>
@@ -99,6 +115,9 @@
           <div class="receipt-customer"><small>CLIENTE</small><strong>{{ printedDocument.customerSnapshot?.name || "Cliente" }}</strong>@if (printedDocument.customerSnapshot?.document) { <span>{{ printedDocument.customerSnapshot?.document }}</span> }</div>
         } @else {
           <div class="receipt-customer"><small>PROVEEDOR</small><strong>{{ printedDocument.supplierSnapshot?.name || "Proveedor" }}</strong>@if (printedDocument.supplierSnapshot?.document) { <span>{{ printedDocument.supplierSnapshot?.document }}</span> }@if (printedDocument.supplierSnapshot?.phone) { <span>{{ printedDocument.supplierSnapshot?.phone }}</span> }</div>
+        }
+        @if (printedDocument.employeeSnapshot?.name) {
+          <div class="receipt-customer"><small>{{ employeeLabel.toUpperCase() }}</small><strong>{{ printedDocument.employeeSnapshot?.name }}</strong></div>
         }
         <div class="receipt-items">@for (item of printedDocument.items; track $index) { <div class="receipt-item"><div><strong>{{ item.name }}</strong><small>{{ item.sku }} · {{ item.quantity }} × {{ formatMoney(isSale ? item.unitPrice : item.unitCost) }}</small></div><b>{{ formatMoney(item.lineTotal) }}</b></div> }</div>
         <div class="receipt-total"><span>Total</span><strong>{{ formatMoney(printedDocument.total) }}</strong></div>

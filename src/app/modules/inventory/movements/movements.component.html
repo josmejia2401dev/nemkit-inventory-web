@@ -58,6 +58,7 @@
             <th>FECHA</th>
             <th>TIPO</th>
             <th>PRODUCTOS</th>
+            <th>RESPONSABLE</th>
             <th>OBSERVACIONES</th>
             <th>ARTÍCULOS</th>
           </tr>
@@ -105,6 +106,9 @@
                     <small>+{{ movement.items.length - 3 }} más</small>
                   }
                 </div>
+              </td>
+              <td data-label="Responsable">
+                {{ movement.employeeSnapshot?.name || "—" }}
               </td>
               <td class="notes-cell" data-label="Observaciones">
                 {{ movement.notes || "—" }}
@@ -174,7 +178,16 @@
           ><label class="form-field"
             ><span>Fecha <b>*</b></span
             ><input type="date" [(ngModel)]="date" name="date" required
-          /></label>
+          /></label
+          ><label class="form-field"
+            ><span>Responsable</span
+            ><select [(ngModel)]="selectedEmployeeId" name="employeeId">
+              <option value="">Sin asignar</option>
+              @for (employee of employees(); track employee.id || employee._id) {
+                <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option>
+              }
+            </select></label
+          >
         </div>
         <div class="items-heading">
           <div>

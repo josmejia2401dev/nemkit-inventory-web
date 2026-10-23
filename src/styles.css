@@ -1474,3 +1474,52 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .sidebar, .button, .category-card, .deploy-card, .deploy-stat-card { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Clientes inteligentes: búsqueda rápida y perfil 360° */
+.customer-lookup { margin-bottom: 16px; }
+.customer-lookup-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.customer-lookup-head small { display: block; color: #78897e; font-size: 11px; }
+.customer-lookup-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+.customer-lookup-bar input { flex: 1 1 220px; min-height: 40px; padding: 0 12px; border: 1px solid rgba(36,65,52,.14); border-radius: 10px; }
+.customer-profile-tier { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 16px; }
+.customer-profile-contact { display: inline-flex; align-items: center; gap: 6px; color: #64756a; font-size: 12px; }
+.loyalty-badge { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 700; color: #6b4f1d; background: #f6ecd6; }
+.loyalty-badge i { font-size: 10px; }
+.loyalty-badge--bronze { color: #7a5230; background: #f0e0d2; }
+.loyalty-badge--silver { color: #5b6672; background: #e7ebef; }
+.loyalty-badge--gold { color: #7a5c12; background: #f7ecc9; }
+.loyalty-badge--platinum { color: #2f5d57; background: #dceee9; }
+
+/* Domicilios */
+.delivery-status-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.delivery-status-tabs button { padding: 7px 14px; border: 1px solid rgba(36,65,52,.12); background: #fafbf8; border-radius: 99px; font-size: 12px; font-weight: 600; color: #64756a; cursor: pointer; }
+.delivery-status-tab--active { background: #244134 !important; color: #fff !important; border-color: #244134 !important; }
+.delivery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.delivery-card { display: flex; flex-direction: column; border: 1px solid rgba(36,65,52,.1); border-radius: 14px; background: #fff; overflow: hidden; }
+.delivery-card-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid rgba(36,65,52,.07); }
+.delivery-card-head small { display: block; color: #a0aaa3; font-size: 10px; }
+.delivery-card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #4c6554; }
+.delivery-card-body i { color: #66886c; margin-right: 4px; }
+.delivery-address { color: #64756a; }
+.delivery-meta { display: flex; justify-content: space-between; align-items: center; }
+.delivery-courier { color: #78897e; }
+.delivery-card-actions { margin-top: auto; padding: 12px 14px; border-top: 1px solid rgba(36,65,52,.07); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.delivery-courier-select { flex: 1 1 100%; min-height: 34px; border: 1px solid rgba(36,65,52,.14); border-radius: 8px; padding: 0 8px; font-size: 12px; }
+.delivery-delivered-at { color: #a0aaa3; font-size: 10px; }
+.delivery-draft-total { display: flex; justify-content: space-between; align-items: center; margin: 14px 0; padding-top: 12px; border-top: 1px solid rgba(36,65,52,.08); font-size: 14px; }
+.status-pill--pending { color: #8a7636; background: #f6f0dd; }
+.status-pill--preparing { color: #5b6672; background: #e7ebef; }
+.status-pill--on_route { color: #2f5a86; background: #dceaf6; }
+.status-pill--delivered { color: #397453; background: #edf5ee; }
+.status-pill--cancelled { color: #a85a4a; background: #f6e6e1; }
+
+/* Dashboard: secciones ampliadas (clientes, domicilios, equipo) */
+.dashboard-extra-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; }
+
+.field-hint-inline { color: #a0aaa3; font-weight: 500; font-size: 9px; }
+
+/* Venta: check de entrega a domicilio */
+.delivery-check { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 6px; padding: 12px 14px; border: 1px solid rgba(36,65,52,.12); border-radius: 10px; background: #f4f7f1; cursor: pointer; }
+.delivery-check input { margin-top: 2px; width: 16px; height: 16px; }
+.delivery-check small { display: block; color: #78897e; font-size: 11px; }
+.delivery-fields { margin-top: 6px; }

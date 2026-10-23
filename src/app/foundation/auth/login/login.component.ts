@@ -43,6 +43,7 @@ export class LoginComponent {
             res.data.user,
             res.data.accessToken,
             res.data.refreshToken,
+            res.data.company,
           );
           this.router.navigate(["/dashboard"]);
         },

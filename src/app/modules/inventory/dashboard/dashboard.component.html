@@ -212,6 +212,46 @@
         ><i class="pi pi-arrow-right"></i
       ></a>
     </section>
+
+    @if (data.customers || data.deliveries || (data.topEmployees && data.topEmployees.length)) {
+      <div class="dashboard-extra-grid">
+        @if (data.customers; as c) {
+          <section class="panel">
+            <div class="report-title-row"><div><p class="eyebrow">CLIENTES</p><h2>Tu base de clientes</h2></div><a routerLink="/customers" class="stat-link">Ver <i class="pi pi-arrow-up-right"></i></a></div>
+            <div class="report-summary">
+              <article><small>Total</small><strong>{{ c.total | number }}</strong></article>
+              <article><small>Nuevos (30 días)</small><strong>{{ c.new | number }}</strong></article>
+              <article><small>Frecuentes</small><strong>{{ c.frequent | number }}</strong></article>
+              <article><small>VIP (Oro/Platino)</small><strong>{{ c.vip | number }}</strong></article>
+            </div>
+          </section>
+        }
+
+        @if (data.deliveries; as d) {
+          <section class="panel">
+            <div class="report-title-row"><div><p class="eyebrow">DOMICILIOS</p><h2>Estado de entregas</h2></div><a routerLink="/deliveries" class="stat-link">Ver <i class="pi pi-arrow-up-right"></i></a></div>
+            <div class="report-summary">
+              <article><small>Pendientes</small><strong>{{ d.pending | number }}</strong></article>
+              <article><small>En ruta</small><strong>{{ d.onRoute | number }}</strong></article>
+              <article><small>Entregados</small><strong>{{ d.delivered | number }}</strong></article>
+              <article><small>Tiempo promedio</small><strong>{{ d.avgDeliveryMinutes != null ? d.avgDeliveryMinutes + " min" : "—" }}</strong></article>
+            </div>
+          </section>
+        }
+
+        @if (data.topEmployees && data.topEmployees.length) {
+          <section class="panel">
+            <div class="report-title-row"><div><p class="eyebrow">EQUIPO</p><h2>Top vendedores (30 días)</h2></div><a routerLink="/reports" class="stat-link">Reportes <i class="pi pi-arrow-up-right"></i></a></div>
+            <div class="table-scroll"><table class="inventory-table">
+              <thead><tr><th>EMPLEADO</th><th>VENTAS</th><th>INGRESOS</th></tr></thead>
+              <tbody>@for (emp of data.topEmployees; track emp.employeeId) {
+                <tr><td data-label="Empleado"><strong>{{ emp.employeeName }}</strong></td><td data-label="Ventas">{{ emp.salesCount }}</td><td data-label="Ingresos"><strong>{{ currency.format(emp.revenue) }}</strong></td></tr>
+              }</tbody>
+            </table></div>
+          </section>
+        }
+      </div>
+    }
   } @else {
     <div class="empty-state panel">
       <span class="empty-icon"><i class="pi pi-cloud"></i></span

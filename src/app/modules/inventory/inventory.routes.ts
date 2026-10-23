@@ -37,6 +37,20 @@ export const inventoryRoutes: Routes = [
       ),
   },
   {
+    path: "employees",
+    loadComponent: () =>
+      import("./employees/employees.component").then(
+        (module) => module.EmployeesComponent,
+      ),
+  },
+  {
+    path: "deliveries",
+    loadComponent: () =>
+      import("./deliveries/deliveries.component").then(
+        (module) => module.DeliveriesComponent,
+      ),
+  },
+  {
     path: "movements",
     loadComponent: () =>
       import("./movements/movements.component").then(

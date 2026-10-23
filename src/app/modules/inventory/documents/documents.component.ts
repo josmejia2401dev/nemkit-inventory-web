@@ -6,6 +6,7 @@ import { ActivatedRoute } from "@angular/router";
 import {
   InventoryContact,
   InventoryDocument,
+  InventoryEmployee,
   InventoryProduct,
   InventoryService,
 } from "../../../core/services/inventory.service";
@@ -35,6 +36,7 @@ export class DocumentsComponent implements OnInit {
   documents = signal<InventoryDocument[]>([]);
   products = signal<InventoryProduct[]>([]);
   contacts = signal<InventoryContact[]>([]);
+  employees = signal<InventoryEmployee[]>([]);
   loading = signal(true);
   page = signal(1);
   pageCount = signal(1);
@@ -45,6 +47,14 @@ export class DocumentsComponent implements OnInit {
   customerFormOpen = signal(false);
   customerSaving = signal(false);
   selectedContactId: number | "" = "";
+  selectedEmployeeId: number | "" = "";
+  // Entrega a domicilio (solo ventas)
+  isDelivery = false;
+  couriers = signal<InventoryEmployee[]>([]);
+  selectedCourierId: number | "" = "";
+  deliveryAddress = "";
+  deliveryLat: number | "" = "";
+  deliveryLng: number | "" = "";
   date = new Date().toISOString().slice(0, 10);
   notes = "";
   items: DraftItem[] = [this.emptyItem()];
@@ -68,6 +78,10 @@ export class DocumentsComponent implements OnInit {
     return this.isSale ? "Cliente" : "Proveedor";
   }
 
+  get employeeLabel(): string {
+    return this.isSale ? "Vendedor" : "Quién recibe";
+  }
+
   ngOnInit(): void {
     this.loadProducts();
     this.route.data
@@ -81,6 +95,8 @@ export class DocumentsComponent implements OnInit {
         this.page.set(1);
         this.load();
         this.loadContacts();
+        this.loadEmployees();
+        if (this.kind === "sales") this.loadCouriers();
       });
   }
 
@@ -152,10 +168,45 @@ export class DocumentsComponent implements OnInit {
     this.loadContacts(this.contactSearch);
   }
 
+  loadEmployees(): void {
+    this.inventory.list<InventoryEmployee>("/employees", {
+      limit: 100,
+      status: "active",
+    }).subscribe({
+      next: (response) => this.employees.set(response.data ?? []),
+    });
+  }
+
+  loadCouriers(): void {
+    this.inventory.list<InventoryEmployee>("/employees", {
+      limit: 100,
+      status: "active",
+      role: "courier",
+    }).subscribe({
+      next: (response) => this.couriers.set(response.data ?? []),
+    });
+  }
+
+  contactChanged(): void {
+    if (!this.isSale) return;
+    const customer = this.contacts().find(
+      (candidate) => (candidate.id ?? candidate._id) === Number(this.selectedContactId),
+    );
+    if (customer?.address && !this.deliveryAddress.trim()) {
+      this.deliveryAddress = customer.address;
+    }
+  }
+
   openCreate(): void {
     this.customerFormOpen.set(false);
     this.customerForm = this.emptyCustomerForm();
     this.selectedContactId = "";
+    this.selectedEmployeeId = "";
+    this.isDelivery = false;
+    this.selectedCourierId = "";
+    this.deliveryAddress = "";
+    this.deliveryLat = "";
+    this.deliveryLng = "";
     this.date = new Date().toISOString().slice(0, 10);
     this.notes = "";
     this.items = [this.emptyItem()];
@@ -288,6 +339,20 @@ export class DocumentsComponent implements OnInit {
       })),
     };
     body[this.isSale ? "customerId" : "supplierId"] = Number(this.selectedContactId);
+    if (this.selectedEmployeeId) body["employeeId"] = Number(this.selectedEmployeeId);
+
+    if (this.isSale && this.isDelivery) {
+      if (!this.deliveryAddress.trim()) {
+        this.notifications.warn("Falta la dirección", "Escribe la dirección de entrega del domicilio.");
+        return;
+      }
+      const delivery: Record<string, unknown> = { address: this.deliveryAddress.trim() };
+      if (this.selectedCourierId) delivery["courierId"] = Number(this.selectedCourierId);
+      if (this.deliveryLat !== "" && this.deliveryLng !== "") {
+        delivery["location"] = { lat: Number(this.deliveryLat), lng: Number(this.deliveryLng) };
+      }
+      body["delivery"] = delivery;
+    }
 
     this.saving.set(true);
     this.inventory.post<InventoryDocument>(`/${this.kind}`, body).subscribe({

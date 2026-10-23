@@ -6,13 +6,14 @@ import {
   InventoryProduct,
   InventoryReportMovement,
   InventoryReportProduct,
+  InventorySalesByEmployeeReport,
   InventorySalesReport,
   InventoryService,
   PageResult,
 } from "../../../core/services/inventory.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 
-type ReportKind = "inventory" | "movements" | "sales";
+type ReportKind = "inventory" | "movements" | "sales" | "employees";
 interface InventoryReport {
   generatedAt: string;
   totals: { productCount: number; units: number; inventoryCost: number; potentialSales: number };
@@ -42,6 +43,7 @@ export class ReportsComponent implements OnInit {
   inventoryReport = signal<InventoryReport | null>(null);
   movements = signal<InventoryReportMovement[]>([]);
   salesReport = signal<InventorySalesReport | null>(null);
+  employeesReport = signal<InventorySalesByEmployeeReport | null>(null);
   products = signal<InventoryProduct[]>([]);
   page = signal(1);
   pageCount = signal(1);
@@ -114,6 +116,19 @@ export class ReportsComponent implements OnInit {
           this.movements.set(response.data ?? []);
           this.movementCount.set(response.pagination?.total ?? response.data.length);
           this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false),
+      });
+      return;
+    }
+
+    if (this.kind === "employees") {
+      this.inventory.get<InventorySalesByEmployeeReport>("/reports/sales-by-employee", {
+        ...range,
+      }).subscribe({
+        next: (response) => {
+          this.employeesReport.set(response.data);
           this.loading.set(false);
         },
         error: () => this.loading.set(false),
