@@ -11,6 +11,12 @@
   </button>
 </div>
 
+<div class="type-tabs" role="tablist" aria-label="Filtrar por tipo de producto">
+  @for (tab of typeFilters; track tab.value) {
+    <button [class.type-tab--active]="typeFilter === tab.value" (click)="applyTypeFilter(tab.value)">{{ tab.label }}</button>
+  }
+</div>
+
 <section class="panel catalog-panel">
   <div class="filter-bar">
     @if (specificProductId) { <button class="button button-secondary button-small" (click)="clearProductFocus()">Quitar filtro del producto</button> }
@@ -83,7 +89,7 @@
                       <i class="pi pi-box"></i>
                     }</span
                   ><span
-                    ><strong>{{ product.name }}</strong
+                    ><strong>{{ product.name }}@if (product.type === "ingredient") { <span class="type-chip type-chip--ingredient">Insumo</span> } @else if (product.type === "prepared") { <span class="type-chip type-chip--prepared">Plato</span> }</strong
                     ><small>{{
                       product.description || "Sin descripción"
                     }}</small></span

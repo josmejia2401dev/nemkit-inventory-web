@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { LayoutComponent, NavItem } from "../../inventory/layout/layout.component";
+import { AuthStore } from "../../../core/store/auth.store";
 
 @Component({
   selector: "app-admin-shell",
@@ -15,7 +16,9 @@ import { LayoutComponent, NavItem } from "../../inventory/layout/layout.componen
   />`,
 })
 export class AdminShellComponent {
-  navItems: NavItem[] = [
+  private store = inject(AuthStore);
+
+  private baseNav: NavItem[] = [
     { path: "/admin/dashboard", label: "Resumen", icon: "pi pi-chart-pie" },
     { path: "/admin/alerts", label: "Alertas", icon: "pi pi-bell" },
     { path: "/admin/reports", label: "Reportes", icon: "pi pi-chart-bar" },
@@ -29,4 +32,9 @@ export class AdminShellComponent {
     { path: "/admin/customers", label: "Clientes", icon: "pi pi-users" },
     { path: "/admin/employees", label: "Empleados", icon: "pi pi-id-card" },
   ];
+
+  // "Mesas" solo tiene sentido en restaurantes.
+  navItems: NavItem[] = this.store.company()?.businessType === "restaurant"
+    ? [...this.baseNav, { path: "/admin/tables", label: "Mesas", icon: "pi pi-stop" }]
+    : this.baseNav;
 }

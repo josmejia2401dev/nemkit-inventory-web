@@ -11,6 +11,8 @@ interface UserProfile {
   fullName: string;
   email: string;
   roles: string[];
+  companyName?: string;
+  businessType?: "retail" | "restaurant";
   security: {
     loginAttempts: number;
     lastLockedAt: string | null;
@@ -49,6 +51,16 @@ export class ProfileComponent implements OnInit {
   newPassword = "";
   confirmPassword = "";
 
+  // Configuración del negocio (solo admin)
+  editCompanyName = "";
+  editBusinessType: "retail" | "restaurant" = "retail";
+  savingBusiness = signal(false);
+
+  get isAdmin(): boolean {
+    const roles: string[] = this.authStore.user()?.roles ?? [];
+    return roles.includes("ADMIN") || roles.includes("SUPERADMIN");
+  }
+
   ngOnInit(): void {
     this.loadProfile();
   }
@@ -83,6 +95,8 @@ export class ProfileComponent implements OnInit {
           this.profile.set(profile);
           this.editName = profile.fullName;
           this.editEmail = profile.email;
+          this.editCompanyName = profile.companyName ?? "";
+          this.editBusinessType = profile.businessType ?? "retail";
         },
         error: (error) => {
           this.profile.set(null);
@@ -126,6 +140,32 @@ export class ProfileComponent implements OnInit {
         this.notifications.success("Perfil actualizado");
       },
       error: () => this.savingProfile.set(false),
+    });
+  }
+
+  saveBusiness(): void {
+    const companyName = this.editCompanyName.trim();
+    this.savingBusiness.set(true);
+    this.api.put<{ companyName: string; businessType: "retail" | "restaurant" }>(
+      "/settings/business",
+      { companyName, businessType: this.editBusinessType },
+    ).subscribe({
+      next: (response) => {
+        this.savingBusiness.set(false);
+        // Reflejar el nombre en la marca de inmediato.
+        const company = this.authStore.company();
+        this.authStore.setSession(
+          this.authStore.user(),
+          this.authStore.accessToken()!,
+          this.authStore.refreshToken()!,
+          { id: company?.id ?? 0, name: response.data.companyName, businessType: response.data.businessType },
+        );
+        this.notifications.success(
+          "Negocio actualizado",
+          "Cierra sesión y vuelve a entrar para aplicar el nuevo modo.",
+        );
+      },
+      error: () => this.savingBusiness.set(false),
     });
   }
 

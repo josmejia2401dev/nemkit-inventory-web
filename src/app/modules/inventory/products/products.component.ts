@@ -38,6 +38,14 @@ export class ProductsComponent implements OnInit {
   editingId: number | null = null;
   search = "";
   categoryFilter: number | "" = "";
+  typeFilter: "" | "simple" | "ingredient" | "prepared" = "";
+
+  readonly typeFilters: Array<{ value: "" | "simple" | "ingredient" | "prepared"; label: string }> = [
+    { value: "", label: "Todos" },
+    { value: "simple", label: "Simples" },
+    { value: "ingredient", label: "Insumos" },
+    { value: "prepared", label: "Platos" },
+  ];
 
   // Insumos disponibles para armar recetas (productos ingredient o simple).
   ingredients = signal<InventoryProduct[]>([]);
@@ -90,6 +98,7 @@ export class ProductsComponent implements OnInit {
         search: this.search,
         categoryId: this.categoryFilter || undefined,
         status: this.statusFilter || undefined,
+        type: this.typeFilter || undefined,
         stockState: this.stockState || undefined,
         productId: this.specificProductId || undefined,
         page: this.page(),
@@ -174,6 +183,12 @@ export class ProductsComponent implements OnInit {
       this.categories().find((category) => (category.id ?? category._id) === id)
         ?.name ?? "Sin categoría"
     );
+  }
+
+  applyTypeFilter(value: "" | "simple" | "ingredient" | "prepared"): void {
+    this.typeFilter = value;
+    this.page.set(1);
+    this.loadProducts();
   }
 
   openCreate(): void {

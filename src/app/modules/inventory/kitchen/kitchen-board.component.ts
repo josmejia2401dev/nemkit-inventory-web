@@ -4,6 +4,8 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { interval } from "rxjs";
 import { InventoryService } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { ConfirmService } from "../../../core/services/confirm.service";
+import { formatCurrency } from "../../../shared/utils/currency.util";
 
 type KitchenStatus = "pending" | "preparing" | "ready" | "served";
 
@@ -12,6 +14,8 @@ interface KitchenOrder {
   date: string;
   tableNumber?: string;
   kitchenStatus: KitchenStatus;
+  paymentStatus?: "paid" | "pending";
+  total?: number;
   notes?: string;
   customerSnapshot?: { name?: string };
   employeeSnapshot?: { name?: string };
@@ -41,6 +45,7 @@ const NEXT: Record<KitchenStatus, { status: KitchenStatus; label: string } | nul
 export class KitchenBoardComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
+  private confirm = inject(ConfirmService);
   private destroyRef = inject(DestroyRef);
 
   readonly columns: KitchenStatus[] = ["pending", "preparing", "ready"];
@@ -89,5 +94,27 @@ export class KitchenBoardComponent implements OnInit {
 
   minutesAgo(date: string): number {
     return Math.max(0, Math.round((Date.now() - new Date(date).getTime()) / 60000));
+  }
+
+  formatMoney(value: number | undefined): string {
+    return formatCurrency(value);
+  }
+
+  /** Registra el cobro de una comanda "por cobrar". */
+  async pay(order: KitchenOrder): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: "Cobrar pedido",
+      message: `¿Registrar el cobro del pedido #${order.id}${order.total != null ? ` por ${this.formatMoney(order.total)}` : ""}?`,
+      confirmLabel: "Cobrar",
+      cancelLabel: "Volver",
+      severity: "info",
+    });
+    if (!ok) return;
+    this.inventory.put(`/sales/${order.id}/pay`, {}).subscribe({
+      next: () => {
+        this.notifications.success(`Pedido #${order.id}`, "Cobro registrado.");
+        this.load(true);
+      },
+    });
   }
 }

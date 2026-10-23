@@ -31,11 +31,21 @@
                 }
               </ul>
               @if (order.notes) { <p class="kitchen-notes"><i class="pi pi-comment"></i> {{ order.notes }}</p> }
+              @if (order.paymentStatus === "pending") {
+                <p class="kitchen-payment kitchen-payment--pending"><i class="pi pi-clock"></i> Por cobrar @if (order.total != null) { · {{ formatMoney(order.total) }} }</p>
+              } @else if (order.paymentStatus === "paid") {
+                <p class="kitchen-payment kitchen-payment--paid"><i class="pi pi-check-circle"></i> Pagado</p>
+              }
               <div class="kitchen-card-foot">
                 <small>{{ order.employeeSnapshot?.name || "—" }}</small>
-                @if (next(order); as n) {
-                  <button class="button button-primary button-small" (click)="advance(order)">{{ n.label }}</button>
-                }
+                <span class="kitchen-card-actions">
+                  @if (order.paymentStatus === "pending") {
+                    <button class="button button-secondary button-small" (click)="pay(order)"><i class="pi pi-dollar"></i> Cobrar</button>
+                  }
+                  @if (next(order); as n) {
+                    <button class="button button-primary button-small" (click)="advance(order)">{{ n.label }}</button>
+                  }
+                </span>
               </div>
             </article>
           }

@@ -3,6 +3,15 @@ import { Injectable, inject } from "@angular/core";
 import { EMPTY, Observable, Subject, expand, reduce, tap } from "rxjs";
 import { environment } from "../../../environments/environment";
 
+export interface InventoryTable {
+  id?: number;
+  _id?: number;
+  name: string;
+  description?: string;
+  occupied?: boolean;
+  activeOrders?: number;
+}
+
 export type ProductType = "simple" | "ingredient" | "prepared";
 
 export interface RecipeItem {
@@ -158,7 +167,12 @@ export interface InventoryDocument {
   employeeSnapshot?: { name?: string };
   movementId: number;
   date: string;
-  status: "completed";
+  status: "completed" | "void";
+  // Estado de cobro de la venta: "paid" (pagada) o "pending" (por cobrar).
+  paymentStatus?: "paid" | "pending";
+  paidAt?: string | null;
+  kitchenStatus?: "pending" | "preparing" | "ready" | "served" | null;
+  tableNumber?: string;
   notes?: string;
   items: InventoryDocumentItem[];
   total: number;

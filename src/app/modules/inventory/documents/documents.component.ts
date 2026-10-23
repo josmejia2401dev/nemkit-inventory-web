@@ -11,6 +11,7 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { ConfirmService } from "../../../core/services/confirm.service";
 import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 
@@ -30,6 +31,7 @@ interface DraftItem {
 export class DocumentsComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
+  private confirm = inject(ConfirmService);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
   private store = inject(AuthStore);
@@ -44,6 +46,7 @@ export class DocumentsComponent implements OnInit {
   products = signal<InventoryProduct[]>([]);
   contacts = signal<InventoryContact[]>([]);
   employees = signal<InventoryEmployee[]>([]);
+  tables = signal<import("../../../core/services/inventory.service").InventoryTable[]>([]);
   loading = signal(true);
   page = signal(1);
   pageCount = signal(1);
@@ -104,8 +107,16 @@ export class DocumentsComponent implements OnInit {
         this.load();
         this.loadContacts();
         this.loadEmployees();
-        if (this.kind === "sales") this.loadCouriers();
+        if (this.kind === "sales") {
+          this.loadCouriers();
+          if (this.isRestaurant) this.loadTables();
+        }
       });
+  }
+
+  loadTables(): void {
+    this.inventory.get<import("../../../core/services/inventory.service").InventoryTable[]>("/tables/occupancy")
+      .subscribe({ next: (response) => this.tables.set(response.data ?? []) });
   }
 
   load(): void {
@@ -247,6 +258,29 @@ export class DocumentsComponent implements OnInit {
 
   openDocument(document: InventoryDocument): void {
     this.previewDocument.set(document);
+  }
+
+  /** Una venta "por cobrar" (restaurante) que aún puede cobrarse. */
+  isPending(document: InventoryDocument): boolean {
+    return this.isSale && document.status !== "void" && document.paymentStatus === "pending";
+  }
+
+  /** Registra el cobro de una venta pendiente. */
+  async pay(document: InventoryDocument): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: "Cobrar venta",
+      message: `¿Registrar el cobro de la venta #${document.id || document._id} por ${this.formatMoney(document.total)}?`,
+      confirmLabel: "Cobrar",
+      cancelLabel: "Volver",
+      severity: "info",
+    });
+    if (!ok) return;
+    this.inventory.put<InventoryDocument>(`/sales/${document.id || document._id}/pay`, {}).subscribe({
+      next: () => {
+        this.notifications.success("Venta cobrada", "El pago quedó registrado.");
+        this.load();
+      },
+    });
   }
 
   lineTotal(item: DraftItem): number {

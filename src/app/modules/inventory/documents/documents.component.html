@@ -27,8 +27,21 @@
           <td [attr.data-label]="contactLabel">{{ documentContact(document) }}</td>
           <td data-label="Artículos"><div class="document-lines-preview">@for (item of document.items.slice(0, 2); track $index) { <span>{{ item.quantity }} × {{ item.name }}</span> } @if (document.items.length > 2) { <small>+{{ document.items.length - 2 }} más</small> }</div></td>
           <td data-label="Total"><strong>{{ formatMoney(document.total) }}</strong></td>
-          <td data-label="Estado"><span class="document-status"><i class="pi pi-check-circle"></i> Registrada</span></td>
-          <td data-label="Acciones"><button class="icon-button" title="Ver detalle e imprimir" aria-label="Ver detalle e imprimir" (click)="openDocument(document)"><i class="pi pi-eye"></i></button></td>
+          <td data-label="Estado">
+            @if (isSale && document.status === "void") {
+              <span class="document-status document-status--void"><i class="pi pi-ban"></i> Anulada</span>
+            } @else if (isSale && document.paymentStatus === "pending") {
+              <span class="document-status document-status--pending"><i class="pi pi-clock"></i> Por cobrar</span>
+            } @else {
+              <span class="document-status"><i class="pi pi-check-circle"></i> {{ isSale ? "Pagada" : "Registrada" }}</span>
+            }
+          </td>
+          <td data-label="Acciones">
+            @if (isPending(document)) {
+              <button class="button button-primary button-small" title="Registrar cobro" (click)="pay(document)"><i class="pi pi-dollar"></i> Cobrar</button>
+            }
+            <button class="icon-button" title="Ver detalle e imprimir" aria-label="Ver detalle e imprimir" (click)="openDocument(document)"><i class="pi pi-eye"></i></button>
+          </td>
         </tr>
       }</tbody>
     </table></div>
@@ -56,7 +69,19 @@
           <label class="form-field"><span>Fecha <b>*</b></span><input type="date" [(ngModel)]="date" name="date" required /></label>
           <label class="form-field"><span>{{ employeeLabel }}</span><select [(ngModel)]="selectedEmployeeId" name="employeeId"><option value="">Sin asignar</option>@for (employee of employees(); track employee.id || employee._id) { <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option> }</select></label>
           @if (isSale && isRestaurant) {
-            <label class="form-field"><span>Mesa</span><input [(ngModel)]="tableNumber" name="tableNumber" maxlength="20" placeholder="Ej. 5" /></label>
+            <label class="form-field"><span>Mesa</span>
+              @if (tables().length) {
+                <select [(ngModel)]="tableNumber" name="tableNumber">
+                  <option value="">Sin mesa / para llevar</option>
+                  @for (table of tables(); track table.id || table._id) {
+                    <option [value]="table.name">{{ table.name }}{{ table.occupied ? " · en uso (puedes agregar)" : " · libre" }}</option>
+                  }
+                </select>
+              } @else {
+                <input [(ngModel)]="tableNumber" name="tableNumber" maxlength="20" placeholder="Ej. Mesa 1" />
+              }
+              <small class="field-hint-inline">Opcional · puedes agregar más pedidos a una mesa en uso</small>
+            </label>
           }
         </div>
 

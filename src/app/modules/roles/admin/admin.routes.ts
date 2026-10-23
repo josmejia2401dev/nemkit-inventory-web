@@ -62,6 +62,10 @@ export const adminRoutes: Routes = [
         path: "employees",
         loadComponent: () => import("../../inventory/employees/employees.component").then((m) => m.EmployeesComponent),
       },
+      {
+        path: "tables",
+        loadComponent: () => import("../../inventory/tables/tables.component").then((m) => m.TablesComponent),
+      },
       ...foundationProfileRoutes,
     ],
   },
