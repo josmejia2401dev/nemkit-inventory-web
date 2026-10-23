@@ -171,6 +171,10 @@ export interface InventoryDocument {
   // Estado de cobro de la venta: "paid" (pagada) o "pending" (por cobrar).
   paymentStatus?: "paid" | "pending";
   paidAt?: string | null;
+  // Cancelación: motivo (código) y nota libre.
+  voidReason?: string;
+  voidNote?: string;
+  voidedAt?: string | null;
   kitchenStatus?: "pending" | "preparing" | "ready" | "served" | null;
   tableNumber?: string;
   notes?: string;

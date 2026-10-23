@@ -14,6 +14,11 @@ import { NotificationService } from "../../../core/services/notification.service
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import {
+  CancelOrderDialogComponent,
+  CancelOrderResult,
+} from "../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
+import { cancelReasonLabel } from "../../../shared/cancel-reasons";
 
 type DocumentKind = "purchases" | "sales";
 interface DraftItem {
@@ -25,7 +30,7 @@ interface DraftItem {
 @Component({
   selector: "app-inventory-documents",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CancelOrderDialogComponent],
   templateUrl: "./documents.component.html",
 })
 export class DocumentsComponent implements OnInit {
@@ -54,6 +59,7 @@ export class DocumentsComponent implements OnInit {
   saving = signal(false);
   dialogOpen = signal(false);
   previewDocument = signal<InventoryDocument | null>(null);
+  cancellingDocument = signal<InventoryDocument | null>(null);
   customerFormOpen = signal(false);
   customerSaving = signal(false);
   selectedContactId: number | "" = "";
@@ -279,6 +285,35 @@ export class DocumentsComponent implements OnInit {
       next: () => {
         this.notifications.success("Venta cobrada", "El pago quedó registrado.");
         this.load();
+      },
+    });
+  }
+
+  /** ¿Se puede cancelar? Ventas no anuladas (restaurante: típicamente pendientes). */
+  canCancel(document: InventoryDocument): boolean {
+    return this.isSale && document.status !== "void";
+  }
+
+  cancelReasonLabel(value: string | undefined | null): string {
+    return cancelReasonLabel(value);
+  }
+
+  openCancel(document: InventoryDocument): void {
+    this.cancellingDocument.set(document);
+  }
+
+  confirmCancel(result: CancelOrderResult): void {
+    const document = this.cancellingDocument();
+    if (!document) return;
+    this.inventory.put<InventoryDocument>(`/sales/${document.id || document._id}/cancel`, result).subscribe({
+      next: () => {
+        this.notifications.success("Pedido cancelado", "El pedido quedó cancelado y el stock se repuso.");
+        this.cancellingDocument.set(null);
+        this.load();
+      },
+      error: (err) => {
+        const detail = err?.error?.message || "No se pudo cancelar el pedido.";
+        this.notifications.error("No se pudo cancelar", detail);
       },
     });
   }

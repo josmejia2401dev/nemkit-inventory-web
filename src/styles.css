@@ -1554,6 +1554,7 @@ a { color: inherit; text-decoration: none; }
 .dashboard-extra-grid .report-summary small { font-size: 10px; }
 
 .field-hint-inline { color: #a0aaa3; font-weight: 500; font-size: 9px; }
+.field-optional { color: #a0aaa3; font-weight: 500; font-size: 10px; text-transform: none; letter-spacing: 0; }
 
 /* Venta: check de entrega a domicilio */
 .delivery-check { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 6px; padding: 12px 14px; border: 1px solid rgba(36,65,52,.12); border-radius: 10px; background: #f4f7f1; cursor: pointer; }
@@ -1677,3 +1678,16 @@ a { color: inherit; text-decoration: none; }
 .log-line--info .log-level { color: #8fd0a6; }
 .log-line--debug .log-level { color: #9db4c7; }
 .log-msg { flex: 1; }
+
+/* ── Botón de acción destructiva y diálogo de cancelación de pedido ──── */
+.button-danger { color: #fff; background: #b4453b; box-shadow: 0 5px 12px rgba(180,69,59,.16); }
+.button-danger:hover { background: #99382f; box-shadow: 0 7px 16px rgba(180,69,59,.22); }
+.button-danger:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.cancel-dialog { width: min(100%, 460px); }
+.cancel-hint { margin: 0 0 14px; color: #647a6c; font-size: 13px; }
+.cancel-reasons { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.cancel-reason { text-align: left; padding: 11px 14px; border: 1px solid rgba(36,65,52,.14); border-radius: 10px; background: #fff; color: #3c4e43; font-size: 13px; font-weight: 600; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.cancel-reason:hover { border-color: #c9a14a; }
+.cancel-reason--active { border-color: #b4453b; background: #fdecea; color: #8a332b; }
+.button-link-danger { display: inline-flex; align-items: center; gap: 5px; padding: 0 4px; border: 0; background: transparent; color: #b4453b; font-size: 11px; font-weight: 600; cursor: pointer; }
+.button-link-danger:hover { color: #99382f; text-decoration: underline; }

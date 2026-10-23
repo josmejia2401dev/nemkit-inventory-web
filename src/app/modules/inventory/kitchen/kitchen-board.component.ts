@@ -6,6 +6,10 @@ import { InventoryService } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import {
+  CancelOrderDialogComponent,
+  CancelOrderResult,
+} from "../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
 
 type KitchenStatus = "pending" | "preparing" | "ready" | "served";
 
@@ -39,7 +43,7 @@ const NEXT: Record<KitchenStatus, { status: KitchenStatus; label: string } | nul
 @Component({
   selector: "app-kitchen-board",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CancelOrderDialogComponent],
   templateUrl: "./kitchen-board.component.html",
 })
 export class KitchenBoardComponent implements OnInit {
@@ -53,6 +57,7 @@ export class KitchenBoardComponent implements OnInit {
 
   orders = signal<KitchenOrder[]>([]);
   loading = signal(true);
+  cancelling = signal<KitchenOrder | null>(null);
 
   ngOnInit(): void {
     this.load();
@@ -114,6 +119,27 @@ export class KitchenBoardComponent implements OnInit {
       next: () => {
         this.notifications.success(`Pedido #${order.id}`, "Cobro registrado.");
         this.load(true);
+      },
+    });
+  }
+
+  /** Abre el diálogo para cancelar un pedido con motivo. */
+  openCancel(order: KitchenOrder): void {
+    this.cancelling.set(order);
+  }
+
+  confirmCancel(result: CancelOrderResult): void {
+    const order = this.cancelling();
+    if (!order) return;
+    this.inventory.put(`/kitchen/${order.id}/cancel`, result).subscribe({
+      next: () => {
+        this.notifications.success(`Pedido #${order.id}`, "Pedido cancelado.");
+        this.cancelling.set(null);
+        this.load(true);
+      },
+      error: (err) => {
+        const detail = err?.error?.message || "No se pudo cancelar el pedido.";
+        this.notifications.error("No se pudo cancelar", detail);
       },
     });
   }

@@ -39,6 +39,7 @@
               <div class="kitchen-card-foot">
                 <small>{{ order.employeeSnapshot?.name || "—" }}</small>
                 <span class="kitchen-card-actions">
+                  <button class="button-link-danger" (click)="openCancel(order)" title="Cancelar pedido"><i class="pi pi-ban"></i> Cancelar</button>
                   @if (order.paymentStatus === "pending") {
                     <button class="button button-secondary button-small" (click)="pay(order)"><i class="pi pi-dollar"></i> Cobrar</button>
                   }
@@ -56,4 +57,12 @@
       </section>
     }
   </div>
+}
+
+@if (cancelling(); as order) {
+  <app-cancel-order-dialog
+    [title]="order.tableNumber ? 'Cancelar pedido · Mesa ' + order.tableNumber : 'Cancelar pedido #' + order.id"
+    (confirm)="confirmCancel($event)"
+    (cancel)="cancelling.set(null)"
+  />
 }
