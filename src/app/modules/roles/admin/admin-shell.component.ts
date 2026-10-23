@@ -37,8 +37,9 @@ export class AdminShellComponent {
 
   private buildNav(): NavItem[] {
     const items = [...this.baseNav];
-    // "Mesas" solo tiene sentido en restaurantes.
+    // "Cocina" y "Mesas" solo tienen sentido en restaurantes.
     if (this.store.company()?.businessType === "restaurant") {
+      items.push({ path: "/admin/kitchen", label: "Cocina", icon: "pi pi-stopwatch" });
       items.push({ path: "/admin/tables", label: "Mesas", icon: "pi pi-stop" });
     }
     return items;

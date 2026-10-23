@@ -67,6 +67,10 @@ export const adminRoutes: Routes = [
         path: "tables",
         loadComponent: () => import("../../inventory/tables/tables.component").then((m) => m.TablesComponent),
       },
+      {
+        path: "kitchen",
+        loadComponent: () => import("../../inventory/kitchen/kitchen-board.component").then((m) => m.KitchenBoardComponent),
+      },
       ...foundationProfileRoutes,
       ...foundationFeedbackRoutes,
     ],
