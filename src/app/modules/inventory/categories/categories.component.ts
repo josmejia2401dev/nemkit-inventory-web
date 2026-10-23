@@ -6,6 +6,7 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { ConfirmService } from "../../../core/services/confirm.service";
 
 @Component({
   selector: "app-categories",
@@ -16,6 +17,7 @@ import { NotificationService } from "../../../core/services/notification.service
 export class CategoriesComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
+  private confirm = inject(ConfirmService);
 
   categories = signal<InventoryCategory[]>([]);
   loading = signal(true);
@@ -102,10 +104,17 @@ export class CategoriesComponent implements OnInit {
     });
   }
 
-  remove(category: InventoryCategory): void {
+  async remove(category: InventoryCategory): Promise<void> {
     const id = category.id ?? category._id;
-    if (!id || !window.confirm(`¿Eliminar la categoría "${category.name}"?`))
-      return;
+    if (!id) return;
+    const ok = await this.confirm.ask({
+      title: "Eliminar categoría",
+      message: `¿Eliminar la categoría "${category.name}"?`,
+      confirmLabel: "Eliminar",
+      cancelLabel: "Cancelar",
+      severity: "danger",
+    });
+    if (!ok) return;
 
     this.inventory.delete(`/categories/${id}`).subscribe({
       next: () => {

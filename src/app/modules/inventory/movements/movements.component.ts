@@ -67,6 +67,7 @@ export class MovementsComponent implements OnInit {
       .list<InventoryProduct>("/products", {
         limit: 100,
         status: "active",
+        types: "simple,ingredient",
         search: this.productSearch.trim() || undefined,
       })
       .subscribe({

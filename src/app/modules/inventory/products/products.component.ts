@@ -7,8 +7,10 @@ import {
   InventoryCategory,
   InventoryProduct,
   InventoryService,
+  ProductType,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 
 @Component({
@@ -20,6 +22,7 @@ import { formatCurrency } from "../../../shared/utils/currency.util";
 export class ProductsComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
+  private confirm = inject(ConfirmService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -35,6 +38,14 @@ export class ProductsComponent implements OnInit {
   editingId: number | null = null;
   search = "";
   categoryFilter: number | "" = "";
+
+  // Insumos disponibles para armar recetas (productos ingredient o simple).
+  ingredients = signal<InventoryProduct[]>([]);
+  readonly typeOptions: Array<{ value: ProductType; label: string; hint: string }> = [
+    { value: "simple", label: "Simple", hint: "Se compra y se vende (tiendas)" },
+    { value: "ingredient", label: "Insumo", hint: "Se compra, no se vende suelto" },
+    { value: "prepared", label: "Plato / preparado", hint: "Se vende con receta de insumos" },
+  ];
   statusFilter = "";
   stockState = "";
   specificProductId: number | "" = "";
@@ -135,6 +146,29 @@ export class ProductsComponent implements OnInit {
     });
   }
 
+  loadIngredients(): void {
+    // Insumos y simples activos, aptos para formar parte de una receta.
+    this.inventory.listAll<InventoryProduct>("/products", {
+      status: "active",
+      types: "ingredient,simple",
+    }).subscribe({
+      next: (products) => this.ingredients.set(products),
+    });
+  }
+
+  ingredientName(id: number): string {
+    const p = this.ingredients().find((item) => (item.id ?? item._id) === id);
+    return p ? p.name : `Insumo #${id}`;
+  }
+
+  addRecipeItem(): void {
+    this.form.recipe = [...this.form.recipe, { ingredientId: "" as number | "", quantity: 1 }];
+  }
+
+  removeRecipeItem(index: number): void {
+    this.form.recipe = this.form.recipe.filter((_item, i) => i !== index);
+  }
+
   categoryName(id: number): string {
     return (
       this.categories().find((category) => (category.id ?? category._id) === id)
@@ -145,6 +179,7 @@ export class ProductsComponent implements OnInit {
   openCreate(): void {
     this.editingId = null;
     this.form = this.emptyForm();
+    this.loadIngredients();
     this.dialogOpen.set(true);
   }
 
@@ -152,6 +187,7 @@ export class ProductsComponent implements OnInit {
     this.editingId = product.id ?? product._id ?? null;
     this.form = {
       categoryId: product.categoryId,
+      type: product.type ?? "simple",
       sku: product.sku,
       barcode: product.barcode ?? "",
       name: product.name,
@@ -161,7 +197,12 @@ export class ProductsComponent implements OnInit {
       minimumStock: product.minimumStock ?? 0,
       status: product.status,
       image: product.image?.url ?? "",
+      recipe: (product.recipe ?? []).map((ri) => ({
+        ingredientId: ri.ingredientId as number | "",
+        quantity: ri.quantity,
+      })),
     };
+    this.loadIngredients();
     this.dialogOpen.set(true);
   }
 
@@ -182,8 +223,23 @@ export class ProductsComponent implements OnInit {
       return;
     }
 
-    const body = {
+    const isPrepared = this.form.type === "prepared";
+    let recipe: Array<{ ingredientId: number; quantity: number }> | undefined;
+    if (isPrepared) {
+      const valid = this.form.recipe.filter((ri) => ri.ingredientId && Number(ri.quantity) > 0);
+      if (!valid.length) {
+        this.notifications.warn(
+          "Falta la receta",
+          "Un plato necesita al menos un insumo con cantidad.",
+        );
+        return;
+      }
+      recipe = valid.map((ri) => ({ ingredientId: Number(ri.ingredientId), quantity: Number(ri.quantity) }));
+    }
+
+    const body: Record<string, unknown> = {
       categoryId: Number(this.form.categoryId),
+      type: this.form.type,
       sku: this.form.sku.trim(),
       barcode: this.form.barcode.trim(),
       name: this.form.name.trim(),
@@ -196,6 +252,7 @@ export class ProductsComponent implements OnInit {
         ? { url: this.form.image.trim() }
         : undefined,
     };
+    if (isPrepared) body["recipe"] = recipe;
 
     this.saving.set(true);
     const request = this.editingId
@@ -218,9 +275,17 @@ export class ProductsComponent implements OnInit {
     });
   }
 
-  remove(product: InventoryProduct): void {
+  async remove(product: InventoryProduct): Promise<void> {
     const id = product.id ?? product._id;
-    if (!id || !window.confirm(`¿Eliminar "${product.name}"?`)) return;
+    if (!id) return;
+    const ok = await this.confirm.ask({
+      title: "Eliminar producto",
+      message: `¿Eliminar "${product.name}"? El producto se moverá a eliminados.`,
+      confirmLabel: "Eliminar",
+      cancelLabel: "Cancelar",
+      severity: "danger",
+    });
+    if (!ok) return;
 
     this.inventory.delete(`/products/${id}`).subscribe({
       next: () => {
@@ -236,6 +301,7 @@ export class ProductsComponent implements OnInit {
   private emptyForm() {
     return {
       categoryId: "" as number | "",
+      type: "simple" as ProductType,
       sku: "",
       barcode: "",
       name: "",
@@ -245,6 +311,7 @@ export class ProductsComponent implements OnInit {
       minimumStock: 0,
       status: "active" as "active" | "inactive",
       image: "",
+      recipe: [] as Array<{ ingredientId: number | ""; quantity: number }>,
     };
   }
 }

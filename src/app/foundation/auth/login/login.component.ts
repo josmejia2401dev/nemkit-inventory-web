@@ -7,6 +7,7 @@ import { PasswordModule } from "primeng/password";
 import { MessageModule } from "primeng/message";
 import { ApiService } from "../../../core/services/api.service";
 import { AuthStore } from "../../../core/store/auth.store";
+import { homeForRoles } from "../../../core/guards/role-home";
 
 @Component({
   selector: "app-login",
@@ -45,7 +46,7 @@ export class LoginComponent {
             res.data.refreshToken,
             res.data.company,
           );
-          this.router.navigate(["/dashboard"]);
+          this.router.navigateByUrl(homeForRoles(res.data.user?.roles));
         },
         error: (err) => {
           this.loading.set(false);

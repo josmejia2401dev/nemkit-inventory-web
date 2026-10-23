@@ -3,9 +3,17 @@ import { Injectable, inject } from "@angular/core";
 import { EMPTY, Observable, Subject, expand, reduce, tap } from "rxjs";
 import { environment } from "../../../environments/environment";
 
+export type ProductType = "simple" | "ingredient" | "prepared";
+
+export interface RecipeItem {
+  ingredientId: number;
+  quantity: number;
+}
+
 export interface InventoryProduct {
   id: number;
   _id?: number;
+  type?: ProductType;
   sku: string;
   barcode?: string;
   name: string;
@@ -17,6 +25,7 @@ export interface InventoryProduct {
   stock: number;
   minimumStock: number;
   status: "active" | "inactive";
+  recipe?: RecipeItem[];
   image?: { url?: string; storageKey?: string };
 }
 
@@ -67,7 +76,8 @@ export type EmployeeRole =
   | "seller"
   | "courier"
   | "warehouse"
-  | "waiter";
+  | "waiter"
+  | "cook";
 
 export type DocumentType = "CC" | "CE" | "NIT" | "PAS" | "TI";
 

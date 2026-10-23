@@ -8,20 +8,40 @@
 </div>
 
 @if (!isSupplier) {
-  <section class="panel customer-lookup">
-    <div class="customer-lookup-head"><span class="panel-icon"><i class="pi pi-id-card"></i></span><div><strong>Identificar cliente</strong><small>Escribe el celular o documento para ver su perfil al instante.</small></div></div>
-    <div class="customer-lookup-bar">
-      <input [(ngModel)]="lookupTerm" (keyup.enter)="lookup()" placeholder="Celular o documento" aria-label="Celular o documento del cliente" inputmode="numeric" />
-      <button class="button button-primary" [disabled]="lookupLoading()" (click)="lookup()"><i [class]="lookupLoading() ? 'pi pi-spin pi-spinner' : 'pi pi-search'"></i> Buscar cliente</button>
+  <section class="customer-lookup">
+    <div class="customer-lookup-head">
+      <span class="customer-lookup-icon"><i class="pi pi-id-card"></i></span>
+      <div class="customer-lookup-copy">
+        <strong>Identificar cliente</strong>
+        <small>Escribe el celular o documento y ve su perfil al instante.</small>
+      </div>
     </div>
+    <form class="customer-lookup-bar" (ngSubmit)="lookup()">
+      <div class="customer-lookup-field">
+        <i class="pi pi-search"></i>
+        <input [(ngModel)]="lookupTerm" name="lookupTerm" (keyup.enter)="lookup()" placeholder="Ej. 3001234567 o 1098765432" aria-label="Celular o documento del cliente" inputmode="numeric" autocomplete="off" />
+        @if (lookupTerm) {
+          <button type="button" class="customer-lookup-clear" aria-label="Limpiar" (click)="lookupTerm = ''"><i class="pi pi-times"></i></button>
+        }
+      </div>
+      <button type="submit" class="button button-primary customer-lookup-btn" [disabled]="lookupLoading()">
+        <i [class]="lookupLoading() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"></i>
+        <span>{{ lookupLoading() ? "Buscando…" : "Buscar" }}</span>
+      </button>
+    </form>
   </section>
 }
 
 <section class="panel catalog-panel">
   <div class="filter-bar">
-    <div class="filter-title"><span class="panel-icon"><i [class]="isSupplier ? 'pi pi-truck' : 'pi pi-users'"></i></span><strong>{{ title }}</strong><span class="filter-count">{{ contacts().length }}</span></div>
-    <input class="contact-search" [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Buscar por nombre, documento o correo" aria-label="Buscar contactos" />
-    <button class="icon-button filter-refresh" title="Buscar" (click)="applySearch()"><i class="pi pi-search"></i></button>
+    <div class="filter-title"><span class="panel-icon"><i [class]="isSupplier ? 'pi pi-truck' : 'pi pi-users'"></i></span><strong>{{ title }}</strong><span class="filter-count">{{ contactCount() }}</span></div>
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Buscar por nombre, documento o correo" aria-label="Buscar contactos" />
+      @if (search) {
+        <button type="button" class="clear-search" aria-label="Limpiar búsqueda" (click)="search = ''; applySearch()"><i class="pi pi-times"></i></button>
+      }
+    </div>
   </div>
   @if (loading()) {
     <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando {{ title.toLowerCase() }}…</span></div>

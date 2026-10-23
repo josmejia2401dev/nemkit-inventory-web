@@ -1,0 +1,49 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">COCINA</p>
+    <h1>Comandas</h1>
+    <p class="heading-subtitle">Los pedidos aparecen aquí al tomarse. Avanza cada uno según lo preparas.</p>
+  </div>
+  <button class="button button-secondary" (click)="load()"><i class="pi pi-refresh"></i> Actualizar</button>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando comandas…</span></div>
+} @else {
+  <div class="kitchen-board">
+    @for (col of columns; track col) {
+      <section class="kitchen-col kitchen-col--{{ col }}">
+        <header class="kitchen-col-head">
+          <span>{{ statusLabels[col] }}</span>
+          <span class="kitchen-col-count">{{ ordersFor(col).length }}</span>
+        </header>
+        <div class="kitchen-col-body">
+          @for (order of ordersFor(col); track order.id) {
+            <article class="kitchen-card">
+              <div class="kitchen-card-head">
+                <strong>@if (order.tableNumber) { Mesa {{ order.tableNumber }} } @else { Pedido #{{ order.id }} }</strong>
+                <span class="kitchen-time" [class.kitchen-time--late]="minutesAgo(order.date) >= 15">{{ minutesAgo(order.date) }} min</span>
+              </div>
+              @if (order.tableNumber) { <small class="kitchen-card-ref">Pedido #{{ order.id }}</small> }
+              <ul class="kitchen-items">
+                @for (item of order.items; track $index) {
+                  <li><b>{{ item.quantity }}×</b> {{ item.name }}</li>
+                }
+              </ul>
+              @if (order.notes) { <p class="kitchen-notes"><i class="pi pi-comment"></i> {{ order.notes }}</p> }
+              <div class="kitchen-card-foot">
+                <small>{{ order.employeeSnapshot?.name || "—" }}</small>
+                @if (next(order); as n) {
+                  <button class="button button-primary button-small" (click)="advance(order)">{{ n.label }}</button>
+                }
+              </div>
+            </article>
+          }
+          @if (!ordersFor(col).length) {
+            <div class="kitchen-empty">Sin pedidos</div>
+          }
+        </div>
+      </section>
+    }
+  </div>
+}

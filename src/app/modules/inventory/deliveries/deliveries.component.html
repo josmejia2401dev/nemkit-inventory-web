@@ -33,12 +33,14 @@
 
           <footer class="delivery-card-actions">
             @if (delivery.status !== "delivered" && delivery.status !== "cancelled") {
-              <select class="delivery-courier-select" [ngModel]="delivery.courierId ?? ''" (ngModelChange)="assignCourier(delivery, $event)" aria-label="Asignar domiciliario">
-                <option value="">Asignar domiciliario</option>
-                @for (courier of couriers(); track courier.id || courier._id) {
-                  <option [ngValue]="courier.id || courier._id">{{ courier.name }}</option>
-                }
-              </select>
+              @if (!isCourier()) {
+                <select class="delivery-courier-select" [ngModel]="delivery.courierId ?? ''" (ngModelChange)="assignCourier(delivery, $event)" aria-label="Asignar domiciliario">
+                  <option value="">Asignar domiciliario</option>
+                  @for (courier of couriers(); track courier.id || courier._id) {
+                    <option [ngValue]="courier.id || courier._id">{{ courier.name }}</option>
+                  }
+                </select>
+              }
               @if (nextStatusLabel(delivery.status)) {
                 <button class="button button-primary button-small" (click)="advance(delivery)"><i class="pi pi-arrow-right"></i> {{ nextStatusLabel(delivery.status) }}</button>
               }

@@ -11,6 +11,7 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 
 type DocumentKind = "purchases" | "sales";
@@ -31,6 +32,12 @@ export class DocumentsComponent implements OnInit {
   private notifications = inject(NotificationService);
   private route = inject(ActivatedRoute);
   private destroyRef = inject(DestroyRef);
+  private store = inject(AuthStore);
+
+  /** Modo restaurante: habilita el campo de mesa en la venta. */
+  get isRestaurant(): boolean {
+    return this.store.company()?.businessType === "restaurant";
+  }
 
   kind: DocumentKind = "purchases";
   documents = signal<InventoryDocument[]>([]);
@@ -48,6 +55,7 @@ export class DocumentsComponent implements OnInit {
   customerSaving = signal(false);
   selectedContactId: number | "" = "";
   selectedEmployeeId: number | "" = "";
+  tableNumber = "";
   // Entrega a domicilio (solo ventas)
   isDelivery = false;
   couriers = signal<InventoryEmployee[]>([]);
@@ -125,9 +133,12 @@ export class DocumentsComponent implements OnInit {
 
   loadProducts(search = ""): void {
     this.productSearch = search;
+    // Ventas: vendibles (simple + plato). Compras: comprables (simple + insumo).
+    const types = this.isSale ? "simple,prepared" : "simple,ingredient";
     this.inventory.list<InventoryProduct>("/products", {
       limit: 100,
       status: "active",
+      types,
       search: search.trim() || undefined,
     }).subscribe({
       next: (response) => {
@@ -169,20 +180,13 @@ export class DocumentsComponent implements OnInit {
   }
 
   loadEmployees(): void {
-    this.inventory.list<InventoryEmployee>("/employees", {
-      limit: 100,
-      status: "active",
-    }).subscribe({
+    this.inventory.get<InventoryEmployee[]>("/employee-options").subscribe({
       next: (response) => this.employees.set(response.data ?? []),
     });
   }
 
   loadCouriers(): void {
-    this.inventory.list<InventoryEmployee>("/employees", {
-      limit: 100,
-      status: "active",
-      role: "courier",
-    }).subscribe({
+    this.inventory.get<InventoryEmployee[]>("/employee-options", { role: "courier" }).subscribe({
       next: (response) => this.couriers.set(response.data ?? []),
     });
   }
@@ -202,6 +206,7 @@ export class DocumentsComponent implements OnInit {
     this.customerForm = this.emptyCustomerForm();
     this.selectedContactId = "";
     this.selectedEmployeeId = "";
+    this.tableNumber = "";
     this.isDelivery = false;
     this.selectedCourierId = "";
     this.deliveryAddress = "";
@@ -340,6 +345,9 @@ export class DocumentsComponent implements OnInit {
     };
     body[this.isSale ? "customerId" : "supplierId"] = Number(this.selectedContactId);
     if (this.selectedEmployeeId) body["employeeId"] = Number(this.selectedEmployeeId);
+    if (this.isSale && this.isRestaurant && this.tableNumber.trim()) {
+      body["tableNumber"] = this.tableNumber.trim();
+    }
 
     if (this.isSale && this.isDelivery) {
       if (!this.deliveryAddress.trim()) {

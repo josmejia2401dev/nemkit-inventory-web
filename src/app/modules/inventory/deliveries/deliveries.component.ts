@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, computed, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import {
@@ -9,6 +9,8 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { ConfirmService } from "../../../core/services/confirm.service";
+import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 
 const STATUS_LABELS: Record<DeliveryStatus, string> = {
@@ -36,6 +38,15 @@ const NEXT_STATUS: Record<DeliveryStatus, DeliveryStatus | null> = {
 export class DeliveriesComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
+  private confirm = inject(ConfirmService);
+  private store = inject(AuthStore);
+
+  /** El domiciliario gestiona sus entregas pero NO asigna domiciliarios. */
+  isCourier = computed(() => {
+    const roles: string[] = this.store.user()?.roles ?? [];
+    const privileged = roles.includes("ADMIN") || roles.includes("SUPERADMIN");
+    return !privileged && roles.includes("COURIER");
+  });
 
   readonly statusFilters: Array<{ value: "" | DeliveryStatus; label: string }> = [
     { value: "", label: "Todos" },
@@ -61,7 +72,9 @@ export class DeliveriesComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
-    this.loadCouriers();
+    // El domiciliario no asigna domiciliarios, así que no necesita la lista
+    // (además el backend restringe /employees a administradores).
+    if (!this.isCourier()) this.loadCouriers();
   }
 
   statusLabel(status: DeliveryStatus): string {
@@ -108,7 +121,7 @@ export class DeliveriesComponent implements OnInit {
   }
 
   loadCouriers(): void {
-    this.inventory.list<InventoryEmployee>("/employees", { limit: 100, status: "active", role: "courier" })
+    this.inventory.get<InventoryEmployee[]>("/employee-options", { role: "courier" })
       .subscribe({ next: (response) => this.couriers.set(response.data ?? []) });
   }
 
@@ -134,8 +147,15 @@ export class DeliveriesComponent implements OnInit {
     this.changeStatus(delivery, next);
   }
 
-  cancel(delivery: InventoryDelivery): void {
-    if (!window.confirm(`¿Cancelar el domicilio #${delivery.id}?`)) return;
+  async cancel(delivery: InventoryDelivery): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: "Cancelar domicilio",
+      message: `¿Cancelar el domicilio #${delivery.id}?`,
+      confirmLabel: "Cancelar domicilio",
+      cancelLabel: "Volver",
+      severity: "warn",
+    });
+    if (!ok) return;
     this.changeStatus(delivery, "cancelled");
   }
 
@@ -148,10 +168,16 @@ export class DeliveriesComponent implements OnInit {
     });
   }
 
-  voidDelivery(delivery: InventoryDelivery): void {
-    const reason = window.prompt(`Anular la entrega #${delivery.id}. Esto revierte la venta y repone el stock.\nMotivo (opcional):`);
-    if (reason === null) return;
-    this.inventory.put<InventoryDelivery>(`/deliveries/${delivery.id}/void`, { reason }).subscribe({
+  async voidDelivery(delivery: InventoryDelivery): Promise<void> {
+    const ok = await this.confirm.ask({
+      title: "Anular entrega",
+      message: `¿Anular la entrega #${delivery.id}? Se revertirá la venta y se repondrá el stock. Esta acción no se puede deshacer.`,
+      confirmLabel: "Anular entrega",
+      cancelLabel: "Volver",
+      severity: "danger",
+    });
+    if (!ok) return;
+    this.inventory.put<InventoryDelivery>(`/deliveries/${delivery.id}/void`, {}).subscribe({
       next: () => {
         this.notifications.success("Entrega anulada", "La venta fue revertida y el stock repuesto.");
         this.load();

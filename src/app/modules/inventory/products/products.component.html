@@ -200,6 +200,14 @@
       <form (ngSubmit)="save()" class="dialog-form">
         <div class="form-grid">
           <label class="form-field form-field--wide"
+            ><span>Tipo de producto</span
+            ><select [(ngModel)]="form.type" name="type">
+              @for (opt of typeOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }} — {{ opt.hint }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-field form-field--wide"
             ><span>Nombre del producto <b>*</b></span
             ><input
               [(ngModel)]="form.name"
@@ -296,10 +304,41 @@
             ></textarea>
           </label>
         </div>
-        <p class="form-hint">
-          <i class="pi pi-info-circle"></i> Las existencias se inicializan en
-          cero. Registra una entrada para agregar stock.
-        </p>
+
+        @if (form.type === "prepared") {
+          <div class="recipe-editor">
+            <div class="items-heading">
+              <div><span class="eyebrow">RECETA</span><strong>Insumos del plato</strong></div>
+              <button type="button" class="button button-secondary button-small" (click)="addRecipeItem()"><i class="pi pi-plus"></i> Agregar insumo</button>
+            </div>
+            @if (!form.recipe.length) {
+              <p class="form-hint"><i class="pi pi-info-circle"></i> Agrega los insumos que consume este plato. Al venderlo se descontarán del stock.</p>
+            }
+            @for (ri of form.recipe; track $index) {
+              <div class="recipe-row">
+                <label class="form-field recipe-ingredient"><span>Insumo</span>
+                  <select [(ngModel)]="ri.ingredientId" [name]="'ingredient-' + $index" required>
+                    <option value="">Selecciona un insumo</option>
+                    @for (ing of ingredients(); track ing.id || ing._id) {
+                      <option [ngValue]="ing.id || ing._id">{{ ing.name }}{{ ing.sku ? " · " + ing.sku : "" }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="form-field recipe-qty"><span>Cantidad</span>
+                  <input type="number" min="0" step="any" [(ngModel)]="ri.quantity" [name]="'recipe-qty-' + $index" required />
+                </label>
+                <button type="button" class="icon-button icon-button--danger recipe-remove" title="Quitar insumo" (click)="removeRecipeItem($index)"><i class="pi pi-times"></i></button>
+              </div>
+            }
+          </div>
+        }
+
+        @if (form.type !== "prepared") {
+          <p class="form-hint">
+            <i class="pi pi-info-circle"></i> Las existencias se inicializan en
+            cero. Registra una entrada para agregar stock.
+          </p>
+        }
         <div class="dialog-actions">
           <button
             type="button"

@@ -8,6 +8,7 @@ const COMPANY_KEY = "deploy_company";
 export interface CompanyInfo {
   id: number;
   name: string;
+  businessType?: "retail" | "restaurant";
 }
 
 @Injectable({ providedIn: "root" })

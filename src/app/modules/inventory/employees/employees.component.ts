@@ -8,6 +8,7 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { ConfirmService } from "../../../core/services/confirm.service";
 
 interface EmployeeForm {
   name: string;
@@ -30,6 +31,7 @@ interface EmployeeForm {
 export class EmployeesComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
+  private confirm = inject(ConfirmService);
 
   readonly roleOptions: Array<{ value: EmployeeRole; label: string }> = [
     { value: "admin", label: "Administrador" },
@@ -38,6 +40,7 @@ export class EmployeesComponent implements OnInit {
     { value: "courier", label: "Domiciliario" },
     { value: "warehouse", label: "Bodeguero" },
     { value: "waiter", label: "Mesero" },
+    { value: "cook", label: "Cocinero" },
   ];
 
   readonly documentTypeOptions: Array<{ value: DocumentType; label: string }> = [
@@ -178,9 +181,17 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  remove(employee: InventoryEmployee): void {
+  async remove(employee: InventoryEmployee): Promise<void> {
     const id = employee.id ?? employee._id;
-    if (!id || !window.confirm(`¿Eliminar a ${employee.name}?`)) return;
+    if (!id) return;
+    const ok = await this.confirm.ask({
+      title: "Eliminar empleado",
+      message: `¿Eliminar a ${employee.name}?`,
+      confirmLabel: "Eliminar",
+      cancelLabel: "Cancelar",
+      severity: "danger",
+    });
+    if (!ok) return;
     this.inventory.delete(`/employees/${id}`).subscribe({
       next: () => {
         this.notifications.success("Empleado eliminado");

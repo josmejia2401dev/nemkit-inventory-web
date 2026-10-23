@@ -12,7 +12,7 @@
     class="sidebar"
     [class.sidebar--open]="sidebarOpen()"
   >
-    <a routerLink="/dashboard" class="brand" (click)="closeSidebar()">
+    <a [routerLink]="dashboardPath" class="brand" (click)="closeSidebar()">
       <span class="brand-mark"><i class="pi pi-box"></i></span>
       <span class="brand-copy"
         ><strong>{{ company()?.name || "nemkit" }}</strong><small>INVENTARIO</small></span
@@ -25,15 +25,12 @@
         <a
           [routerLink]="item.path"
           routerLinkActive="nav-link--active"
-          [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+          [routerLinkActiveOptions]="{ exact: item.path === dashboardPath }"
           class="nav-link"
           (click)="closeSidebar()"
         >
           <i [class]="item.icon"></i><span>{{ item.label }}</span>
-          @if (item.path === "/products") {
-            <span class="nav-arrow">↗</span>
-          }
-          @if (item.path === "/alerts" && alertCount()) {
+          @if (showAlerts && item.path.endsWith("/alerts") && alertCount()) {
             <span class="nav-count">{{ alertCount() > 99 ? "99+" : alertCount() }}</span>
           }
         </a>
@@ -43,7 +40,7 @@
     <div class="sidebar-bottom">
       <div class="user-row">
         <a
-          routerLink="/profile"
+          [routerLink]="profilePath"
           class="user-profile-link"
           aria-label="Ver y editar mi perfil"
           (click)="closeSidebar()"
@@ -88,12 +85,14 @@
           ><i class="pi pi-calendar"></i>
           {{ today | date: "EEEE, d MMMM" }}</span
         >
-        <a routerLink="/alerts" class="alert-bell" [attr.aria-label]="alertCount() ? alertCount() + ' alertas de stock' : 'Alertas de stock'" title="Alertas de stock">
-          <i class="pi pi-bell"></i>
-          @if (alertCount()) { <span>{{ alertCount() > 99 ? "99+" : alertCount() }}</span> }
-        </a>
+        @if (showAlerts) {
+          <a [routerLink]="alertsPath" class="alert-bell" [attr.aria-label]="alertCount() ? alertCount() + ' alertas de stock' : 'Alertas de stock'" title="Alertas de stock">
+            <i class="pi pi-bell"></i>
+            @if (alertCount()) { <span>{{ alertCount() > 99 ? "99+" : alertCount() }}</span> }
+          </a>
+        }
         <a
-          routerLink="/profile"
+          [routerLink]="profilePath"
           class="topbar-avatar"
           title="Mi perfil"
           aria-label="Ver y editar mi perfil"
@@ -116,7 +115,7 @@
       <a
         [routerLink]="item.path"
         routerLinkActive="mobile-tab--active"
-        [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+        [routerLinkActiveOptions]="{ exact: item.path === dashboardPath }"
         [attr.aria-label]="item.label"
         (click)="closeSidebar()"
       >

@@ -7,6 +7,7 @@ import { PasswordModule } from "primeng/password";
 import { MessageModule } from "primeng/message";
 import { ApiService } from "../../../core/services/api.service";
 import { AuthStore } from "../../../core/store/auth.store";
+import { homeForRoles } from "../../../core/guards/role-home";
 
 @Component({
   selector: "app-register",
@@ -28,6 +29,7 @@ export class RegisterComponent {
 
   fullName = "";
   companyName = "";
+  businessType: "retail" | "restaurant" = "retail";
   email = "";
   password = "";
   error = signal<string | null>(null);
@@ -40,6 +42,7 @@ export class RegisterComponent {
       .post<any>("/auth/register", {
         fullName: this.fullName,
         companyName: this.companyName,
+        businessType: this.businessType,
         email: this.email,
         password: this.password,
       })
@@ -52,7 +55,7 @@ export class RegisterComponent {
             response.data.company,
           );
           this.loading.set(false);
-          this.router.navigate(["/dashboard"]);
+          this.router.navigateByUrl(homeForRoles(response.data.user?.roles));
         },
         error: (error) => {
           this.loading.set(false);

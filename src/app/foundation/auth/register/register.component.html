@@ -70,6 +70,13 @@
             autocomplete="organization"
             maxlength="160"
         /></span>
+        <label class="field-label" for="businessType">Tipo de negocio</label>
+        <span class="input-wrap"
+          ><i class="pi pi-shop"></i
+          ><select id="businessType" [(ngModel)]="businessType" name="businessType" class="auth-select">
+            <option value="retail">Tienda / comercio</option>
+            <option value="restaurant">Restaurante</option>
+          </select></span>
         <label class="field-label" for="email">Correo electrónico</label>
         <span class="input-wrap"
           ><i class="pi pi-envelope"></i

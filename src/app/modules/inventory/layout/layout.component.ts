@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from "@angular/core";
+import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CommonModule } from "@angular/common";
 import {
@@ -13,6 +13,17 @@ import { AuthStore } from "../../../core/store/auth.store";
 import { BackendStatusTagComponent } from "../../../shared/components/backend-status-tag/backend-status-tag.component";
 import { InventoryService, InventoryStockAlerts } from "../../../core/services/inventory.service";
 
+export interface NavItem {
+  path: string;
+  label: string;
+  icon: string;
+}
+
+/**
+ * Shell de la aplicación (sidebar + topbar + outlet). Es agnóstico al rol: cada
+ * espacio de rol le pasa su propio menú (`navItems`), las rutas destacadas del
+ * tab-bar móvil (`mobilePaths`) y si debe mostrar el contador de alertas.
+ */
 @Component({
   selector: "app-layout",
   standalone: true,
@@ -31,6 +42,19 @@ export class LayoutComponent implements OnInit {
   private inventory = inject(InventoryService);
   private destroyRef = inject(DestroyRef);
 
+  /** Menú del rol. Rutas absolutas (p. ej. "/cashier/sales"). */
+  @Input({ required: true }) navItems: NavItem[] = [];
+  /** Rutas destacadas en el tab-bar móvil. */
+  @Input() mobilePaths: string[] = [];
+  /** Muestra el contador de alertas de stock (bodeguero/admin). */
+  @Input() showAlerts = false;
+  /** Ruta del dashboard del rol (para la marca). */
+  @Input() dashboardPath = "/dashboard";
+  /** Ruta de alertas del rol (si aplica). */
+  @Input() alertsPath = "/alerts";
+  /** Ruta del perfil del rol. */
+  @Input() profilePath = "/profile";
+
   sidebarOpen = signal(false);
   alertCount = signal(0);
   user = this.store.user;
@@ -38,54 +62,30 @@ export class LayoutComponent implements OnInit {
   today = new Date();
 
   ngOnInit(): void {
-    this.refreshAlertCount();
-    this.inventory.changes
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.refreshAlertCount());
-    this.router.events
-      .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe(() => this.refreshAlertCount());
+    if (this.showAlerts) {
+      this.refreshAlertCount();
+      this.inventory.changes
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.refreshAlertCount());
+      this.router.events
+        .pipe(
+          filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe(() => this.refreshAlertCount());
+    }
+  }
+
+  get mobileNavItems(): NavItem[] {
+    const paths = this.mobilePaths.length ? this.mobilePaths : this.navItems.map((item) => item.path);
+    return this.navItems.filter((item) => paths.includes(item.path)).slice(0, 4);
   }
 
   get currentPage(): string {
-    const path = this.router.url.split("/")[1];
-    if (path === "profile") return "Mi perfil";
-
-    return (
-      this.navItems.find((item) => item.path.endsWith(path))?.label ?? "Resumen"
-    );
-  }
-
-  // ADMIN y SUPERADMIN ven todo. Los demás roles ven solo lo relevante a su cargo.
-  // El backend es quien autoriza de verdad; esto es únicamente UX.
-  private allNavItems = [
-    { path: "/dashboard", label: "Resumen", icon: "pi pi-chart-pie", roles: ["ADMIN", "CASHIER", "SELLER", "COURIER", "WAREHOUSE", "WAITER"] },
-    { path: "/alerts", label: "Alertas", icon: "pi pi-bell", roles: ["ADMIN", "WAREHOUSE"] },
-    { path: "/reports", label: "Reportes", icon: "pi pi-chart-bar", roles: ["ADMIN"] },
-    { path: "/products", label: "Productos", icon: "pi pi-box", roles: ["ADMIN", "CASHIER", "SELLER", "WAREHOUSE"] },
-    { path: "/purchases", label: "Compras", icon: "pi pi-truck", roles: ["ADMIN", "WAREHOUSE"] },
-    { path: "/sales", label: "Ventas", icon: "pi pi-receipt", roles: ["ADMIN", "CASHIER", "SELLER", "WAITER"] },
-    { path: "/deliveries", label: "Domicilios", icon: "pi pi-send", roles: ["ADMIN", "CASHIER", "SELLER", "COURIER", "WAITER"] },
-    { path: "/categories", label: "Categorías", icon: "pi pi-tag", roles: ["ADMIN", "WAREHOUSE"] },
-    { path: "/movements", label: "Movimientos", icon: "pi pi-arrow-right-arrow-left", roles: ["ADMIN", "WAREHOUSE"] },
-    { path: "/suppliers", label: "Proveedores", icon: "pi pi-building", roles: ["ADMIN", "WAREHOUSE"] },
-    { path: "/customers", label: "Clientes", icon: "pi pi-users", roles: ["ADMIN", "CASHIER", "SELLER", "WAITER"] },
-    { path: "/employees", label: "Empleados", icon: "pi pi-id-card", roles: ["ADMIN"] },
-  ];
-
-  navItems = this.allNavItems.filter((item) => this.canSee(item.roles));
-
-  mobileNavItems = this.navItems
-    .filter((item) => ["/dashboard", "/products", "/sales", "/deliveries"].includes(item.path))
-    .slice(0, 4);
-
-  private canSee(allowedRoles: string[]): boolean {
-    const roles: string[] = this.store.user()?.roles ?? [];
-    if (roles.includes("SUPERADMIN") || roles.includes("ADMIN")) return true;
-    return allowedRoles.some((role) => roles.includes(role));
+    const segments = this.router.url.split("/").filter(Boolean);
+    const last = segments[segments.length - 1] ?? "";
+    if (last === "profile") return "Mi perfil";
+    return this.navItems.find((item) => item.path.endsWith(last))?.label ?? "Resumen";
   }
 
   toggleSidebar(): void {

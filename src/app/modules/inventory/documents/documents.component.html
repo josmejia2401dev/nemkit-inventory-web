@@ -55,6 +55,9 @@
           }
           <label class="form-field"><span>Fecha <b>*</b></span><input type="date" [(ngModel)]="date" name="date" required /></label>
           <label class="form-field"><span>{{ employeeLabel }}</span><select [(ngModel)]="selectedEmployeeId" name="employeeId"><option value="">Sin asignar</option>@for (employee of employees(); track employee.id || employee._id) { <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option> }</select></label>
+          @if (isSale && isRestaurant) {
+            <label class="form-field"><span>Mesa</span><input [(ngModel)]="tableNumber" name="tableNumber" maxlength="20" placeholder="Ej. 5" /></label>
+          }
         </div>
 
         @if (isSale) {

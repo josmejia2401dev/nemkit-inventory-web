@@ -9,6 +9,7 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 
 type ContactKind = "suppliers" | "customers";
@@ -22,6 +23,7 @@ type ContactKind = "suppliers" | "customers";
 export class ContactsComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
+  private confirm = inject(ConfirmService);
   private route = inject(ActivatedRoute);
 
   kind: ContactKind = "suppliers";
@@ -140,9 +142,17 @@ export class ContactsComponent implements OnInit {
     });
   }
 
-  remove(contact: InventoryContact): void {
+  async remove(contact: InventoryContact): Promise<void> {
     const id = contact.id ?? contact._id;
-    if (!id || !window.confirm(`¿Eliminar a ${contact.name}?`)) return;
+    if (!id) return;
+    const ok = await this.confirm.ask({
+      title: `Eliminar ${this.singular}`,
+      message: `¿Eliminar a ${contact.name}?`,
+      confirmLabel: "Eliminar",
+      cancelLabel: "Cancelar",
+      severity: "danger",
+    });
+    if (!ok) return;
     this.inventory.delete(`/${this.kind}/${id}`).subscribe({
       next: () => {
         this.notifications.success("Registro eliminado");
