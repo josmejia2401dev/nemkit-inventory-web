@@ -45,6 +45,8 @@
   </div>
   @if (loading()) {
     <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando {{ title.toLowerCase() }}…</span></div>
+  } @else if (loadFailed()) {
+    <div class="empty-state" role="alert"><span class="empty-icon"><i class="pi pi-exclamation-circle"></i></span><strong>No se pudieron cargar {{ title.toLowerCase() }}</strong><p>Revisa tu conexión e inténtalo de nuevo.</p><button class="button button-secondary button-small" (click)="load()"><i class="pi pi-refresh"></i> Intentar de nuevo</button></div>
   } @else if (contacts().length) {
     <div class="table-scroll">
       <table class="inventory-table">
@@ -105,11 +107,19 @@
       </div>
 
       <div class="report-summary">
-        <article><small>Total comprado</small><strong>{{ money(data.customer.stats?.totalSpent) }}</strong></article>
-        <article><small>Compras</small><strong>{{ data.customer.stats?.purchaseCount || 0 }}</strong></article>
-        <article><small>Última compra</small><strong>{{ data.customer.stats?.lastPurchaseAt ? (data.customer.stats?.lastPurchaseAt | date: "d MMM yyyy" : "" : "es-CO") : "—" }}</strong></article>
-        <article><small>Cliente desde</small><strong>{{ data.customer.stats?.firstPurchaseAt ? (data.customer.stats?.firstPurchaseAt | date: "MMM yyyy" : "" : "es-CO") : "—" }}</strong></article>
+        <article><small>Pedidos</small><strong>{{ data.analytics.totalOrders }}</strong></article>
+        <article><small>Domicilios</small><strong>{{ data.analytics.deliveryOrders }}</strong></article>
+        <article><small>En sitio</small><strong>{{ data.analytics.onSiteOrders }}</strong></article>
+        <article><small>Compras pagadas</small><strong>{{ data.analytics.paidOrders }}</strong></article>
+        <article><small>Total comprado</small><strong>{{ money(data.analytics.totalSpent) }}</strong></article>
+        <article><small>Promedio por compra</small><strong>{{ money(data.analytics.averageOrderValue) }}</strong></article>
+        <article><small>Frecuencia</small><strong>{{ purchaseFrequency(data.analytics.averageDaysBetweenPurchases) }}</strong></article>
+        <article><small>Última compra</small><strong>{{ data.analytics.lastOrderAt ? (data.analytics.lastOrderAt | date: "d MMM yyyy" : "" : "es-CO") : "—" }}</strong></article>
       </div>
+
+      @if (data.analytics.totalOrders === 0) {
+        <div class="customer-first-visit"><i class="pi pi-sparkles"></i><span><strong>Primera visita</strong><small>Aún no hay pedidos anteriores. Es una buena oportunidad para darle la bienvenida.</small></span></div>
+      }
 
       <div class="items-heading"><div><span class="eyebrow">HISTORIAL</span><strong>Compras recientes</strong></div></div>
       @if (data.history.data.length) {

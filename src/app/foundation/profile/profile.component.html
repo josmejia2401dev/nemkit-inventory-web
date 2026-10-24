@@ -140,38 +140,6 @@
           </div>
         </section>
 
-        @if (isAdmin) {
-          <section class="panel security-card">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">CONFIGURACIÓN</p>
-                <h3>Negocio</h3>
-                <p>Nombre y tipo de tu negocio. Cambiar el tipo activa o desactiva el modo restaurante.</p>
-              </div>
-              <span class="section-mark"><i class="pi pi-shop"></i></span>
-            </div>
-            <form (ngSubmit)="saveBusiness()" class="profile-form">
-              <label class="form-field">
-                <span>Nombre del negocio</span>
-                <input [(ngModel)]="editCompanyName" name="companyName" maxlength="160" />
-              </label>
-              <label class="form-field">
-                <span>Tipo de negocio</span>
-                <select [(ngModel)]="editBusinessType" name="businessType">
-                  <option value="retail">Tienda / comercio</option>
-                  <option value="restaurant">Restaurante</option>
-                </select>
-              </label>
-              <p class="form-hint"><i class="pi pi-info-circle"></i> Al cambiar el tipo, cierra sesión y vuelve a entrar para aplicar el nuevo modo (cocina, mesas).</p>
-              <div class="profile-form-footer">
-                <button class="button button-primary" [disabled]="savingBusiness()">
-                  <i [class]="savingBusiness() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>
-                  {{ savingBusiness() ? "Guardando…" : "Guardar negocio" }}
-                </button>
-              </div>
-            </form>
-          </section>
-        }
       </div>
 
       <aside class="profile-side-column">

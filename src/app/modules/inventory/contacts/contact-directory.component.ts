@@ -1,7 +1,6 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, Input, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { ActivatedRoute } from "@angular/router";
 import {
   CustomerProfile,
   InventoryContact,
@@ -12,23 +11,23 @@ import { NotificationService } from "../../../core/services/notification.service
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 
-type ContactKind = "suppliers" | "customers";
+export type ContactKind = "suppliers" | "customers";
 
 @Component({
   selector: "app-inventory-contacts",
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: "./contacts.component.html",
+  templateUrl: "./contact-directory.component.html",
 })
-export class ContactsComponent implements OnInit {
+export class ContactDirectoryComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
-  private route = inject(ActivatedRoute);
 
-  kind: ContactKind = "suppliers";
+  @Input({ required: true }) kind!: ContactKind;
   contacts = signal<InventoryContact[]>([]);
   loading = signal(true);
+  loadFailed = signal(false);
   page = signal(1);
   pageCount = signal(1);
   contactCount = signal(0);
@@ -64,12 +63,12 @@ export class ContactsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.kind = this.route.snapshot.data["kind"] === "customers" ? "customers" : "suppliers";
     this.load();
   }
 
   load(): void {
     this.loading.set(true);
+    this.loadFailed.set(false);
     this.inventory.list<InventoryContact>(`/${this.kind}`, {
       page: this.page(),
       limit: 20,
@@ -81,7 +80,10 @@ export class ContactsComponent implements OnInit {
         this.contactCount.set(response.pagination?.total ?? response.data.length);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.loadFailed.set(true);
+        this.loading.set(false);
+      },
     });
   }
 
@@ -203,6 +205,16 @@ export class ContactsComponent implements OnInit {
 
   tierStars(tier?: LoyaltyTier): number {
     return { bronze: 1, silver: 2, gold: 3, platinum: 4 }[tier ?? "bronze"];
+  }
+
+  purchaseFrequency(days: number | null | undefined): string {
+    if (days == null) return "Aún sin frecuencia";
+    if (days < 1) return "Varias veces al día";
+    if (days < 2) return "A diario";
+    if (days < 7) return `Cada ${Math.round(days)} días`;
+    if (days < 14) return "Cada semana";
+    if (days < 45) return "Cada mes";
+    return `Cada ${Math.round(days)} días`;
   }
 
   money(value?: number): string {

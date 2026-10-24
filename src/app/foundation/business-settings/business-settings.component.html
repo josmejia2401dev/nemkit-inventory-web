@@ -1,0 +1,69 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ADMINISTRACIÓN</p>
+    <h1>Configuración del negocio</h1>
+    <p class="heading-subtitle">
+      Administra el nombre y el tipo de operación de tu empresa.
+    </p>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel panel" role="status">
+    <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+    <span>Cargando configuración…</span>
+  </div>
+} @else if (loadFailed()) {
+  <section class="panel empty-state" role="alert">
+    <strong>No se pudo cargar la configuración</strong>
+    <p>Comprueba la conexión e inténtalo de nuevo.</p>
+    <button class="button button-secondary button-small" (click)="load()">
+      Intentar de nuevo
+    </button>
+  </section>
+} @else {
+  <section class="panel profile-settings-card">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">DETALLES DE LA EMPRESA</p>
+        <h2>Negocio</h2>
+        <p>El tipo activa funciones específicas como cocina y mesas.</p>
+      </div>
+      <span class="section-mark"><i class="pi pi-shop" aria-hidden="true"></i></span>
+    </div>
+
+    <form class="profile-form" (ngSubmit)="save()">
+      <label class="form-field">
+        <span>Nombre del negocio <b>*</b></span>
+        <input
+          [(ngModel)]="companyName"
+          name="companyName"
+          autocomplete="organization"
+          maxlength="160"
+          minlength="2"
+          required
+        />
+      </label>
+
+      <label class="form-field profile-field-spaced">
+        <span>Tipo de negocio</span>
+        <select [(ngModel)]="businessType" name="businessType" required>
+          <option value="retail">Tienda / comercio</option>
+          <option value="restaurant">Restaurante</option>
+        </select>
+      </label>
+
+      <p class="form-hint">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        Cierra sesión y vuelve a entrar para aplicar el nuevo modo de operación.
+      </p>
+
+      <div class="profile-form-footer">
+        <button class="button button-primary" [disabled]="saving()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'" aria-hidden="true"></i>
+          {{ saving() ? "Guardando…" : "Guardar negocio" }}
+        </button>
+      </div>
+    </form>
+  </section>
+}

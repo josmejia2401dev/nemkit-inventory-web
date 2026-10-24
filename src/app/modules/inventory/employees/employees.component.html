@@ -4,7 +4,7 @@
     <h1>Empleados</h1>
     <p class="heading-subtitle">Registra a tu equipo y asígnale un cargo para operar ventas, compras y domicilios.</p>
   </div>
-  <button class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo empleado</button>
+  <div class="heading-actions"><button class="button button-secondary" (click)="associationOpen.set(true)"><i class="pi pi-link"></i> Asociar cuenta</button><button class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo empleado</button></div>
 </div>
 
 <section class="panel catalog-panel">
@@ -44,7 +44,7 @@
               <td class="row-actions-cell">
                 <div class="row-actions">
                   <button class="icon-button" title="Editar" (click)="openEdit(employee)"><i class="pi pi-pencil"></i></button>
-                  <button class="icon-button icon-button--danger" title="Eliminar" (click)="remove(employee)"><i class="pi pi-trash"></i></button>
+                  <button class="icon-button icon-button--danger" title="Desasociar cuenta y empleado" (click)="remove(employee)"><i class="pi pi-link-slash"></i></button>
                 </div>
               </td>
             </tr>
@@ -115,6 +115,20 @@
           <button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button>
           <button class="button button-primary" [disabled]="saving()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Guardar" }}</button>
         </div>
+      </form>
+    </section>
+  </div>
+}
+
+@if (associationOpen()) {
+  <div class="dialog-backdrop" (click)="associationOpen.set(false)">
+    <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="dialog-heading"><div><p class="eyebrow">EQUIPO DE TRABAJO</p><h2>Asociar cuenta existente</h2></div><button class="icon-button" (click)="associationOpen.set(false)"><i class="pi pi-times"></i></button></div>
+      <form class="dialog-form" (ngSubmit)="associateExisting()">
+        <p class="form-hint"><i class="pi pi-info-circle"></i> Usa el correo de una cuenta que fue desasociada de una empresa. Conservará su contraseña y recuperará acceso con el cargo asignado.</p>
+        <label class="form-field"><span>Correo de la cuenta <b>*</b></span><input [(ngModel)]="associationEmail" name="associationEmail" type="email" required maxlength="254" autocomplete="email" /></label>
+        <label class="form-field"><span>Cargo <b>*</b></span><select [(ngModel)]="associationRole" name="associationRole" required><option value="" disabled>Selecciona un cargo</option>@for (option of roleOptions; track option.value) { <option [value]="option.value">{{ option.label }}</option> }</select></label>
+        <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="associationOpen.set(false)">Cancelar</button><button class="button button-primary" [disabled]="associationSaving()"><i [class]="associationSaving() ? 'pi pi-spin pi-spinner' : 'pi pi-link'"></i>{{ associationSaving() ? "Asociando…" : "Asociar cuenta" }}</button></div>
       </form>
     </section>
   </div>

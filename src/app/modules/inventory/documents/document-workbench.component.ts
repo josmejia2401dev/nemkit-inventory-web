@@ -1,9 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Component, DestroyRef, inject, OnInit, signal } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Component, inject, Input, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { ActivatedRoute } from "@angular/router";
 import {
+  CustomerProfile,
   InventoryContact,
   InventoryDocument,
   InventoryEmployee,
@@ -19,8 +18,11 @@ import {
   CancelOrderResult,
 } from "../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
 import { cancelReasonLabel } from "../../../shared/cancel-reasons";
+import { ORDER_STATUS_LABELS, OrderStatus } from "../order-status.constants";
+import { CustomerSaleSummaryComponent } from "./customer-sale-summary.component";
+import { DocumentReceiptComponent } from "./document-receipt.component";
+import type { DocumentKind } from "./document.types";
 
-type DocumentKind = "purchases" | "sales";
 interface DraftItem {
   productId: number | "";
   quantity: number;
@@ -30,15 +32,13 @@ interface DraftItem {
 @Component({
   selector: "app-inventory-documents",
   standalone: true,
-  imports: [CommonModule, FormsModule, CancelOrderDialogComponent],
-  templateUrl: "./documents.component.html",
+  imports: [CommonModule, FormsModule, CancelOrderDialogComponent, CustomerSaleSummaryComponent, DocumentReceiptComponent],
+  templateUrl: "./document-workbench.component.html",
 })
-export class DocumentsComponent implements OnInit {
+export class DocumentWorkbenchComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
-  private route = inject(ActivatedRoute);
-  private destroyRef = inject(DestroyRef);
   private store = inject(AuthStore);
 
   /** Modo restaurante: habilita el campo de mesa en la venta. */
@@ -46,7 +46,7 @@ export class DocumentsComponent implements OnInit {
     return this.store.company()?.businessType === "restaurant";
   }
 
-  kind: DocumentKind = "purchases";
+  @Input({ required: true }) kind!: DocumentKind;
   documents = signal<InventoryDocument[]>([]);
   products = signal<InventoryProduct[]>([]);
   contacts = signal<InventoryContact[]>([]);
@@ -62,6 +62,8 @@ export class DocumentsComponent implements OnInit {
   cancellingDocument = signal<InventoryDocument | null>(null);
   customerFormOpen = signal(false);
   customerSaving = signal(false);
+  customerProfile = signal<CustomerProfile | null>(null);
+  customerProfileLoading = signal(false);
   selectedContactId: number | "" = "";
   selectedEmployeeId: number | "" = "";
   tableNumber = "";
@@ -95,29 +97,29 @@ export class DocumentsComponent implements OnInit {
     return this.isSale ? "Cliente" : "Proveedor";
   }
 
+  orderStatusLabel(document: InventoryDocument): string | null {
+    const status = document.orderStatus ?? document.kitchenStatus;
+    return status ? ORDER_STATUS_LABELS[status as OrderStatus] : null;
+  }
+
   get employeeLabel(): string {
     return this.isSale ? "Vendedor" : "Quién recibe";
   }
 
   ngOnInit(): void {
     this.loadProducts();
-    this.route.data
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-        this.kind = data["kind"] === "sales" ? "sales" : "purchases";
-        this.selectedContactId = "";
-        this.dialogOpen.set(false);
-        this.customerFormOpen.set(false);
-        this.previewDocument.set(null);
-        this.page.set(1);
-        this.load();
-        this.loadContacts();
-        this.loadEmployees();
-        if (this.kind === "sales") {
-          this.loadCouriers();
-          if (this.isRestaurant) this.loadTables();
-        }
-      });
+    this.selectedContactId = "";
+    this.dialogOpen.set(false);
+    this.customerFormOpen.set(false);
+    this.previewDocument.set(null);
+    this.page.set(1);
+    this.load();
+    this.loadContacts();
+    this.loadEmployees();
+    if (this.kind === "sales") {
+      this.loadCouriers();
+      if (this.isRestaurant) this.loadTables();
+    }
   }
 
   loadTables(): void {
@@ -213,6 +215,22 @@ export class DocumentsComponent implements OnInit {
     const customer = this.contacts().find(
       (candidate) => (candidate.id ?? candidate._id) === Number(this.selectedContactId),
     );
+    this.customerProfile.set(null);
+    if (customer && this.selectedContactId) {
+      const customerId = customer.id ?? customer._id;
+      if (customerId) {
+        this.customerProfileLoading.set(true);
+        this.inventory.get<CustomerProfile>(`/customers/${customerId}/profile`, { limit: 1 }).subscribe({
+          next: (response) => {
+            if (Number(this.selectedContactId) === customerId) {
+              this.customerProfile.set(response.data);
+            }
+            this.customerProfileLoading.set(false);
+          },
+          error: () => this.customerProfileLoading.set(false),
+        });
+      }
+    }
     if (customer?.address && !this.deliveryAddress.trim()) {
       this.deliveryAddress = customer.address;
     }
@@ -222,6 +240,8 @@ export class DocumentsComponent implements OnInit {
     this.customerFormOpen.set(false);
     this.customerForm = this.emptyCustomerForm();
     this.selectedContactId = "";
+    this.customerProfile.set(null);
+    this.customerProfileLoading.set(false);
     this.selectedEmployeeId = "";
     this.tableNumber = "";
     this.isDelivery = false;
@@ -367,6 +387,7 @@ export class DocumentsComponent implements OnInit {
         this.customerSaving.set(false);
         this.contacts.update((contacts) => [...contacts, response.data]);
         this.selectedContactId = response.data.id ?? response.data._id ?? "";
+        this.contactChanged();
         this.customerForm = this.emptyCustomerForm();
         this.customerFormOpen.set(false);
         this.notifications.success(
@@ -444,30 +465,6 @@ export class DocumentsComponent implements OnInit {
       },
       error: () => this.saving.set(false),
     });
-  }
-
-  printDocument(): void {
-    const printContent = document.querySelector<HTMLElement>(".print-document");
-    if (!printContent) {
-      window.print();
-      return;
-    }
-
-    const originalWidth = printContent.style.width;
-    printContent.style.width = "72mm";
-    const pageHeightMm = Math.max(
-      60,
-      Math.ceil((printContent.getBoundingClientRect().height * 25.4) / 96 + 4),
-    );
-    printContent.style.width = originalWidth;
-
-    const printPageStyle = document.createElement("style");
-    printPageStyle.id = "inventory-print-page-size";
-    printPageStyle.textContent = `@page { size: 80mm ${pageHeightMm}mm; margin: 0; }`;
-    document.head.appendChild(printPageStyle);
-
-    window.addEventListener("afterprint", () => printPageStyle.remove(), { once: true });
-    window.print();
   }
 
   closeDocument(): void {

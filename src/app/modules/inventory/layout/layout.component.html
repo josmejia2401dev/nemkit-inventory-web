@@ -25,6 +25,7 @@
         <a
           [routerLink]="item.path"
           routerLinkActive="nav-link--active"
+          ariaCurrentWhenActive="page"
           [routerLinkActiveOptions]="{ exact: item.path === dashboardPath }"
           class="nav-link"
           (click)="closeSidebar()"
@@ -39,7 +40,7 @@
 
     <div class="sidebar-bottom">
       <a
-        [routerLink]="reportPath"
+        [routerLink]="effectiveReportPath"
         routerLinkActive="report-link--active"
         class="report-link"
         aria-label="Reportar un problema"
@@ -88,6 +89,7 @@
       <div class="breadcrumb">
         <span>Inventario</span><i class="pi pi-angle-right"></i
         ><strong>{{ currentPage }}</strong>
+        <span class="role-context-badge" [attr.aria-label]="'Rol activo: ' + currentRoleLabel">{{ currentRoleLabel }}</span>
       </div>
       <div class="topbar-actions">
         <span class="today-label"
@@ -119,11 +121,12 @@
     </footer>
   </main>
 
-  <nav class="mobile-tab-bar" aria-label="Navegación principal">
+  <nav class="mobile-tab-bar" [style.--mobile-nav-count]="mobileNavItems.length" aria-label="Navegación principal">
     @for (item of mobileNavItems; track item.path) {
       <a
         [routerLink]="item.path"
         routerLinkActive="mobile-tab--active"
+        ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: item.path === dashboardPath }"
         [attr.aria-label]="item.label"
         (click)="closeSidebar()"

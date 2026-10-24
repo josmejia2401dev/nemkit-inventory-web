@@ -1,5 +1,12 @@
 import { CommonModule } from "@angular/common";
-import { Component, DestroyRef, inject, OnInit, signal } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+} from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -12,15 +19,18 @@ import {
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import { ProductCatalogService } from "./product-catalog.service";
 
 @Component({
   selector: "app-products",
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: "./products.component.html",
+  templateUrl: "./product-management.component.html",
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductsComponent implements OnInit {
+export class ProductManagementComponent implements OnInit {
   private inventory = inject(InventoryService);
+  private catalog = inject(ProductCatalogService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
   private route = inject(ActivatedRoute);
@@ -93,8 +103,8 @@ export class ProductsComponent implements OnInit {
 
   loadProducts(): void {
     this.loading.set(true);
-    this.inventory
-      .list<InventoryProduct>("/products", {
+    this.catalog
+      .list({
         search: this.search,
         categoryId: this.categoryFilter || undefined,
         status: this.statusFilter || undefined,
@@ -150,7 +160,7 @@ export class ProductsComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.inventory.listAll<InventoryCategory>("/categories").subscribe({
+    this.catalog.listCategories().subscribe({
       next: (categories) => this.categories.set(categories),
     });
   }

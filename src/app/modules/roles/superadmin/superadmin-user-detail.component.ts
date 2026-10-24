@@ -26,14 +26,14 @@ import { PlatformService, PlatformUser } from "../../../core/services/platform.s
           <div><small>Nombre</small><strong>{{ u.fullName }}</strong></div>
           <div><small>Correo</small><strong>{{ u.email }}</strong></div>
           <div><small>Roles</small><div class="role-chips">@for (r of u.roles; track r) { <span class="role-chip">{{ r }}</span> }</div></div>
-          <div><small>Tipo</small><strong>{{ u.isOwner ? "Dueño de cuenta" : "Empleado" }}</strong></div>
+          <div><small>Tipo de cuenta</small><strong>{{ u.accountLabel }}</strong></div>
           <div><small>Empresa</small><strong>{{ u.companyName || "—" }}</strong></div>
           <div><small>Tipo de negocio</small><strong>{{ u.businessType === "restaurant" ? "Restaurante" : "Tienda" }}</strong></div>
           <div><small>Estado</small><strong>{{ u.recordStatus }}</strong></div>
           <div><small>Último acceso</small><strong>{{ u.security?.lastLoginAt ? (u.security?.lastLoginAt | date: "d MMM yyyy, HH:mm" : "" : "es-CO") : "Nunca" }}</strong></div>
           <div><small>Creado</small><strong>{{ u.createdAt | date: "d MMM yyyy" : "" : "es-CO" }}</strong></div>
-          @if (!u.isOwner && u.tenantId) {
-            <div><small>Empresa (tenant)</small><a [routerLink]="['/superadmin/companies', u.tenantId]">Ver empresa #{{ u.tenantId }}</a></div>
+          @if (u.isEmployee && u.tenantId) {
+            <div><small>Empresa actual</small><a [routerLink]="['/superadmin/companies', u.tenantId]">{{ u.companyName || "Ver empresa #" + u.tenantId }}</a></div>
           }
         </div>
       </section>
@@ -55,6 +55,26 @@ import { PlatformService, PlatformUser } from "../../../core/services/platform.s
           </table></div>
         </section>
       }
+
+      @if (u.employmentHistory; as employmentHistory) {
+        @if (employmentHistory.length) {
+          <section class="panel">
+            <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i class="pi pi-history"></i></span><strong>Historial de asociaciones</strong><span class="filter-count">{{ employmentHistory.length }}</span></div></div>
+            <div class="table-scroll"><table class="inventory-table">
+              <thead><tr><th>EMPRESA</th><th>CARGO</th><th>DESDE</th><th>HASTA</th><th>ESTADO</th></tr></thead>
+              <tbody>@for (membership of employmentHistory; track membership.employeeId) {
+                <tr>
+                  <td data-label="Empresa"><a [routerLink]="['/superadmin/companies', membership.companyId]">{{ membership.companyName }}</a></td>
+                  <td data-label="Cargo">{{ membership.role }}</td>
+                  <td data-label="Desde">{{ membership.associatedAt | date: "d MMM yyyy" : "" : "es-CO" }}</td>
+                  <td data-label="Hasta">{{ membership.disassociatedAt ? (membership.disassociatedAt | date: "d MMM yyyy" : "" : "es-CO") : "—" }}</td>
+                  <td data-label="Estado">{{ membership.isCurrent ? "Asociado" : "Finalizado" }}</td>
+                </tr>
+              }</tbody>
+            </table></div>
+          </section>
+        }
+      }
       }
     } @else {
       <div class="empty-state"><span class="empty-icon"><i class="pi pi-user"></i></span><strong>Usuario no encontrado</strong></div>
@@ -74,6 +94,14 @@ export class SuperadminUserDetailComponent implements OnInit {
       next: (response) => {
         this.user.set(response.data);
         this.loading.set(false);
+        this.platform.getEmploymentHistory(id).subscribe({
+          next: (history) => this.user.update((user) => user
+            ? { ...user, employmentHistory: history.data ?? [] }
+            : user),
+          error: () => this.user.update((user) => user
+            ? { ...user, employmentHistory: [] }
+            : user),
+        });
       },
       error: () => this.loading.set(false),
     });

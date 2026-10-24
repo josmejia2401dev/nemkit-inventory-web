@@ -17,7 +17,12 @@ export interface PlatformUser {
   companyName: string;
   businessType: "retail" | "restaurant";
   employeeId: number | null;
+  accountType: "company_owner" | "employee" | "unassigned_employee" | "super_admin";
+  accountLabel: string;
   isOwner: boolean;
+  isEmployee: boolean;
+  isUnassigned: boolean;
+  isSuperAdmin: boolean;
   recordStatus: string;
   security?: {
     lastLoginAt?: string | null;
@@ -27,6 +32,21 @@ export interface PlatformUser {
   createdAt?: string;
   updatedAt?: string;
   employees?: PlatformUser[];
+  employmentHistory?: PlatformEmploymentHistory[];
+}
+
+export interface PlatformEmploymentHistory {
+  employeeId: number;
+  companyId: number;
+  companyName: string;
+  role: string;
+  status: string;
+  recordStatus: string;
+  associatedAt: string;
+  disassociatedAt: string | null;
+  associatedBy: number | null;
+  disassociatedBy: number | null;
+  isCurrent: boolean;
 }
 
 export interface PlatformCompany {
@@ -87,12 +107,24 @@ export class PlatformService {
     return this.api.get<PlatformUser>(`/platform/users/${id}`);
   }
 
+  getEmploymentHistory(id: number): Observable<ApiResponse<PlatformEmploymentHistory[]>> {
+    return this.api.get<PlatformEmploymentHistory[]>(`/platform/users/${id}/employment-history`);
+  }
+
   listCompanies(params?: Record<string, unknown>): Observable<PaginatedResponse<PlatformCompany>> {
     return this.api.get<PlatformCompany[]>("/platform/companies", params) as unknown as Observable<PaginatedResponse<PlatformCompany>>;
   }
 
   getCompany(id: number): Observable<ApiResponse<PlatformCompanyDetail>> {
     return this.api.get<PlatformCompanyDetail>(`/platform/companies/${id}`);
+  }
+
+  associateEmployee(companyId: number, email: string, role: string): Observable<ApiResponse<unknown>> {
+    return this.api.post<unknown>(`/platform/companies/${companyId}/members`, { email, role });
+  }
+
+  disassociateEmployee(companyId: number, userId: number): Observable<ApiResponse<null>> {
+    return this.api.delete<null>(`/platform/companies/${companyId}/members/${userId}`);
   }
 
   logFiles(): Observable<ApiResponse<LogFile[]>> {

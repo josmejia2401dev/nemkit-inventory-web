@@ -1,18 +1,16 @@
 import { CommonModule } from "@angular/common";
-import { Component, DestroyRef, inject, OnInit, signal } from "@angular/core";
+import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { interval } from "rxjs";
-import { InventoryService } from "../../../core/services/inventory.service";
+import { InventoryService, KitchenStatus } from "../../../core/services/inventory.service";
+import { ORDER_STATUS_LABELS } from "../order-status.constants";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
-import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 import {
   CancelOrderDialogComponent,
   CancelOrderResult,
 } from "../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
-
-type KitchenStatus = "pending" | "preparing" | "ready" | "served";
 
 interface KitchenOrder {
   id: number;
@@ -27,11 +25,13 @@ interface KitchenOrder {
   items: Array<{ name: string; quantity: number }>;
 }
 
+export type KitchenBoardMode = "service" | "preparation";
+
 const STATUS_LABELS: Record<KitchenStatus, string> = {
-  pending: "Pendiente",
-  preparing: "En preparación",
-  ready: "Listo",
-  served: "Servido",
+  pending: ORDER_STATUS_LABELS.pending,
+  preparing: ORDER_STATUS_LABELS.preparing,
+  ready: ORDER_STATUS_LABELS.ready,
+  served: ORDER_STATUS_LABELS.served,
 };
 
 const NEXT: Record<KitchenStatus, { status: KitchenStatus; label: string; icon: string } | null> = {
@@ -51,17 +51,12 @@ export class KitchenBoardComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
-  private store = inject(AuthStore);
   private destroyRef = inject(DestroyRef);
+
+  @Input({ required: true }) mode!: KitchenBoardMode;
 
   readonly columns: KitchenStatus[] = ["pending", "preparing", "ready"];
   readonly statusLabels = STATUS_LABELS;
-
-  /** El cocinero solo prepara: no cobra ni cancela (eso es de mesero/caja). */
-  get canCharge(): boolean {
-    const roles: string[] = this.store.user()?.roles ?? [];
-    return roles.some((r) => ["CASHIER", "SELLER", "WAITER", "ADMIN", "SUPERADMIN"].includes(r));
-  }
 
   orders = signal<KitchenOrder[]>([]);
   loading = signal(true);

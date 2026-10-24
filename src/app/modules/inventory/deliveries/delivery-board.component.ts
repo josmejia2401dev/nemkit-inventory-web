@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, computed, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, Input, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import {
@@ -10,18 +10,10 @@ import {
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
-import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import { ORDER_STATUS_LABELS } from "../order-status.constants";
 
-const STATUS_LABELS: Record<DeliveryStatus, string> = {
-  pending: "Pendiente",
-  preparing: "Preparando",
-  ready: "Listo para recoger",
-  picked_up: "Recogido",
-  on_route: "En camino",
-  delivered: "Entregado",
-  cancelled: "Cancelado",
-};
+const STATUS_LABELS: Record<DeliveryStatus, string> = ORDER_STATUS_LABELS;
 
 /** Siguiente paso de reparto una vez el domiciliario tiene el pedido. */
 const REPARTO_NEXT: Partial<Record<DeliveryStatus, DeliveryStatus>> = {
@@ -37,24 +29,19 @@ const NEXT_ACTION_LABELS: Partial<Record<DeliveryStatus, string>> = {
   delivered: "Marcar entregado",
 };
 
+export type DeliveryBoardMode = "operations" | "courier";
+
 @Component({
   selector: "app-inventory-deliveries",
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: "./deliveries.component.html",
+  templateUrl: "./delivery-board.component.html",
 })
-export class DeliveriesComponent implements OnInit {
+export class DeliveryBoardComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
-  private store = inject(AuthStore);
-
-  /** El domiciliario gestiona sus entregas pero NO asigna domiciliarios. */
-  isCourier = computed(() => {
-    const roles: string[] = this.store.user()?.roles ?? [];
-    const privileged = roles.includes("ADMIN") || roles.includes("SUPERADMIN");
-    return !privileged && roles.includes("COURIER");
-  });
+  @Input({ required: true }) mode!: DeliveryBoardMode;
 
   readonly statusFilters: Array<{ value: "" | DeliveryStatus; label: string }> = [
     { value: "", label: "Todos" },
@@ -84,7 +71,7 @@ export class DeliveriesComponent implements OnInit {
     this.load();
     // El domiciliario no asigna domiciliarios, así que no necesita la lista
     // (además el backend restringe /employees a administradores).
-    if (!this.isCourier()) this.loadCouriers();
+    if (this.mode === "operations") this.loadCouriers();
   }
 
   statusLabel(status: DeliveryStatus): string {
@@ -178,8 +165,8 @@ export class DeliveriesComponent implements OnInit {
   async cancel(delivery: InventoryDelivery): Promise<void> {
     const ok = await this.confirm.ask({
       title: "Cancelar domicilio",
-      message: `¿Cancelar el domicilio #${delivery.id}?`,
-      confirmLabel: "Cancelar domicilio",
+      message: `¿Cancelar el pedido #${delivery.id} en todo el sistema? La venta se anulará y el inventario se repondrá.`,
+      confirmLabel: "Cancelar pedido",
       cancelLabel: "Volver",
       severity: "warn",
     });

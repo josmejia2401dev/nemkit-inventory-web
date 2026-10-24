@@ -23,6 +23,7 @@ export class AdminShellComponent {
     { path: "/admin/alerts", label: "Alertas", icon: "pi pi-bell" },
     { path: "/admin/reports", label: "Reportes", icon: "pi pi-chart-bar" },
     { path: "/admin/products", label: "Productos", icon: "pi pi-box" },
+    { path: "/admin/business", label: "Negocio", icon: "pi pi-shop" },
     { path: "/admin/purchases", label: "Compras", icon: "pi pi-truck" },
     { path: "/admin/sales", label: "Ventas", icon: "pi pi-receipt" },
     { path: "/admin/deliveries", label: "Domicilios", icon: "pi pi-send" },

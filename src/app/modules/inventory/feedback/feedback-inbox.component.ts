@@ -47,6 +47,7 @@ export class FeedbackInboxComponent implements OnInit {
 
   items = signal<FeedbackItem[]>([]);
   loading = signal(true);
+  errorMessage = signal("");
   statusFilter = "";
   typeFilter = "";
   search = "";
@@ -58,6 +59,7 @@ export class FeedbackInboxComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
+    this.errorMessage.set("");
     this.inventory.list<FeedbackItem>("/feedback", {
       status: this.statusFilter || undefined,
       type: this.typeFilter || undefined,
@@ -68,7 +70,10 @@ export class FeedbackInboxComponent implements OnInit {
         this.items.set(response.data ?? []);
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: (error) => {
+        this.loading.set(false);
+        this.errorMessage.set(error?.error?.message || "No se pudieron cargar los reportes.");
+      },
     });
   }
 
@@ -90,6 +95,10 @@ export class FeedbackInboxComponent implements OnInit {
         );
         this.selected.update((current) => (current && current.id === item.id ? { ...current, status } : current));
       },
+      error: (error) => this.notifications.error(
+        "No se pudo actualizar",
+        error?.error?.message || "Intenta actualizar el estado nuevamente.",
+      ),
     });
   }
 

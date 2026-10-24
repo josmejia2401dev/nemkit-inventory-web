@@ -50,10 +50,10 @@
                   @if (order.kitchenStatus !== "ready") {
                     <button class="kitchen-mini" (click)="serve(order)" title="Marcar como servido">✓ Servir</button>
                   }
-                  @if (canCharge && order.paymentStatus === "pending") {
+                  @if (mode === "service" && order.paymentStatus === "pending") {
                     <button class="kitchen-mini kitchen-mini--pay" (click)="pay(order)" title="Cobrar"><i class="pi pi-dollar"></i> Cobrar</button>
                   }
-                  @if (canCharge) {
+                  @if (mode === "service") {
                     <button class="kitchen-mini kitchen-mini--danger" (click)="openCancel(order)" title="Cancelar pedido"><i class="pi pi-ban"></i></button>
                   }
                 </span>

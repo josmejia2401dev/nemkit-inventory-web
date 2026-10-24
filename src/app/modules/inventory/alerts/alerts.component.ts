@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit, inject, signal } from "@angular/core";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { InventoryService, InventoryStockAlerts } from "../../../core/services/inventory.service";
 
 @Component({
@@ -11,9 +11,16 @@ import { InventoryService, InventoryStockAlerts } from "../../../core/services/i
 })
 export class AlertsComponent implements OnInit {
   private inventory = inject(InventoryService);
+  private router = inject(Router);
 
   alerts = signal<InventoryStockAlerts | null>(null);
   loading = signal(true);
+
+  get productsPath(): string {
+    const rolePath = this.router.url.split("/").filter(Boolean)[0];
+    const productRoles = ["admin", "warehouse", "cashier", "seller", "waiter"];
+    return productRoles.includes(rolePath) ? `/${rolePath}/products` : "/products";
+  }
 
   ngOnInit(): void {
     this.refresh();

@@ -3,6 +3,9 @@ import { WarehouseShellComponent } from "./warehouse-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
+import { productManagementRoute } from "../../inventory/products/products.routes";
+import { supplierDirectoryRoute } from "../../inventory/contacts/contacts.routes";
+import { purchasesRoute } from "../../inventory/documents/documents.routes";
 
 export const warehouseRoutes: Routes = [
   {
@@ -19,10 +22,7 @@ export const warehouseRoutes: Routes = [
         path: "alerts",
         loadComponent: () => import("../../inventory/alerts/alerts.component").then((m) => m.AlertsComponent),
       },
-      {
-        path: "products",
-        loadComponent: () => import("../../inventory/products/products.component").then((m) => m.ProductsComponent),
-      },
+      productManagementRoute,
       {
         path: "categories",
         loadComponent: () => import("../../inventory/categories/categories.component").then((m) => m.CategoriesComponent),
@@ -31,16 +31,8 @@ export const warehouseRoutes: Routes = [
         path: "movements",
         loadComponent: () => import("../../inventory/movements/movements.component").then((m) => m.MovementsComponent),
       },
-      {
-        path: "purchases",
-        data: { kind: "purchases" },
-        loadComponent: () => import("../../inventory/documents/documents.component").then((m) => m.DocumentsComponent),
-      },
-      {
-        path: "suppliers",
-        data: { kind: "suppliers" },
-        loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
-      },
+      purchasesRoute,
+      supplierDirectoryRoute,
       ...foundationProfileRoutes,
       ...foundationFeedbackRoutes,
     ],

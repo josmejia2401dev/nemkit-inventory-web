@@ -56,6 +56,11 @@ export class AuthStore {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   }
 
+  updateCompany(company: CompanyInfo): void {
+    this.companySignal.set(company);
+    localStorage.setItem(COMPANY_KEY, JSON.stringify(company));
+  }
+
   clear(): void {
     this.userSignal.set(null);
     this.companySignal.set(null);

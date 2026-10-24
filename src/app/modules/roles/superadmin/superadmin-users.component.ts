@@ -25,8 +25,10 @@ import { PlatformService, PlatformUser } from "../../../core/services/platform.s
           <input [(ngModel)]="search" name="search" (keyup.enter)="reload()" placeholder="Buscar por nombre, correo o empresa" aria-label="Buscar usuarios" />
           <select [(ngModel)]="kind" name="kind" (ngModelChange)="reload()" aria-label="Filtrar por tipo">
             <option value="">Todos</option>
-            <option value="owner">Dueños de cuenta</option>
-            <option value="employee">Empleados</option>
+            <option value="owner">Titulares de empresa</option>
+            <option value="employee">Empleados asociados</option>
+            <option value="unassigned_employee">Empleados sin asociación</option>
+            <option value="super_admin">Superadministradores</option>
           </select>
           <button class="button button-secondary button-small" (click)="reload()"><i class="pi pi-search"></i> Buscar</button>
         </div>
@@ -43,7 +45,7 @@ import { PlatformService, PlatformUser } from "../../../core/services/platform.s
               <td data-label="Correo">{{ u.email }}</td>
               <td data-label="Roles"><div class="role-chips">@for (r of u.roles; track r) { <span class="role-chip">{{ r }}</span> }</div></td>
               <td data-label="Empresa">{{ u.companyName || "—" }}</td>
-              <td data-label="Tipo"><span class="feedback-tag feedback-tag--other">{{ u.isOwner ? "Dueño" : "Empleado" }}</span></td>
+              <td data-label="Tipo"><span class="feedback-tag feedback-tag--other">{{ u.accountLabel }}</span></td>
               <td data-label="Estado"><span class="feedback-status" [class.feedback-status--resolved]="u.recordStatus === 'active'" [class.feedback-status--open]="u.recordStatus !== 'active'">{{ u.recordStatus === "active" ? "Activo" : u.recordStatus }}</span></td>
               <td data-label="Acciones"><a class="icon-button" [routerLink]="['/superadmin/users', u.id]" title="Ver detalle"><i class="pi pi-eye"></i></a></td>
             </tr>

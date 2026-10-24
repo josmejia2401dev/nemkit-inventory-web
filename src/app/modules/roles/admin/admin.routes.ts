@@ -3,11 +3,16 @@ import { AdminShellComponent } from "./admin-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
+import { productManagementRoute } from "../../inventory/products/products.routes";
+import { customerDirectoryRoute, supplierDirectoryRoute } from "../../inventory/contacts/contacts.routes";
+import { purchasesRoute, salesRoute } from "../../inventory/documents/documents.routes";
+import { deliveryOperationsRoute } from "../../inventory/deliveries/deliveries.routes";
+import { kitchenServiceRoute } from "../../inventory/kitchen/kitchen.routes";
 
 export const adminRoutes: Routes = [
   {
     path: "admin",
-    canActivate: [roleGuard(["ADMIN", "SUPERADMIN"])],
+    canActivate: [roleGuard(["ADMIN"])],
     component: AdminShellComponent,
     children: [
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
@@ -23,9 +28,13 @@ export const adminRoutes: Routes = [
         path: "reports",
         loadComponent: () => import("../../inventory/reports/reports.component").then((m) => m.ReportsComponent),
       },
+      productManagementRoute,
       {
-        path: "products",
-        loadComponent: () => import("../../inventory/products/products.component").then((m) => m.ProductsComponent),
+        path: "business",
+        loadComponent: () =>
+          import("../../../foundation/business-settings/business-settings.component").then(
+            (module) => module.BusinessSettingsComponent,
+          ),
       },
       {
         path: "categories",
@@ -35,30 +44,11 @@ export const adminRoutes: Routes = [
         path: "movements",
         loadComponent: () => import("../../inventory/movements/movements.component").then((m) => m.MovementsComponent),
       },
-      {
-        path: "purchases",
-        data: { kind: "purchases" },
-        loadComponent: () => import("../../inventory/documents/documents.component").then((m) => m.DocumentsComponent),
-      },
-      {
-        path: "sales",
-        data: { kind: "sales" },
-        loadComponent: () => import("../../inventory/documents/documents.component").then((m) => m.DocumentsComponent),
-      },
-      {
-        path: "deliveries",
-        loadComponent: () => import("../../inventory/deliveries/deliveries.component").then((m) => m.DeliveriesComponent),
-      },
-      {
-        path: "suppliers",
-        data: { kind: "suppliers" },
-        loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
-      },
-      {
-        path: "customers",
-        data: { kind: "customers" },
-        loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
-      },
+      purchasesRoute,
+      salesRoute,
+      deliveryOperationsRoute,
+      supplierDirectoryRoute,
+      customerDirectoryRoute,
       {
         path: "employees",
         loadComponent: () => import("../../inventory/employees/employees.component").then((m) => m.EmployeesComponent),
@@ -67,10 +57,7 @@ export const adminRoutes: Routes = [
         path: "tables",
         loadComponent: () => import("../../inventory/tables/tables.component").then((m) => m.TablesComponent),
       },
-      {
-        path: "kitchen",
-        loadComponent: () => import("../../inventory/kitchen/kitchen-board.component").then((m) => m.KitchenBoardComponent),
-      },
+      kitchenServiceRoute,
       ...foundationProfileRoutes,
       ...foundationFeedbackRoutes,
     ],

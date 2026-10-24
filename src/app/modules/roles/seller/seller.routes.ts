@@ -3,6 +3,10 @@ import { SellerShellComponent } from "./seller-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
+import { productCatalogRoute } from "../../inventory/products/products.routes";
+import { customerDirectoryRoute } from "../../inventory/contacts/contacts.routes";
+import { salesRoute } from "../../inventory/documents/documents.routes";
+import { deliveryOperationsRoute } from "../../inventory/deliveries/deliveries.routes";
 
 export const sellerRoutes: Routes = [
   {
@@ -15,20 +19,10 @@ export const sellerRoutes: Routes = [
         path: "dashboard",
         loadComponent: () => import("./seller-dashboard.component").then((m) => m.SellerDashboardComponent),
       },
-      {
-        path: "sales",
-        data: { kind: "sales" },
-        loadComponent: () => import("../../inventory/documents/documents.component").then((m) => m.DocumentsComponent),
-      },
-      {
-        path: "deliveries",
-        loadComponent: () => import("../../inventory/deliveries/deliveries.component").then((m) => m.DeliveriesComponent),
-      },
-      {
-        path: "customers",
-        data: { kind: "customers" },
-        loadComponent: () => import("../../inventory/contacts/contacts.component").then((m) => m.ContactsComponent),
-      },
+      salesRoute,
+      deliveryOperationsRoute,
+      customerDirectoryRoute,
+      productCatalogRoute,
       ...foundationProfileRoutes,
       ...foundationFeedbackRoutes,
     ],

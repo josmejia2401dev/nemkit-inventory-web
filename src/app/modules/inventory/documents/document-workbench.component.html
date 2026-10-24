@@ -38,6 +38,9 @@
             } @else {
               <span class="document-status"><i class="pi pi-check-circle"></i> {{ isSale ? "Pagada" : "Registrada" }}</span>
             }
+            @if (isSale && document.status !== "void" && orderStatusLabel(document); as orderStatus) {
+              <small class="document-status-order"><i class="pi pi-sync"></i> {{ orderStatus }}</small>
+            }
           </td>
           <td data-label="Acciones">
             @if (isPending(document)) {
@@ -91,6 +94,13 @@
           }
         </div>
 
+        @if (isSale && selectedContactId) {
+          <app-customer-sale-summary
+            [profile]="customerProfile()"
+            [loading]="customerProfileLoading()"
+          />
+        }
+
         @if (isSale) {
           <label class="delivery-check">
             <input type="checkbox" [(ngModel)]="isDelivery" name="isDelivery" />
@@ -99,7 +109,7 @@
           @if (isDelivery) {
             <div class="form-grid delivery-fields">
               <label class="form-field form-field--wide"><span>Dirección de entrega <b>*</b></span><input [(ngModel)]="deliveryAddress" name="deliveryAddress" maxlength="300" autocomplete="street-address" placeholder="Se autocompleta con la del cliente" /></label>
-              <label class="form-field"><span>Domiciliario</span><select [(ngModel)]="selectedCourierId" name="courierId"><option value="">Asignar luego</option>@for (courier of couriers(); track courier.id || courier._id) { <option [ngValue]="courier.id || courier._id">{{ courier.name }}</option> }</select></label>
+              <label class="form-field"><span>Domiciliario</span><select [(ngModel)]="selectedCourierId" name="courierId"><option value="">Asignar luego</option>@for (courier of couriers(); track courier.id || courier._id) { <option [ngValue]="courier.id || courier._id">{{ courier.name }}</option> }</select><small class="field-hint-inline">Puedes asignarlo después desde Domicilios; hasta entonces solo aparecerá en la bandeja de gestión.</small></label>
               <label class="form-field"><span>Latitud</span><input type="number" step="any" [(ngModel)]="deliveryLat" name="deliveryLat" placeholder="4.6097" /></label>
               <label class="form-field"><span>Longitud</span><input type="number" step="any" [(ngModel)]="deliveryLng" name="deliveryLng" placeholder="-74.0817" /></label>
             </div>
@@ -139,28 +149,12 @@
 }
 
 @if (previewDocument(); as printedDocument) {
-  <div class="dialog-backdrop receipt-backdrop" (click)="closeDocument()">
-    <section class="form-dialog receipt-dialog" role="dialog" aria-modal="true" [attr.aria-label]="'Comprobante de ' + singular" (click)="$event.stopPropagation()">
-      <div class="receipt-actions"><span class="document-status"><i class="pi pi-check-circle"></i> {{ isSale ? "Venta" : "Compra" }} registrada</span><button class="icon-button" (click)="closeDocument()" aria-label="Cerrar"><i class="pi pi-times"></i></button></div>
-      <article class="print-document">
-        <div class="receipt-brand"><span class="brand-mark"><i class="pi pi-box"></i></span><div><strong>Nemkit Inventory</strong><small>COMPROBANTE DE {{ isSale ? "VENTA" : "COMPRA" }}</small></div></div>
-        <div class="receipt-meta"><span>Documento <b>#{{ printedDocument.id || printedDocument._id }}</b></span><span>Fecha <b>{{ printedDocument.date | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</b></span></div>
-        @if (isSale) {
-          <div class="receipt-customer"><small>CLIENTE</small><strong>{{ printedDocument.customerSnapshot?.name || "Cliente" }}</strong>@if (printedDocument.customerSnapshot?.document) { <span>{{ printedDocument.customerSnapshot?.document }}</span> }</div>
-        } @else {
-          <div class="receipt-customer"><small>PROVEEDOR</small><strong>{{ printedDocument.supplierSnapshot?.name || "Proveedor" }}</strong>@if (printedDocument.supplierSnapshot?.document) { <span>{{ printedDocument.supplierSnapshot?.document }}</span> }@if (printedDocument.supplierSnapshot?.phone) { <span>{{ printedDocument.supplierSnapshot?.phone }}</span> }</div>
-        }
-        @if (printedDocument.employeeSnapshot?.name) {
-          <div class="receipt-customer"><small>{{ employeeLabel.toUpperCase() }}</small><strong>{{ printedDocument.employeeSnapshot?.name }}</strong></div>
-        }
-        <div class="receipt-items">@for (item of printedDocument.items; track $index) { <div class="receipt-item"><div><strong>{{ item.name }}</strong><small>{{ item.sku }} · {{ item.quantity }} × {{ formatMoney(isSale ? item.unitPrice : item.unitCost) }}</small></div><b>{{ formatMoney(item.lineTotal) }}</b></div> }</div>
-        <div class="receipt-total"><span>Total</span><strong>{{ formatMoney(printedDocument.total) }}</strong></div>
-        @if (printedDocument.notes) { <p class="receipt-notes">{{ printedDocument.notes }}</p> }
-        <p class="receipt-thanks">Nemkit Inventory · {{ isSale ? "Gracias por tu compra" : "Detalle de compra" }}</p>
-      </article>
-      <div class="dialog-actions receipt-screen-actions"><button class="button button-secondary" (click)="closeDocument()">Cerrar</button><button class="button button-primary" (click)="printDocument()"><i class="pi pi-print"></i> Imprimir / Guardar PDF</button></div>
-    </section>
-  </div>
+  <app-document-receipt
+    [document]="printedDocument"
+    [kind]="kind"
+    [employeeLabel]="employeeLabel"
+    (closed)="closeDocument()"
+  />
 }
 
 @if (cancellingDocument(); as document) {

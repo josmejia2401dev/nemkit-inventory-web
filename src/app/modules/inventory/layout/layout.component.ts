@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
+import { Component, DestroyRef, HostListener, inject, Input, OnInit, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { CommonModule } from "@angular/common";
 import {
@@ -55,7 +55,7 @@ export class LayoutComponent implements OnInit {
   /** Ruta del perfil del rol. */
   @Input() profilePath = "/profile";
   /** Ruta del formulario para reportar un problema (transversal). */
-  @Input() reportPath = "/feedback";
+  @Input() reportPath = "";
 
   sidebarOpen = signal(false);
   alertCount = signal(0);
@@ -92,12 +92,38 @@ export class LayoutComponent implements OnInit {
     return this.navItems.find((item) => item.path.endsWith(last))?.label ?? "Resumen";
   }
 
+  get currentRoleLabel(): string {
+    const role = this.router.url.split("/").filter(Boolean)[0]?.toUpperCase();
+    const labels: Record<string, string> = {
+      SUPERADMIN: "Superadministrador",
+      ADMIN: "Administrador",
+      CASHIER: "Cajero",
+      SELLER: "Vendedor",
+      WAREHOUSE: "Bodeguero",
+      COURIER: "Domiciliario",
+      WAITER: "Mesero",
+      COOK: "Cocinero",
+    };
+    return labels[role ?? ""] ?? "Usuario";
+  }
+
+  get effectiveReportPath(): string {
+    if (this.reportPath) return this.reportPath;
+    const rolePath = this.dashboardPath.split("/").filter(Boolean)[0];
+    return rolePath ? `/${rolePath}/feedback` : "/feedback";
+  }
+
   toggleSidebar(): void {
     this.sidebarOpen.update((value) => !value);
   }
 
   closeSidebar(): void {
     this.sidebarOpen.set(false);
+  }
+
+  @HostListener("document:keydown.escape")
+  closeSidebarWithEscape(): void {
+    if (this.sidebarOpen()) this.closeSidebar();
   }
 
   logout(): void {

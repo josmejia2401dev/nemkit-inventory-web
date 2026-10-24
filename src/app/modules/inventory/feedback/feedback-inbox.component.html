@@ -28,6 +28,8 @@
 
   @if (loading()) {
     <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando reportes…</span></div>
+  } @else if (errorMessage()) {
+    <div class="empty-state" role="alert"><span class="empty-icon"><i class="pi pi-exclamation-circle"></i></span><strong>No se pudo abrir la bandeja</strong><p>{{ errorMessage() }}</p><button class="button button-secondary" (click)="load()"><i class="pi pi-refresh"></i> Reintentar</button></div>
   } @else if (items().length) {
     <div class="table-scroll"><table class="inventory-table">
       <thead><tr><th>TIPO</th><th>TÍTULO</th><th>REPORTADO POR</th><th>FECHA</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>

@@ -2,6 +2,9 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { EMPTY, Observable, Subject, expand, reduce, tap } from "rxjs";
 import { environment } from "../../../environments/environment";
+import { DeliveryStatus, KitchenStatus, OrderStatus } from "../../modules/inventory/order-status.constants";
+
+export type { DeliveryStatus, KitchenStatus, OrderStatus } from "../../modules/inventory/order-status.constants";
 
 export interface InventoryTable {
   id?: number;
@@ -67,6 +70,17 @@ export interface InventoryContact {
 
 export interface CustomerProfile {
   customer: InventoryContact;
+  analytics: {
+    totalOrders: number;
+    paidOrders: number;
+    deliveryOrders: number;
+    onSiteOrders: number;
+    totalSpent: number;
+    averageOrderValue: number;
+    averageDaysBetweenPurchases: number | null;
+    firstOrderAt: string | null;
+    lastOrderAt: string | null;
+  };
   history: {
     data: Array<{
       id: number;
@@ -74,6 +88,10 @@ export interface CustomerProfile {
       total: number;
       items: InventoryDocumentItem[];
       employeeSnapshot?: { name?: string };
+      paymentStatus?: "paid" | "pending";
+      orderStatus?: string | null;
+      kitchenStatus?: string | null;
+      tableNumber?: string;
     }>;
     pagination: { page: number; limit: number; total: number; totalPages: number };
   };
@@ -114,15 +132,6 @@ export interface InventoryDocumentItem {
   unitPrice?: number;
   lineTotal: number;
 }
-
-export type DeliveryStatus =
-  | "pending"
-  | "preparing"
-  | "ready"
-  | "picked_up"
-  | "on_route"
-  | "delivered"
-  | "cancelled";
 
 export interface InventoryDelivery {
   id: number;
@@ -174,6 +183,7 @@ export interface InventoryDocument {
   movementId: number;
   date: string;
   status: "completed" | "void";
+  orderStatus?: OrderStatus | null;
   // Estado de cobro de la venta: "paid" (pagada) o "pending" (por cobrar).
   paymentStatus?: "paid" | "pending";
   paidAt?: string | null;
@@ -181,7 +191,7 @@ export interface InventoryDocument {
   voidReason?: string;
   voidNote?: string;
   voidedAt?: string | null;
-  kitchenStatus?: "pending" | "preparing" | "ready" | "served" | null;
+  kitchenStatus?: KitchenStatus | null;
   tableNumber?: string;
   notes?: string;
   items: InventoryDocumentItem[];

@@ -9,7 +9,8 @@ import { homeForRoles } from "./role-home";
  * - Si el usuario no tiene ninguno de los roles permitidos → se le redirige a
  *   SU propio home (no a login), evitando el acceso cruzado por URL.
  *
- * ADMIN y SUPERADMIN tienen acceso a cualquier bloque.
+ * ADMIN puede acceder a los bloques operativos de la empresa. SUPERADMIN tiene
+ * su propio espacio de plataforma y no entra al tenant operativo.
  *
  * @param allowed roles de usuario (MAYÚSCULAS) autorizados para el bloque.
  */
@@ -24,7 +25,7 @@ export function roleGuard(allowed: string[]): CanActivateFn {
     }
 
     const roles: string[] = store.user()?.roles ?? [];
-    const privileged = roles.includes("ADMIN") || roles.includes("SUPERADMIN");
+    const privileged = roles.includes("ADMIN");
     const ok = privileged || allowed.some((role) => roles.includes(role));
 
     if (!ok) {
