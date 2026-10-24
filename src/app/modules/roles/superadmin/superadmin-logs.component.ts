@@ -2,11 +2,12 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { PlatformService, LogEntry, LogFile } from "../../../core/services/platform.service";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 @Component({
   selector: "app-superadmin-logs",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   template: `
     <div class="page-heading">
       <div>
@@ -40,9 +41,9 @@ import { PlatformService, LogEntry, LogFile } from "../../../core/services/platf
       @if (!files().length && !loadingFiles()) {
         <div class="empty-state"><span class="empty-icon"><i class="pi pi-list"></i></span><strong>Sin archivos de log</strong><p>No hay archivos .log disponibles en el servidor.</p></div>
       } @else if (entries().length) {
-        <p class="log-meta">{{ result()?.returned }} de {{ result()?.total }} líneas · {{ result()?.file }}</p>
+        <p class="log-meta">Últimas {{ result()?.returned }} de {{ result()?.total }} líneas que coinciden · {{ result()?.file }}</p>
         <div class="log-viewer">
-          @for (e of entries(); track $index) {
+          @for (e of visibleEntries(); track $index) {
             <div class="log-line log-line--{{ (e.level || 'info') }}">
               <span class="log-time">{{ e.timestamp ? (e.timestamp | date: "HH:mm:ss" : "" : "es-CO") : "—" }}</span>
               <span class="log-level">{{ e.level || "info" }}</span>
@@ -50,6 +51,7 @@ import { PlatformService, LogEntry, LogFile } from "../../../core/services/platf
             </div>
           }
         </div>
+        <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="entries().length" itemLabel="líneas cargadas" (pageChange)="goToPage($event)" />
       } @else if (didRead()) {
         <div class="empty-state"><span class="empty-icon"><i class="pi pi-inbox"></i></span><strong>Sin resultados</strong><p>No hay líneas que coincidan con el filtro.</p></div>
       }
@@ -57,6 +59,7 @@ import { PlatformService, LogEntry, LogFile } from "../../../core/services/platf
   `,
 })
 export class SuperadminLogsComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private platform = inject(PlatformService);
 
   files = signal<LogFile[]>([]);
@@ -65,6 +68,7 @@ export class SuperadminLogsComponent implements OnInit {
   loadingFiles = signal(true);
   reading = signal(false);
   didRead = signal(false);
+  page = signal(1);
   file = "";
   level = "";
   search = "";
@@ -87,6 +91,7 @@ export class SuperadminLogsComponent implements OnInit {
 
   read(): void {
     if (!this.file) return;
+    this.page.set(1);
     this.reading.set(true);
     this.platform.readLogs({
       file: this.file,
@@ -110,5 +115,16 @@ export class SuperadminLogsComponent implements OnInit {
         this.reading.set(false);
       },
     });
+  }
+
+  visibleEntries(): LogEntry[] {
+    const start = (this.page() - 1) * this.pageSize;
+    return this.entries().slice(start, start + this.pageSize);
+  }
+
+  goToPage(page: number): void {
+    const totalPages = Math.max(1, Math.ceil(this.entries().length / this.pageSize));
+    if (page < 1 || page > totalPages) return;
+    this.page.set(page);
   }
 }

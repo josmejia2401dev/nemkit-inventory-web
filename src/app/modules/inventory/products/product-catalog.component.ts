@@ -15,16 +15,18 @@ import {
   InventoryProduct,
 } from "../../../core/services/inventory.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 import { ProductCatalogService } from "./product-catalog.service";
 
 @Component({
   selector: "app-product-catalog",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./product-catalog.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCatalogComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private readonly catalog = inject(ProductCatalogService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -74,13 +76,19 @@ export class ProductCatalogComponent implements OnInit {
         stockState: this.stockState || undefined,
         productId: this.specificProductId || undefined,
         page: this.page(),
-        limit: 20,
+        limit: this.pageSize,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
+          const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+          if (this.page() > totalPages) {
+            this.page.set(totalPages);
+            this.loadProducts();
+            return;
+          }
           this.products.set(response.data ?? []);
-          this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.pageCount.set(totalPages);
           this.productCount.set(response.pagination?.total ?? response.data.length);
           this.loading.set(false);
         },
@@ -91,8 +99,7 @@ export class ProductCatalogComponent implements OnInit {
       });
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
 
     this.page.set(nextPage);

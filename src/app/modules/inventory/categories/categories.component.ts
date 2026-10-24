@@ -7,14 +7,16 @@ import {
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 @Component({
   selector: "app-categories",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./categories.component.html",
 })
 export class CategoriesComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
@@ -37,11 +39,17 @@ export class CategoriesComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.inventory
-      .list<InventoryCategory>("/categories", { page: this.page(), limit: 20 })
+      .list<InventoryCategory>("/categories", { page: this.page(), limit: this.pageSize })
       .subscribe({
         next: (response) => {
+          const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+          if (this.page() > totalPages) {
+            this.page.set(totalPages);
+            this.load();
+            return;
+          }
           this.categories.set(response.data ?? []);
-          this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.pageCount.set(totalPages);
           this.categoryCount.set(response.pagination?.total ?? response.data.length);
           this.loading.set(false);
         },
@@ -49,8 +57,7 @@ export class CategoriesComponent implements OnInit {
       });
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
     this.page.set(nextPage);
     this.load();

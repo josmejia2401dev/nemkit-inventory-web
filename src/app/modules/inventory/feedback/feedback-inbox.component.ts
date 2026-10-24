@@ -3,6 +3,7 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { InventoryService } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 type FeedbackType = "bug" | "suggestion" | "other";
 type FeedbackStatus = "open" | "reviewed" | "resolved";
@@ -34,10 +35,11 @@ const STATUS_LABELS: Record<FeedbackStatus, string> = {
 @Component({
   selector: "app-feedback-inbox",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./feedback-inbox.component.html",
 })
 export class FeedbackInboxComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
 
@@ -52,6 +54,9 @@ export class FeedbackInboxComponent implements OnInit {
   typeFilter = "";
   search = "";
   selected = signal<FeedbackItem | null>(null);
+  page = signal(1);
+  pageCount = signal(1);
+  total = signal(0);
 
   ngOnInit(): void {
     this.load();
@@ -61,13 +66,22 @@ export class FeedbackInboxComponent implements OnInit {
     this.loading.set(true);
     this.errorMessage.set("");
     this.inventory.list<FeedbackItem>("/feedback", {
+      page: this.page(),
       status: this.statusFilter || undefined,
       type: this.typeFilter || undefined,
       search: this.search.trim() || undefined,
-      limit: 100,
+      limit: this.pageSize,
     }).subscribe({
       next: (response) => {
+        const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+        if (this.page() > totalPages) {
+          this.page.set(totalPages);
+          this.load();
+          return;
+        }
         this.items.set(response.data ?? []);
+        this.total.set(response.pagination?.total ?? response.data.length);
+        this.pageCount.set(totalPages);
         this.loading.set(false);
       },
       error: (error) => {
@@ -75,6 +89,17 @@ export class FeedbackInboxComponent implements OnInit {
         this.errorMessage.set(error?.error?.message || "No se pudieron cargar los reportes.");
       },
     });
+  }
+
+  applyFilters(): void {
+    this.page.set(1);
+    this.load();
+  }
+
+  goToPage(page: number): void {
+    if (page < 1 || page > this.pageCount()) return;
+    this.page.set(page);
+    this.load();
   }
 
   open(item: FeedbackItem): void {

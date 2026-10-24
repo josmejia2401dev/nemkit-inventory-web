@@ -276,6 +276,26 @@ export interface InventoryReportProduct {
   potentialSales: number;
 }
 
+export interface InventoryCancelledSale {
+  id: number;
+  date: string;
+  saleDate: string;
+  total: number;
+  customerSnapshot?: { name?: string };
+  employeeSnapshot?: { name?: string };
+  voidedBy?: number | null;
+  voidedBySnapshot?: { name?: string };
+  voidReason?: string;
+  voidNote?: string;
+}
+
+export interface InventoryCancelledSalesReport {
+  generatedAt: string;
+  totals: { cancellationCount: number; cancelledValue: number };
+  cancellations: InventoryCancelledSale[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
 export interface InventoryReportMovement extends InventoryMovement {
   type: string;
   notes: string;

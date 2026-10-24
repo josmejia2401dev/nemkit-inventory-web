@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import * as XLSX from "xlsx";
 import {
   InventoryProduct,
+  InventoryCancelledSalesReport,
   InventoryReportMovement,
   InventoryReportProduct,
   InventorySalesByEmployeeReport,
@@ -12,8 +13,9 @@ import {
   PageResult,
 } from "../../../core/services/inventory.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
-type ReportKind = "inventory" | "movements" | "sales" | "employees";
+type ReportKind = "inventory" | "movements" | "sales" | "employees" | "cancellations";
 interface InventoryReport {
   generatedAt: string;
   totals: { productCount: number; units: number; inventoryCost: number; potentialSales: number };
@@ -24,6 +26,7 @@ const MOVEMENT_LABELS: Record<string, string> = {
   purchase: "Compra",
   manual_adjustment: "Ajuste manual",
   sale: "Venta",
+  sale_void: "Anulación de venta",
   damage: "Daño",
   loss: "Pérdida",
   internal_use: "Consumo interno",
@@ -32,10 +35,11 @@ const MOVEMENT_LABELS: Record<string, string> = {
 @Component({
   selector: "app-inventory-reports",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./reports.component.html",
 })
 export class ReportsComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
 
   kind: ReportKind = "inventory";
@@ -44,12 +48,18 @@ export class ReportsComponent implements OnInit {
   movements = signal<InventoryReportMovement[]>([]);
   salesReport = signal<InventorySalesReport | null>(null);
   employeesReport = signal<InventorySalesByEmployeeReport | null>(null);
+  cancellationsReport = signal<InventoryCancelledSalesReport | null>(null);
   products = signal<InventoryProduct[]>([]);
   page = signal(1);
   pageCount = signal(1);
   movementCount = signal(0);
+  movementError = signal(false);
+  cancellationError = signal(false);
+  inventoryPage = signal(1);
+  salesPage = signal(1);
+  employeesPage = signal(1);
   dateError = signal(false);
-  from = this.localDate(-29);
+  from = this.localDate(-364);
   to = this.localDate(0);
   groupBy: "day" | "week" | "month" = "day";
   movementType = "";
@@ -81,7 +91,41 @@ export class ReportsComponent implements OnInit {
   selectReport(kind: ReportKind): void {
     this.kind = kind;
     this.page.set(1);
+    this.inventoryPage.set(1);
+    this.salesPage.set(1);
+    this.employeesPage.set(1);
+    this.cancellationsReport.set(null);
     this.load();
+  }
+
+  inventoryItems(items: InventoryReportProduct[]): InventoryReportProduct[] {
+    const start = (this.inventoryPage() - 1) * this.pageSize;
+    return items.slice(start, start + this.pageSize);
+  }
+
+  salesPeriods(periods: InventorySalesReport["periods"]): InventorySalesReport["periods"] {
+    const start = (this.salesPage() - 1) * this.pageSize;
+    return periods.slice(start, start + this.pageSize);
+  }
+
+  employeesRows(rows: InventorySalesByEmployeeReport["employees"]): InventorySalesByEmployeeReport["employees"] {
+    const start = (this.employeesPage() - 1) * this.pageSize;
+    return rows.slice(start, start + this.pageSize);
+  }
+
+  setInventoryPage(page: number, total: number): void {
+    if (page < 1 || page > Math.max(1, Math.ceil(total / this.pageSize))) return;
+    this.inventoryPage.set(page);
+  }
+
+  setSalesPage(page: number, total: number): void {
+    if (page < 1 || page > Math.max(1, Math.ceil(total / this.pageSize))) return;
+    this.salesPage.set(page);
+  }
+
+  setEmployeesPage(page: number, total: number): void {
+    if (page < 1 || page > Math.max(1, Math.ceil(total / this.pageSize))) return;
+    this.employeesPage.set(page);
   }
 
   load(): void {
@@ -105,20 +149,30 @@ export class ReportsComponent implements OnInit {
     this.loading.set(true);
     const range = { from: this.from, to: this.to };
     if (this.kind === "movements") {
+      this.movementError.set(false);
       this.inventory.list<InventoryReportMovement>("/reports/movements", {
         ...range,
         page: this.page(),
-        limit: 100,
+        limit: this.pageSize,
         type: this.movementType || undefined,
         productId: this.productId || undefined,
       }).subscribe({
         next: (response: PageResult<InventoryReportMovement>) => {
+          const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+          if (this.page() > totalPages) {
+            this.page.set(totalPages);
+            this.load();
+            return;
+          }
           this.movements.set(response.data ?? []);
           this.movementCount.set(response.pagination?.total ?? response.data.length);
-          this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.pageCount.set(totalPages);
           this.loading.set(false);
         },
-        error: () => this.loading.set(false),
+        error: () => {
+          this.movementError.set(true);
+          this.loading.set(false);
+        },
       });
       return;
     }
@@ -136,6 +190,34 @@ export class ReportsComponent implements OnInit {
       return;
     }
 
+    if (this.kind === "cancellations") {
+      this.cancellationError.set(false);
+      this.inventory.get<InventoryCancelledSalesReport>("/reports/cancelled-sales", {
+        ...range,
+        page: this.page(),
+        limit: this.pageSize,
+      }).subscribe({
+        next: (response) => {
+          const report = response.data;
+          const totalPages = Math.max(1, report.pagination?.totalPages ?? 1);
+          if (this.page() > totalPages) {
+            this.page.set(totalPages);
+            this.load();
+            return;
+          }
+          this.cancellationsReport.set(report);
+          this.movementCount.set(report.pagination?.total ?? report.cancellations.length);
+          this.pageCount.set(totalPages);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.cancellationError.set(true);
+          this.loading.set(false);
+        },
+      });
+      return;
+    }
+
     this.inventory.get<InventorySalesReport>("/reports/sales", {
       ...range,
       groupBy: this.groupBy,
@@ -148,8 +230,7 @@ export class ReportsComponent implements OnInit {
     });
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
     this.page.set(nextPage);
     this.load();
@@ -161,6 +242,17 @@ export class ReportsComponent implements OnInit {
 
   movementLabel(type: string): string {
     return MOVEMENT_LABELS[type] ?? type;
+  }
+
+  cancellationReason(reason: string | undefined): string {
+    const labels: Record<string, string> = {
+      customer_left: "Cliente se retiró",
+      order_error: "Error al tomar el pedido",
+      out_of_stock: "Sin insumos o stock",
+      customer_changed: "Cliente cambió de opinión",
+      other: "Otro",
+    };
+    return reason ? labels[reason] ?? reason : "Sin motivo registrado";
   }
 
   movementQuantity(movement: InventoryReportMovement): number {

@@ -20,10 +20,11 @@
     <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i class="pi pi-bell"></i></span><strong>Productos que requieren atención</strong><span class="filter-count">{{ data.products.length }}</span></div></div>
     @if (data.products.length) {
       <div class="table-scroll"><table class="inventory-table"><thead><tr><th>PRODUCTO</th><th>CATEGORÍA</th><th>STOCK ACTUAL</th><th>STOCK MÍNIMO</th><th>ESTADO</th><th></th></tr></thead><tbody>
-        @for (product of data.products; track product.id) {
+        @for (product of visibleProducts(); track product.id) {
           <tr><td data-label="Producto"><strong>{{ product.name }}</strong><small class="table-subtext">{{ product.sku }}</small></td><td data-label="Categoría">{{ product.categoryName || "—" }}</td><td data-label="Stock actual"><strong>{{ product.stock }}</strong></td><td data-label="Stock mínimo">{{ product.minimumStock }}</td><td data-label="Estado"><span class="alert-state" [class.alert-state--empty]="product.state === 'out_of_stock'"><i [class]="product.state === 'out_of_stock' ? 'pi pi-times-circle' : 'pi pi-exclamation-triangle'"></i>{{ product.state === "out_of_stock" ? "Agotado" : "Stock bajo" }}</span></td><td data-label="Acción"><a class="button button-secondary button-small" [routerLink]="productsPath" [queryParams]="{ stockState: product.state, productId: product.id }">Ver producto</a></td></tr>
         }
       </tbody></table></div>
+      <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="data.products.length" (pageChange)="goToPage($event)" />
     } @else {
       <div class="empty-state"><span class="empty-icon"><i class="pi pi-check-circle"></i></span><strong>Todo el stock está en nivel suficiente</strong><p>Cuando un producto llegue a su mínimo, aparecerá aquí.</p><a [routerLink]="productsPath" class="button button-primary button-small">Ver productos</a></div>
     }

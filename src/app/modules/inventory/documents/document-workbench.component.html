@@ -54,7 +54,8 @@
         </tr>
       }</tbody>
     </table></div>
-    <div class="table-footer"><span>{{ documentCount() }} documentos · página {{ page() }} de {{ pageCount() }}</span><span class="table-pagination-actions"><button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button><button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button></span><span>El stock refleja estos registros</span></div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="documentCount()" (pageChange)="goToPage($event)" />
+    <p class="table-footer-note">El stock refleja estos registros</p>
   } @else {
     <div class="empty-state"><span class="empty-icon"><i [class]="isSale ? 'pi pi-receipt' : 'pi pi-truck'"></i></span><strong>Aún no hay {{ title.toLowerCase() }}</strong><p>{{ isSale ? "Registra tu primera venta y genera un comprobante listo para imprimir." : "Registra una compra para recibir productos y actualizar las existencias." }}</p><button class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Registrar {{ singular }}</button></div>
   }

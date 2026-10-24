@@ -126,11 +126,8 @@
         </tbody>
       </table>
     </div>
-    <div class="table-footer">
-      <span>{{ movementCount() }} movimientos · página {{ page() }} de {{ pageCount() }}</span>
-      <span class="table-pagination-actions"><button class="button button-secondary button-small" [disabled]="page() <= 1" (click)="changePage(-1)">Anterior</button><button class="button button-secondary button-small" [disabled]="page() >= pageCount()" (click)="changePage(1)">Siguiente</button></span>
-      <span>Las existencias reflejan cada registro</span>
-    </div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="movementCount()" (pageChange)="goToPage($event)" />
+    <p class="table-footer-note">Las existencias reflejan cada registro</p>
   } @else {
     <div class="empty-state">
       <span class="empty-icon"><i class="pi pi-history"></i></span

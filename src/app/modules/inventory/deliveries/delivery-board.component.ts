@@ -12,6 +12,7 @@ import { NotificationService } from "../../../core/services/notification.service
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 import { ORDER_STATUS_LABELS } from "../order-status.constants";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 const STATUS_LABELS: Record<DeliveryStatus, string> = ORDER_STATUS_LABELS;
 
@@ -34,10 +35,11 @@ export type DeliveryBoardMode = "operations" | "courier";
 @Component({
   selector: "app-inventory-deliveries",
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent],
   templateUrl: "./delivery-board.component.html",
 })
 export class DeliveryBoardComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
@@ -109,12 +111,18 @@ export class DeliveryBoardComponent implements OnInit {
     this.loading.set(true);
     this.inventory.list<InventoryDelivery>("/deliveries", {
       page: this.page(),
-      limit: 20,
+      limit: this.pageSize,
       status: this.statusFilter || undefined,
     }).subscribe({
       next: (response) => {
+        const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+        if (this.page() > totalPages) {
+          this.page.set(totalPages);
+          this.load();
+          return;
+        }
         this.deliveries.set(response.data ?? []);
-        this.pageCount.set(response.pagination?.totalPages ?? 1);
+        this.pageCount.set(totalPages);
         this.deliveryCount.set(response.pagination?.total ?? response.data.length);
         this.loading.set(false);
       },
@@ -128,8 +136,7 @@ export class DeliveryBoardComponent implements OnInit {
     this.load();
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
     this.page.set(nextPage);
     this.load();

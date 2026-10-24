@@ -10,16 +10,18 @@ import {
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 export type ContactKind = "suppliers" | "customers";
 
 @Component({
   selector: "app-inventory-contacts",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./contact-directory.component.html",
 })
 export class ContactDirectoryComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
@@ -42,6 +44,8 @@ export class ContactDirectoryComponent implements OnInit {
   lookupLoading = signal(false);
   profile = signal<CustomerProfile | null>(null);
   profileOpen = signal(false);
+  profilePage = signal(1);
+  readonly profilePageSize = DEFAULT_PAGE_SIZE;
 
   readonly tierLabels: Record<LoyaltyTier, string> = {
     bronze: "Bronce",
@@ -71,12 +75,18 @@ export class ContactDirectoryComponent implements OnInit {
     this.loadFailed.set(false);
     this.inventory.list<InventoryContact>(`/${this.kind}`, {
       page: this.page(),
-      limit: 20,
+      limit: this.pageSize,
       search: this.search.trim(),
     }).subscribe({
       next: (response) => {
+        const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+        if (this.page() > totalPages) {
+          this.page.set(totalPages);
+          this.load();
+          return;
+        }
         this.contacts.set(response.data ?? []);
-        this.pageCount.set(response.pagination?.totalPages ?? 1);
+        this.pageCount.set(totalPages);
         this.contactCount.set(response.pagination?.total ?? response.data.length);
         this.loading.set(false);
       },
@@ -92,8 +102,7 @@ export class ContactDirectoryComponent implements OnInit {
     this.load();
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
     this.page.set(nextPage);
     this.load();
@@ -186,7 +195,23 @@ export class ContactDirectoryComponent implements OnInit {
   openProfile(customer: InventoryContact): void {
     const id = customer.id ?? customer._id;
     if (!id) return;
-    this.inventory.get<CustomerProfile>(`/customers/${id}/profile`).subscribe({
+    this.profilePage.set(1);
+    this.loadCustomerProfile(id, 1);
+  }
+
+  goToProfilePage(page: number): void {
+    const customerId = this.profile()?.customer.id ?? this.profile()?.customer._id;
+    const totalPages = this.profile()?.history.pagination.totalPages ?? 1;
+    if (!customerId || page < 1 || page > totalPages) return;
+    this.profilePage.set(page);
+    this.loadCustomerProfile(customerId, page);
+  }
+
+  private loadCustomerProfile(customerId: number, page: number): void {
+    this.inventory.get<CustomerProfile>(`/customers/${customerId}/profile`, {
+      page,
+      limit: this.profilePageSize,
+    }).subscribe({
       next: (response) => {
         this.profile.set(response.data);
         this.profileOpen.set(true);

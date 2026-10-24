@@ -8,6 +8,7 @@ import {
   InventoryService,
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 const MOVEMENT_LABELS: Record<string, string> = {
   purchase: "Compra a proveedor",
@@ -21,10 +22,11 @@ const MOVEMENT_LABELS: Record<string, string> = {
 @Component({
   selector: "app-movements",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./movements.component.html",
 })
 export class MovementsComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
 
@@ -97,13 +99,19 @@ export class MovementsComponent implements OnInit {
     this.inventory
       .list<InventoryMovement>("/movements", {
         page: this.page(),
-        limit: 20,
+        limit: this.pageSize,
         type: this.filterType || undefined,
       })
       .subscribe({
         next: (response) => {
+          const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+          if (this.page() > totalPages) {
+            this.page.set(totalPages);
+            this.fetchMovements();
+            return;
+          }
           this.movements.set(response.data ?? []);
-          this.pageCount.set(response.pagination?.totalPages ?? 1);
+          this.pageCount.set(totalPages);
           this.movementCount.set(response.pagination?.total ?? response.data.length);
           this.loading.set(false);
         },
@@ -111,8 +119,7 @@ export class MovementsComponent implements OnInit {
       });
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
     this.page.set(nextPage);
     this.fetchMovements();

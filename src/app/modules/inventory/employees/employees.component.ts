@@ -9,6 +9,7 @@ import {
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 interface EmployeeForm {
   name: string;
@@ -25,10 +26,11 @@ interface EmployeeForm {
 @Component({
   selector: "app-inventory-employees",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./employees.component.html",
 })
 export class EmployeesComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
@@ -84,14 +86,20 @@ export class EmployeesComponent implements OnInit {
     this.inventory
       .list<InventoryEmployee>("/employees", {
         page: this.page(),
-        limit: 20,
+        limit: this.pageSize,
         search: this.search.trim(),
         role: this.roleFilter,
       })
       .subscribe({
         next: (response) => {
+        const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+        if (this.page() > totalPages) {
+          this.page.set(totalPages);
+          this.load();
+          return;
+        }
           this.employees.set(response.data ?? []);
-          this.pageCount.set(response.pagination?.totalPages ?? 1);
+        this.pageCount.set(totalPages);
           this.employeeCount.set(response.pagination?.total ?? response.data.length);
           this.loading.set(false);
         },
@@ -104,8 +112,7 @@ export class EmployeesComponent implements OnInit {
     this.load();
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
     this.page.set(nextPage);
     this.load();

@@ -13,6 +13,7 @@ import { NotificationService } from "../../../core/services/notification.service
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 import {
   CancelOrderDialogComponent,
   CancelOrderResult,
@@ -32,10 +33,11 @@ interface DraftItem {
 @Component({
   selector: "app-inventory-documents",
   standalone: true,
-  imports: [CommonModule, FormsModule, CancelOrderDialogComponent, CustomerSaleSummaryComponent, DocumentReceiptComponent],
+  imports: [CommonModule, FormsModule, CancelOrderDialogComponent, CustomerSaleSummaryComponent, DocumentReceiptComponent, PaginationComponent],
   templateUrl: "./document-workbench.component.html",
 })
 export class DocumentWorkbenchComponent implements OnInit {
+  readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
@@ -131,11 +133,17 @@ export class DocumentWorkbenchComponent implements OnInit {
     this.loading.set(true);
     this.inventory.list<InventoryDocument>(`/${this.kind}`, {
       page: this.page(),
-      limit: 20,
+      limit: this.pageSize,
     }).subscribe({
       next: (response) => {
+        const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
+        if (this.page() > totalPages) {
+          this.page.set(totalPages);
+          this.load();
+          return;
+        }
         this.documents.set(response.data ?? []);
-        this.pageCount.set(response.pagination?.totalPages ?? 1);
+        this.pageCount.set(totalPages);
         this.documentCount.set(response.pagination?.total ?? response.data.length);
         this.loading.set(false);
       },
@@ -143,8 +151,7 @@ export class DocumentWorkbenchComponent implements OnInit {
     });
   }
 
-  changePage(direction: -1 | 1): void {
-    const nextPage = this.page() + direction;
+  goToPage(nextPage: number): void {
     if (nextPage < 1 || nextPage > this.pageCount()) return;
     this.page.set(nextPage);
     this.load();
