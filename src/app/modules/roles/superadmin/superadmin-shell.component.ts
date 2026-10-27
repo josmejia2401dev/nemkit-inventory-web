@@ -24,6 +24,5 @@ export class SuperadminShellComponent {
     { path: "/superadmin/users", label: "Usuarios del sistema", icon: "pi pi-users" },
     { path: "/superadmin/companies", label: "Empresas", icon: "pi pi-building" },
     { path: "/superadmin/feedback-inbox", label: "Reportes de usuarios", icon: "pi pi-inbox" },
-    { path: "/superadmin/logs", label: "Logs", icon: "pi pi-list" },
   ];
 }

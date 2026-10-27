@@ -32,10 +32,6 @@ export const superadminRoutes: Routes = [
         loadComponent: () => import("./superadmin-company-detail.component").then((m) => m.SuperadminCompanyDetailComponent),
       },
       {
-        path: "logs",
-        loadComponent: () => import("./superadmin-logs.component").then((m) => m.SuperadminLogsComponent),
-      },
-      {
         path: "feedback-inbox",
         loadComponent: () => import("../../inventory/feedback/feedback-inbox.component").then((m) => m.FeedbackInboxComponent),
       },

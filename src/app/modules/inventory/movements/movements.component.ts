@@ -60,7 +60,7 @@ export class MovementsComponent implements OnInit {
 
   loadEmployees(): void {
     this.inventory
-      .list<InventoryEmployee>("/employees", { limit: 100, status: "active" })
+      .get<InventoryEmployee[]>("/employee-options")
       .subscribe({ next: (response) => this.employees.set(response.data ?? []) });
   }
 

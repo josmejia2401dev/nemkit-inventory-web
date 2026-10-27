@@ -42,7 +42,7 @@ export class BusinessSettingsComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.loadFailed.set(false);
-    this.api.get<BusinessProfile>("/profile").subscribe({
+    this.api.get<BusinessProfile>("/users/profile").subscribe({
       next: ({ data }) => {
         this.companyName = data.companyName ?? "";
         this.businessType = data.businessType ?? "retail";
@@ -67,7 +67,7 @@ export class BusinessSettingsComponent implements OnInit {
 
     this.saving.set(true);
     this.api
-      .put<BusinessProfile>("/settings/business", {
+      .put<BusinessProfile>("/users/profile", {
         companyName,
         businessType: this.businessType,
       })

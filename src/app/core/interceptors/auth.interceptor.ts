@@ -21,13 +21,13 @@ import { environment } from "../../../environments/environment";
 import { SKIP_AUTH } from "../http/http-context.tokens";
 
 const PUBLIC_PATHS = [
-  "/auth/login",
-  "/auth/register",
-  "/auth/refresh",
-  "/auth/forgot-password",
-  "/auth/employee/login",
-  "/auth/employee/refresh",
-  "/auth/employee/forgot-password",
+  "/auth/users/login",
+  "/auth/users/register",
+  "/auth/users/refresh",
+  "/auth/users/forgot-password",
+  "/auth/employees/login",
+  "/auth/employees/refresh",
+  "/auth/employees/forgot-password",
 ];
 
 let isRefreshing = false;
@@ -96,8 +96,8 @@ function doRefresh(
 
   // El empleado refresca contra su propio endpoint.
   const refreshUrl = store.sessionType() === "employee"
-    ? "/auth/employee/refresh"
-    : "/auth/refresh";
+    ? "/auth/employees/refresh"
+    : "/auth/users/refresh";
 
   return api
     .post<any>(refreshUrl, { refreshToken: store.refreshToken() })

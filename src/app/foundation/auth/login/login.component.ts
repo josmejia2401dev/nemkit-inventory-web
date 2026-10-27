@@ -36,7 +36,7 @@ export class LoginComponent {
     this.error.set(null);
     this.loading.set(true);
     this.api
-      .post<any>("/auth/login", { email: this.email, password: this.password })
+      .post<any>("/auth/users/login", { email: this.email, password: this.password })
       .subscribe({
         next: (res) => {
           this.loading.set(false);

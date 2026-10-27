@@ -43,6 +43,11 @@ export class ProfileComponent implements OnInit {
   passwordDialogVisible = signal(false);
   savingPassword = signal(false);
 
+  /** Base del endpoint de perfil según el tipo de sesión (empresa o empleado). */
+  private get base(): string {
+    return this.authStore.sessionType() === "employee" ? "/employees/profile" : "/users/profile";
+  }
+
   editName = "";
   editEmail = "";
   currentPassword = "";
@@ -56,7 +61,7 @@ export class ProfileComponent implements OnInit {
   loadProfile(): void {
     this.loading.set(true);
     this.api
-      .get<UserProfileResponse>("/profile")
+      .get<UserProfileResponse & { name?: string }>(this.base)
       .pipe(
         timeout(15000),
         finalize(() => this.loading.set(false)),
@@ -70,6 +75,8 @@ export class ProfileComponent implements OnInit {
 
           const profile: UserProfile = {
             ...response.data,
+            // El perfil de empleado usa 'name'; el de empresa 'fullName'.
+            fullName: response.data.fullName ?? response.data.name ?? "",
             security: {
               loginAttempts: 0,
               lastLockedAt: null,
@@ -107,11 +114,15 @@ export class ProfileComponent implements OnInit {
     }
 
     this.savingProfile.set(true);
-    this.api.put<UserProfile>("/profile", { fullName, email }).subscribe({
+    const body = this.authStore.sessionType() === "employee"
+      ? { name: fullName, email }
+      : { fullName, email };
+    this.api.put<UserProfile & { name?: string }>(this.base, body).subscribe({
       next: (response) => {
         const updatedProfile = {
           ...this.profile()!,
           ...response.data,
+          fullName: response.data.fullName ?? response.data.name ?? this.profile()!.fullName,
         };
 
         this.profile.set(updatedProfile);
@@ -163,7 +174,7 @@ export class ProfileComponent implements OnInit {
 
     this.savingPassword.set(true);
     this.api
-      .put("/profile/password", {
+      .put(`${this.base}/password`, {
         currentPassword: this.currentPassword,
         newPassword: this.newPassword,
       })

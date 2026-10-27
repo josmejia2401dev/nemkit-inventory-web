@@ -80,7 +80,7 @@ export class EmployeesComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.inventory
-      .list<InventoryEmployee>("/employees", {
+      .list<InventoryEmployee>("/users/employees", {
         page: this.page(),
         limit: this.pageSize,
         search: this.search.trim(),
@@ -175,8 +175,8 @@ export class EmployeesComponent implements OnInit {
 
     this.saving.set(true);
     const request = isCreate
-      ? this.inventory.post<InventoryEmployee>("/employees", body)
-      : this.inventory.put<InventoryEmployee>(`/employees/${this.editingId}`, body);
+      ? this.inventory.post<InventoryEmployee>("/users/employees", body)
+      : this.inventory.put<InventoryEmployee>(`/users/employees/${this.editingId}`, body);
     request.subscribe({
       next: () => {
         this.saving.set(false);
@@ -199,7 +199,7 @@ export class EmployeesComponent implements OnInit {
       severity: "danger",
     });
     if (!ok) return;
-    this.inventory.delete(`/employees/${id}`).subscribe({
+    this.inventory.delete(`/users/employees/${id}`).subscribe({
       next: () => {
         this.notifications.success("Empleado eliminado", "La cuenta quedó dada de baja.");
         this.load();

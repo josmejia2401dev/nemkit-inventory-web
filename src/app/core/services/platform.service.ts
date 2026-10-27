@@ -54,57 +54,28 @@ export interface PlatformCompanyDetail {
   memberCount: number;
 }
 
-export interface LogFile {
-  name: string;
-  sizeBytes: number;
-  modifiedAt: string;
-}
-
-export interface LogEntry {
-  timestamp?: string | null;
-  level?: string;
-  message?: string;
-  requestId?: string;
-  [key: string]: unknown;
-}
-
-export interface LogReadResult {
-  file: string;
-  total: number;
-  returned: number;
-  entries: LogEntry[];
-}
-
 /** Cliente de los endpoints de plataforma (solo super admin). */
 @Injectable({ providedIn: "root" })
 export class PlatformService {
   private api = inject(ApiService);
 
   overview(): Observable<ApiResponse<PlatformOverview>> {
-    return this.api.get<PlatformOverview>("/platform/overview");
+    return this.api.get<PlatformOverview>("/sys/overview");
   }
 
   listUsers(params?: Record<string, unknown>): Observable<PaginatedResponse<PlatformUser>> {
-    return this.api.get<PlatformUser[]>("/platform/users", params) as unknown as Observable<PaginatedResponse<PlatformUser>>;
+    return this.api.get<PlatformUser[]>("/sys/users", params) as unknown as Observable<PaginatedResponse<PlatformUser>>;
   }
 
   getUser(id: number): Observable<ApiResponse<PlatformUser>> {
-    return this.api.get<PlatformUser>(`/platform/users/${id}`);
+    return this.api.get<PlatformUser>(`/sys/users/${id}`);
   }
 
   listCompanies(params?: Record<string, unknown>): Observable<PaginatedResponse<PlatformCompany>> {
-    return this.api.get<PlatformCompany[]>("/platform/companies", params) as unknown as Observable<PaginatedResponse<PlatformCompany>>;
+    return this.api.get<PlatformCompany[]>("/sys/companies", params) as unknown as Observable<PaginatedResponse<PlatformCompany>>;
   }
 
   getCompany(id: number): Observable<ApiResponse<PlatformCompanyDetail>> {
-    return this.api.get<PlatformCompanyDetail>(`/platform/companies/${id}`);
-  }
-
-  logFiles(): Observable<ApiResponse<LogFile[]>> {
-    return this.api.get<LogFile[]>("/platform/logs/files");
-  }
-
-  readLogs(params: Record<string, unknown>): Observable<ApiResponse<LogReadResult>> {
-    return this.api.get<LogReadResult>("/platform/logs/read", params);
+    return this.api.get<PlatformCompanyDetail>(`/sys/companies/${id}`);
   }
 }

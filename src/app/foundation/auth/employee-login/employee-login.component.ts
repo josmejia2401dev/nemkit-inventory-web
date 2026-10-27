@@ -36,7 +36,7 @@ export class EmployeeLoginComponent {
     this.error.set(null);
     this.loading.set(true);
     this.api
-      .post<any>("/auth/employee/login", { email: this.email, password: this.password })
+      .post<any>("/auth/employees/login", { email: this.email, password: this.password })
       .subscribe({
         next: (res) => {
           this.loading.set(false);
