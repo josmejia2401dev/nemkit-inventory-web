@@ -1,0 +1,66 @@
+<div class="dialog-backdrop employee-payments-backdrop" (click)="closed.emit()">
+  <section class="form-dialog employee-payments-dialog" role="dialog" aria-modal="true" aria-labelledby="employee-payments-title" (click)="$event.stopPropagation()">
+    <header class="dialog-heading">
+      <div><p class="eyebrow">HISTORIAL LABORAL</p><h2 id="employee-payments-title">Pagos a {{ employeeName }}</h2><p class="dialog-subtitle">Consulta y registra pagos realizados a este empleado.</p></div>
+      <button class="icon-button" type="button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+    </header>
+
+    <div class="employee-payment-summary">
+      <div><span>Total registrado</span><strong>{{ money(summary()?.totals?.totalPaid ?? 0) }}</strong></div>
+      <div><span>Pagos</span><strong>{{ summary()?.totals?.paymentCount ?? 0 }}</strong></div>
+      <button class="button button-primary" type="button" (click)="openForm()"><i class="pi pi-plus"></i> Registrar pago</button>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando historial…</span></div>
+    } @else if (records().length) {
+      <div class="table-scroll employee-payment-table-wrap">
+        <table class="inventory-table">
+          <thead><tr><th>FECHA DE PAGO</th><th>CONCEPTO</th><th>PERÍODO</th><th>MEDIO / REFERENCIA</th><th>VALOR</th></tr></thead>
+          <tbody>
+            @for (record of records(); track record.id) {
+              <tr>
+                <td data-label="Fecha de pago">{{ record.paymentDate | date: "d MMM yyyy" : "" : "es-CO" }}</td>
+                <td data-label="Concepto"><strong>{{ paymentTypeLabel(record.type) }}</strong><small class="table-subtext">{{ record.notes || "Sin nota" }}</small></td>
+                <td data-label="Período">@if (record.periodStart && record.periodEnd) { {{ record.periodStart | date: "d MMM" : "" : "es-CO" }} – {{ record.periodEnd | date: "d MMM yyyy" : "" : "es-CO" }} } @else { — }</td>
+                <td data-label="Medio / referencia">{{ paymentMethodLabel(record.method) }}<small class="table-subtext">{{ record.reference || "Sin referencia" }}</small></td>
+                <td data-label="Valor"><strong>{{ money(record.amount) }}</strong></td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr class="employee-total-footer">
+              <td colspan="4"><strong>Total del historial</strong><small>{{ summary()?.totals?.paymentCount ?? total() }} pagos registrados</small></td>
+              <td data-label="Total pagado"><strong>{{ money(summary()?.totals?.totalPaid ?? 0) }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="total()" itemLabel="pagos" (pageChange)="page.set($event); load()" />
+    } @else {
+      <div class="empty-state"><span class="empty-icon"><i class="pi pi-wallet"></i></span><strong>Aún no hay pagos registrados</strong><p>Registra los pagos realizados para conservar un historial consultable.</p><button class="button button-primary button-small" (click)="openForm()"><i class="pi pi-plus"></i> Registrar primer pago</button></div>
+    }
+  </section>
+</div>
+
+@if (formOpen()) {
+  <div class="dialog-backdrop employee-payment-form-backdrop" (click)="formOpen.set(false)">
+    <section class="form-dialog form-dialog--narrow employee-payment-form" role="dialog" aria-modal="true" aria-labelledby="employee-payment-form-title" (click)="$event.stopPropagation()">
+      <div class="dialog-heading"><div><p class="eyebrow">NUEVO REGISTRO</p><h2 id="employee-payment-form-title">Registrar pago</h2></div><button class="icon-button" type="button" aria-label="Cerrar" (click)="formOpen.set(false)"><i class="pi pi-times"></i></button></div>
+      <form class="dialog-form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <label class="form-field"><span>Fecha del pago <b>*</b></span><input type="date" [(ngModel)]="form.paymentDate" name="paymentDate" required /></label>
+          <label class="form-field"><span>Valor pagado <b>*</b></span><input type="number" [(ngModel)]="form.amount" name="amount" min="0.01" step="0.01" required /></label>
+          <label class="form-field"><span>Concepto <b>*</b></span><select [(ngModel)]="form.type" name="type" required><option value="salary">Salario</option><option value="advance">Anticipo</option><option value="commission">Comisión</option><option value="bonus">Bonificación</option><option value="other">Otro pago</option></select></label>
+          <label class="form-field"><span>Medio de pago</span><select [(ngModel)]="form.method" name="method"><option value="bank_transfer">Transferencia</option><option value="cash">Efectivo</option><option value="other">Otro</option></select></label>
+          <label class="form-field"><span>Inicio del período</span><input type="date" [(ngModel)]="form.periodStart" name="periodStart" /></label>
+          <label class="form-field"><span>Fin del período</span><input type="date" [(ngModel)]="form.periodEnd" name="periodEnd" /></label>
+          <label class="form-field form-field--wide"><span>Referencia / comprobante</span><input [(ngModel)]="form.reference" name="reference" maxlength="120" placeholder="Número de transferencia o recibo" /></label>
+          <label class="form-field form-field--wide"><span>Nota</span><textarea [(ngModel)]="form.notes" name="notes" maxlength="1000" rows="3" placeholder="Detalle adicional del pago"></textarea></label>
+        </div>
+        <p class="form-hint"><i class="pi pi-info-circle"></i> El historial conserva los pagos registrados para consulta y reportes.</p>
+        <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="formOpen.set(false)">Cancelar</button><button class="button button-primary" [disabled]="saving()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Guardar pago" }}</button></div>
+      </form>
+    </section>
+  </div>
+}

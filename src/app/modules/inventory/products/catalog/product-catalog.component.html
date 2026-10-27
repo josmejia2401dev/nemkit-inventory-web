@@ -1,0 +1,50 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">CATÁLOGO</p>
+    <h1>Productos</h1>
+    <p class="heading-subtitle">
+      Consulta existencias, precios y disponibilidad de tus productos.
+    </p>
+  </div>
+</div>
+
+<section class="panel catalog-panel" aria-label="Catálogo de productos">
+  <app-product-filter-bar
+    [categories]="categories()"
+    [search]="search"
+    (searchChange)="search = $event"
+    [categoryFilter]="categoryFilter"
+    (categoryFilterChange)="categoryFilter = $event"
+    [stockState]="stockState"
+    (stockStateChange)="updateStockFilter($event)"
+    [hasProductFocus]="!!specificProductId"
+    (clearProductFocus)="clearProductFocus()"
+    (apply)="applyFilters()"
+  />
+
+  @if (loading()) {
+    <div class="loading-panel" role="status" aria-live="polite">
+      <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+      <span>Cargando productos…</span>
+    </div>
+  } @else if (loadFailed()) {
+    <div class="empty-state" role="alert">
+      <span class="empty-icon"><i class="pi pi-exclamation-circle" aria-hidden="true"></i></span>
+      <strong>No se pudieron cargar los productos</strong>
+      <p>Revisa tu conexión e inténtalo de nuevo.</p>
+      <button class="button button-secondary button-small" (click)="loadProducts()">
+        Intentar de nuevo
+      </button>
+    </div>
+  } @else if (products().length) {
+    <app-product-table [products]="products()" [categories]="categories()" />
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="productCount()" (pageChange)="goToPage($event)" />
+    <p class="table-footer-note">El stock cambia al registrar movimientos</p>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-box" aria-hidden="true"></i></span>
+      <strong>{{ search || categoryFilter || stockState ? "No hay resultados" : "No hay productos disponibles" }}</strong>
+      <p>Prueba con otros filtros o una búsqueda diferente.</p>
+    </div>
+  }
+</section>

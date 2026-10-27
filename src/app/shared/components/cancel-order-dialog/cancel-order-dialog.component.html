@@ -1,0 +1,33 @@
+<div class="dialog-backdrop" (click)="cancel.emit()">
+  <section class="form-dialog cancel-dialog" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <div class="dialog-heading">
+      <div><p class="eyebrow">CANCELAR</p><h2>{{ title }}</h2></div>
+      <button class="icon-button" (click)="cancel.emit()" aria-label="Cerrar"><i class="pi pi-times"></i></button>
+    </div>
+    <div class="dialog-form">
+      <p class="cancel-hint">Selecciona el motivo de la cancelación. El pedido saldrá de la cola y se repondrá el stock.</p>
+      <div class="cancel-reasons">
+        @for (r of reasons; track r.value) {
+          <button type="button" class="cancel-reason" [class.cancel-reason--active]="reason() === r.value" (click)="reason.set(r.value)">
+            {{ r.label }}
+          </button>
+        }
+      </div>
+      @if (reason() === "other") {
+        <label class="form-field">
+          <span>Describe el motivo <b>*</b></span>
+          <input [ngModel]="note()" (ngModelChange)="note.set($event)" name="note" maxlength="300" placeholder="Ej. Falla en la cocina" />
+        </label>
+      } @else {
+        <label class="form-field">
+          <span>Nota (opcional)</span>
+          <input [ngModel]="note()" (ngModelChange)="note.set($event)" name="note" maxlength="300" placeholder="Detalle adicional" />
+        </label>
+      }
+      <div class="dialog-actions">
+        <button class="button button-secondary" (click)="cancel.emit()">Volver</button>
+        <button class="button button-danger" [disabled]="!canConfirm()" (click)="submit()"><i class="pi pi-ban"></i> Cancelar pedido</button>
+      </div>
+    </div>
+  </section>
+</div>

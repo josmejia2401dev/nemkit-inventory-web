@@ -5,6 +5,7 @@ import { finalize, timeout } from "rxjs";
 import { ApiService } from "../../core/services/api.service";
 import { NotificationService } from "../../core/services/notification.service";
 import { AuthStore } from "../../core/store/auth.store";
+import { BusinessProfileChanges, BusinessProfileSectionComponent } from "./components/business-profile-section/business-profile-section.component";
 
 interface UserProfile {
   id: number;
@@ -16,10 +17,11 @@ interface UserProfile {
     lastLockedAt: string | null;
     lockedUntil: string | null;
     lastLoginAt: string | null;
-    mustChangePassword: boolean;
   };
   createdAt: string;
   updatedAt: string;
+  companyName?: string;
+  businessType?: "retail" | "restaurant";
 }
 
 type UserProfileResponse = Omit<UserProfile, "security"> & {
@@ -29,7 +31,7 @@ type UserProfileResponse = Omit<UserProfile, "security"> & {
 @Component({
   selector: "app-profile",
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BusinessProfileSectionComponent],
   templateUrl: "./profile.component.html",
 })
 export class ProfileComponent implements OnInit {
@@ -40,6 +42,7 @@ export class ProfileComponent implements OnInit {
   profile = signal<UserProfile | null>(null);
   loading = signal(true);
   savingProfile = signal(false);
+  savingBusinessProfile = signal(false);
   passwordDialogVisible = signal(false);
   savingPassword = signal(false);
 
@@ -53,6 +56,11 @@ export class ProfileComponent implements OnInit {
   currentPassword = "";
   newPassword = "";
   confirmPassword = "";
+
+  get showBusinessSettings(): boolean {
+    const profile = this.profile();
+    return Boolean(profile?.companyName && profile.roles.includes("ADMIN"));
+  }
 
   ngOnInit(): void {
     this.loadProfile();
@@ -82,7 +90,6 @@ export class ProfileComponent implements OnInit {
               lastLockedAt: null,
               lockedUntil: null,
               lastLoginAt: null,
-              mustChangePassword: false,
               ...response.data.security,
             },
           };
@@ -137,6 +144,35 @@ export class ProfileComponent implements OnInit {
         this.notifications.success("Perfil actualizado");
       },
       error: () => this.savingProfile.set(false),
+    });
+  }
+
+  saveBusinessProfile(changes: BusinessProfileChanges): void {
+    if (changes.companyName.length < 2) {
+      this.notifications.warn("Revisa el nombre", "Escribe al menos dos caracteres para el negocio.");
+      return;
+    }
+
+    this.savingBusinessProfile.set(true);
+    this.api.put<Pick<UserProfile, "companyName" | "businessType">>("/users/profile", changes).subscribe({
+      next: (response) => {
+        const currentProfile = this.profile();
+        if (currentProfile) this.profile.set({ ...currentProfile, ...response.data });
+
+        const currentCompany = this.authStore.company();
+        this.authStore.updateCompany({
+          id: currentCompany?.id ?? currentProfile?.id ?? 0,
+          name: changes.companyName,
+          businessType: changes.businessType,
+        });
+
+        this.savingBusinessProfile.set(false);
+        this.notifications.success(
+          "Negocio actualizado",
+          "Cierra sesión y vuelve a entrar para aplicar el nuevo modo de operación.",
+        );
+      },
+      error: () => this.savingBusinessProfile.set(false),
     });
   }
 

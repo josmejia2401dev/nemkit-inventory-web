@@ -1,0 +1,151 @@
+.employee-payments-backdrop {
+  z-index: 1000;
+}
+
+.employee-payments-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: min(100%, 1050px);
+  max-height: min(92dvh, 900px);
+  overflow: auto;
+  padding: clamp(18px, 3vw, 30px);
+}
+
+.employee-payments-dialog .dialog-heading {
+  margin: 0;
+}
+
+.employee-payments-dialog .dialog-subtitle {
+  margin-top: 7px;
+}
+
+.employee-payment-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(36, 65, 52, 0.09);
+  border-radius: 16px;
+  background: #f8faf7;
+}
+
+.employee-payment-summary > div {
+  display: grid;
+  gap: 5px;
+  min-width: 150px;
+}
+
+.employee-payment-summary span {
+  color: #718177;
+  font-size: 12px;
+}
+
+.employee-payment-summary strong {
+  color: #203d30;
+  font-size: 20px;
+}
+
+.employee-payment-summary .button {
+  margin-left: auto;
+}
+
+.employee-payment-form-backdrop {
+  z-index: 1010;
+}
+
+.employee-payment-form {
+  width: min(100%, 650px);
+}
+
+.employee-payment-form textarea {
+  resize: vertical;
+}
+
+.employee-payment-table-wrap .employee-total-footer td {
+  padding: 14px;
+  border-top: 2px solid rgba(36, 65, 52, 0.14);
+  color: #294536;
+  background: #f5f8f4;
+  font-size: 12px;
+}
+
+.employee-payment-table-wrap .employee-total-footer td:first-child {
+  text-align: right;
+}
+
+.employee-payment-table-wrap .employee-total-footer td:last-child {
+  font-size: 14px;
+}
+
+.employee-payment-table-wrap .employee-total-footer small {
+  display: block;
+  margin-top: 4px;
+  color: #758279;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+@media (max-width: 700px) {
+  .employee-payments-dialog {
+    width: 100%;
+    max-height: calc(100dvh - env(safe-area-inset-top));
+    padding: 17px;
+  }
+
+  .employee-payment-summary {
+    flex-wrap: wrap;
+    padding: 13px;
+  }
+
+  .employee-payment-summary > div {
+    flex: 1 1 110px;
+    min-width: 0;
+  }
+
+  .employee-payment-summary strong {
+    font-size: 17px;
+  }
+
+  .employee-payment-summary .button {
+    width: 100%;
+    margin: 4px 0 0;
+    justify-content: center;
+  }
+
+  .employee-payment-table-wrap .inventory-table tfoot {
+    display: block;
+    padding: 0 10px 10px;
+  }
+
+  .employee-payment-table-wrap .employee-total-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(36, 65, 52, 0.11);
+    border-radius: 13px;
+    background: #f5f8f4;
+  }
+
+  .employee-payment-table-wrap .employee-total-footer td,
+  .employee-payment-table-wrap .employee-total-footer td:first-child,
+  .employee-payment-table-wrap .employee-total-footer td:last-child {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .employee-payment-table-wrap .employee-total-footer td::before {
+    display: none;
+  }
+
+  .employee-payment-table-wrap .employee-total-footer td:last-child {
+    flex: 0 0 auto;
+    font-size: 14px;
+    text-align: right;
+  }
+}

@@ -41,6 +41,7 @@
       @if (search) {
         <button type="button" class="clear-search" aria-label="Limpiar búsqueda" (click)="search = ''; applySearch()"><i class="pi pi-times"></i></button>
       }
+      <button type="button" class="contact-directory-search-button" aria-label="Buscar" (click)="applySearch()"><i class="pi pi-arrow-right"></i></button>
     </div>
   </div>
   @if (loading()) {
@@ -73,8 +74,8 @@
 
 @if (dialogOpen()) {
   <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
-    <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-      <div class="dialog-heading"><div><p class="eyebrow">RELACIONES COMERCIALES</p><h2>{{ editingId ? "Editar" : "Nuevo" }} {{ singular }}</h2></div><button class="icon-button" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button></div>
+    <section class="form-dialog form-dialog--narrow contact-dialog" role="dialog" aria-modal="true" [attr.aria-label]="editingId ? 'Editar ' + singular : 'Nuevo ' + singular" (click)="$event.stopPropagation()">
+      <div class="dialog-heading"><div><p class="eyebrow">RELACIONES COMERCIALES</p><h2>{{ editingId ? "Editar" : "Nuevo" }} {{ singular }}</h2></div><button class="icon-button" type="button" aria-label="Cerrar" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button></div>
       <form (ngSubmit)="save()" class="dialog-form">
         <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="form.name" name="name" required minlength="2" maxlength="160" autocomplete="organization" /></label>
         <div class="form-grid">
@@ -91,7 +92,7 @@
 
 @if (profileOpen() && profile(); as data) {
   <div class="dialog-backdrop" (click)="closeProfile()">
-    <section class="form-dialog" role="dialog" aria-modal="true" aria-label="Perfil del cliente" (click)="$event.stopPropagation()">
+    <section class="form-dialog customer-profile-dialog" role="dialog" aria-modal="true" aria-label="Perfil del cliente" (click)="$event.stopPropagation()">
       <div class="dialog-heading">
         <div><p class="eyebrow">PERFIL DEL CLIENTE</p><h2>{{ data.customer.name }}</h2></div>
         <button class="icon-button" (click)="closeProfile()"><i class="pi pi-times"></i></button>

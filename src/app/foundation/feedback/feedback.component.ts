@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { InventoryService } from "../../core/services/inventory.service";
+import { ApiService } from "../../core/services/api.service";
 import { NotificationService } from "../../core/services/notification.service";
 
 type FeedbackType = "bug" | "suggestion" | "other";
@@ -17,7 +17,7 @@ type FeedbackType = "bug" | "suggestion" | "other";
   templateUrl: "./feedback.component.html",
 })
 export class FeedbackComponent {
-  private inventory = inject(InventoryService);
+  private api = inject(ApiService);
   private notifications = inject(NotificationService);
 
   readonly types: Array<{ value: FeedbackType; label: string; icon: string }> = [
@@ -45,7 +45,7 @@ export class FeedbackComponent {
     }
 
     this.saving.set(true);
-    this.inventory.post("/feedback", { type: this.type, title, description }).subscribe({
+    this.api.post("/feedback", { type: this.type, title, description }).subscribe({
       next: () => {
         this.saving.set(false);
         this.sent.set(true);

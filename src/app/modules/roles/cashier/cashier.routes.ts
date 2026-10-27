@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { CashierShellComponent } from "./cashier-shell.component";
+import { CashierShellComponent } from "./shell/cashier-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
@@ -17,7 +17,7 @@ export const cashierRoutes: Routes = [
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
       {
         path: "dashboard",
-        loadComponent: () => import("./cashier-dashboard.component").then((m) => m.CashierDashboardComponent),
+        loadComponent: () => import("./dashboard/cashier-dashboard.component").then((m) => m.CashierDashboardComponent),
       },
       salesRoute,
       deliveryOperationsRoute,

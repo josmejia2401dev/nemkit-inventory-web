@@ -1,8 +1,13 @@
 <main class="auth-page">
   <div class="auth-art">
     <a routerLink="/login" class="brand brand--light"
-      ><span class="brand-mark"><i class="pi pi-box"></i></span
-      ><span class="brand-copy"
+      ><span class="brand-mark">
+        <img
+          src="/icons/inventory-mark.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </span><span class="brand-copy"
         ><strong>nemkit</strong><small>INVENTARIO</small></span
       ></a
     >
@@ -36,8 +41,13 @@
   <section class="auth-form-side">
     <div class="auth-mobile-brand">
       <a routerLink="/login" class="brand"
-        ><span class="brand-mark"><i class="pi pi-box"></i></span
-        ><span class="brand-copy"
+        ><span class="brand-mark">
+        <img
+          src="/icons/inventory-mark.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </span><span class="brand-copy"
           ><strong>nemkit</strong><small>INVENTARIO</small></span
         ></a
       >
@@ -45,7 +55,7 @@
     <div class="auth-form-wrap">
       <span class="auth-overline">QUÉ BUENO TENERTE DE VUELTA</span>
       <h2>Inicia sesión</h2>
-      <p class="auth-lead">Ingresa a tu espacio de inventario.</p>
+      <p class="auth-lead">Acceso para administradores y propietarios del negocio.</p>
       @if (error()) {
         <p-message severity="error" [text]="error()!" class="auth-message" />
       }
@@ -91,12 +101,18 @@
           >Crea tu cuenta <i class="pi pi-arrow-up-right"></i
         ></a>
       </p>
-      <p class="auth-switch">
-        ¿Eres empleado?
-        <a routerLink="/employee/login"
-          >Entra con tu cuenta <i class="pi pi-arrow-up-right"></i
-        ></a>
-      </p>
+      <a
+        routerLink="/employee/login"
+        class="employee-login-callout"
+        aria-label="Ir al acceso para empleados"
+      >
+        <span class="employee-login-icon"><i class="pi pi-id-card" aria-hidden="true"></i></span>
+        <span class="employee-login-copy">
+          <strong>¿Eres empleado?</strong>
+          <small>Ingresa con la cuenta que te asignó tu empresa.</small>
+        </span>
+        <i class="pi pi-arrow-right employee-login-arrow" aria-hidden="true"></i>
+      </a>
     </div>
     <span class="auth-legal"
       >Un espacio tranquilo para llevar mejor tus cuentas.</span

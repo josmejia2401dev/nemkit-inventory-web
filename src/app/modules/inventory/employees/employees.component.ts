@@ -10,6 +10,7 @@ import {
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { EmployeePaymentsComponent } from "./payments/employee-payments.component";
 
 interface EmployeeForm {
   name: string;
@@ -18,6 +19,7 @@ interface EmployeeForm {
   phone: string;
   email: string;
   password: string;
+  confirmPassword: string;
   role: EmployeeRole | "";
   hireDate: string;
   status: "active" | "inactive";
@@ -26,8 +28,9 @@ interface EmployeeForm {
 @Component({
   selector: "app-inventory-employees",
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, EmployeePaymentsComponent],
   templateUrl: "./employees.component.html",
+  styleUrls: ["./employees.component.css"],
 })
 export class EmployeesComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
@@ -59,10 +62,18 @@ export class EmployeesComponent implements OnInit {
   pageCount = signal(1);
   employeeCount = signal(0);
   saving = signal(false);
+  statusUpdatingId = signal<number | null>(null);
+  passwordDialogOpen = signal(false);
+  resettingPassword = signal(false);
+  passwordEmployee = signal<InventoryEmployee | null>(null);
+  paymentEmployee = signal<InventoryEmployee | null>(null);
   dialogOpen = signal(false);
   editingId: number | null = null;
   search = "";
   roleFilter = "";
+  statusFilter: "active" | "inactive" | "all" = "active";
+  newPassword = "";
+  confirmNewPassword = "";
   form: EmployeeForm = this.emptyForm();
 
   ngOnInit(): void {
@@ -85,6 +96,7 @@ export class EmployeesComponent implements OnInit {
         limit: this.pageSize,
         search: this.search.trim(),
         role: this.roleFilter,
+        status: this.statusFilter,
       })
       .subscribe({
         next: (response) => {
@@ -129,6 +141,7 @@ export class EmployeesComponent implements OnInit {
       phone: employee.phone ?? "",
       email: employee.email ?? "",
       password: "",
+      confirmPassword: "",
       role: employee.role,
       hireDate: employee.hireDate ? employee.hireDate.slice(0, 10) : "",
       status: employee.status ?? "active",
@@ -155,6 +168,10 @@ export class EmployeesComponent implements OnInit {
       }
       if (this.form.password.length < 6) {
         this.notifications.warn("Revisa la contraseña", "Debe tener al menos 6 caracteres.");
+        return;
+      }
+      if (this.form.password !== this.form.confirmPassword) {
+        this.notifications.warn("Las contraseñas no coinciden", "Confirma la clave temporal.");
         return;
       }
     }
@@ -188,22 +205,72 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  async remove(employee: InventoryEmployee): Promise<void> {
+  async changeStatus(employee: InventoryEmployee): Promise<void> {
     const id = employee.id ?? employee._id;
     if (!id) return;
+    const nextStatus = employee.status === "active" ? "inactive" : "active";
+    const deactivating = nextStatus === "inactive";
     const ok = await this.confirm.ask({
-      title: "Eliminar empleado",
-      message: `${employee.name} dejará de tener acceso al sistema. Esta acción da de baja su cuenta.`,
-      confirmLabel: "Eliminar",
+      title: deactivating ? "Desactivar acceso" : "Reactivar acceso",
+      message: deactivating
+        ? `${employee.name} no podrá iniciar sesión. Su información e historial se conservarán y podrás reactivarlo después.`
+        : `${employee.name} podrá volver a iniciar sesión con su cuenta actual.`,
+      confirmLabel: deactivating ? "Desactivar" : "Reactivar",
       cancelLabel: "Cancelar",
-      severity: "danger",
+      severity: deactivating ? "danger" : "info",
     });
     if (!ok) return;
-    this.inventory.delete(`/users/employees/${id}`).subscribe({
+    this.statusUpdatingId.set(id);
+    this.inventory.put(`/users/employees/${id}`, { status: nextStatus }).subscribe({
       next: () => {
-        this.notifications.success("Empleado eliminado", "La cuenta quedó dada de baja.");
+        this.statusUpdatingId.set(null);
+        this.notifications.success(
+          deactivating ? "Acceso desactivado" : "Acceso reactivado",
+          deactivating ? "El empleado ya no puede iniciar sesión." : "El empleado ya puede iniciar sesión.",
+        );
         this.load();
       },
+      error: () => this.statusUpdatingId.set(null),
+    });
+  }
+
+  openPasswordReset(employee: InventoryEmployee): void {
+    this.passwordEmployee.set(employee);
+    this.newPassword = "";
+    this.confirmNewPassword = "";
+    this.passwordDialogOpen.set(true);
+  }
+
+  openPayments(employee: InventoryEmployee): void {
+    this.paymentEmployee.set(employee);
+  }
+
+  resetPassword(): void {
+    const employee = this.passwordEmployee();
+    const id = employee?.id ?? employee?._id;
+    if (!id) return;
+    if (this.newPassword.length < 6) {
+      this.notifications.warn("Contraseña muy corta", "Usa al menos seis caracteres.");
+      return;
+    }
+    if (this.newPassword !== this.confirmNewPassword) {
+      this.notifications.warn("Las contraseñas no coinciden", "Confirma la contraseña temporal.");
+      return;
+    }
+
+    this.resettingPassword.set(true);
+    this.inventory.put(`/users/employees/${id}/password`, { newPassword: this.newPassword }).subscribe({
+      next: () => {
+        this.resettingPassword.set(false);
+        this.passwordDialogOpen.set(false);
+        this.newPassword = "";
+        this.confirmNewPassword = "";
+        this.notifications.success(
+          "Clave temporal asignada",
+          "Entrégasela al empleado. Se le pedirá crear una contraseña propia al ingresar.",
+        );
+      },
+      error: () => this.resettingPassword.set(false),
     });
   }
 
@@ -215,6 +282,7 @@ export class EmployeesComponent implements OnInit {
       phone: "",
       email: "",
       password: "",
+      confirmPassword: "",
       role: "",
       hireDate: "",
       status: "active",

@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from "@angular/core";
-import { DocumentWorkbenchComponent } from "../documents/document-workbench.component";
+import { DocumentWorkbenchComponent } from "../documents/document-workbench/document-workbench.component";
 
 @Component({
   selector: "app-purchases-page",
   standalone: true,
   imports: [DocumentWorkbenchComponent],
-  template: `<app-inventory-documents [kind]="'purchases'" />`,
+  templateUrl: "./purchases-page.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PurchasesPageComponent {}

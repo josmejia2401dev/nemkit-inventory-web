@@ -1,0 +1,158 @@
+:host {
+  display: block;
+}
+
+.page-heading > .button {
+  min-height: 44px;
+  border-radius: 11px;
+}
+
+.customer-lookup {
+  box-shadow: 0 5px 18px rgba(31, 57, 45, 0.04);
+}
+
+.customer-lookup-field input {
+  min-height: 44px;
+  font-size: 16px;
+}
+
+.customer-lookup-btn {
+  min-height: 44px;
+  border-radius: 11px;
+}
+
+.filter-bar .search-box {
+  min-width: min(100%, 300px);
+}
+
+.contact-directory-search-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  background: #276650;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.contact-directory-search-button:hover {
+  background: #1c5140;
+}
+
+.contact-directory-search-button:active {
+  transform: scale(0.96);
+}
+
+.contact-dialog {
+  width: min(100%, 600px);
+}
+
+.customer-profile-dialog {
+  width: min(100%, 760px);
+  max-height: min(90dvh, 900px);
+  padding: 0 20px 18px;
+}
+
+.customer-profile-dialog > .dialog-heading {
+  margin: 0 -20px 16px;
+}
+
+.customer-profile-dialog .report-summary {
+  gap: 9px;
+}
+
+.customer-profile-dialog .report-summary article {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(36, 65, 52, 0.07);
+  border-radius: 11px;
+  background: #fbfcfa;
+}
+
+.customer-profile-dialog .report-summary strong {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .page-heading > .button {
+    min-height: 44px;
+    font-size: 12px;
+  }
+
+  .customer-lookup {
+    margin-bottom: 13px;
+    padding: 15px;
+  }
+
+  .customer-lookup-head {
+    margin-bottom: 12px;
+  }
+
+  .customer-lookup-field {
+    min-height: 48px;
+    flex-basis: 100%;
+  }
+
+  .customer-lookup-field input {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .customer-lookup-btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .filter-bar {
+    align-items: stretch;
+  }
+
+  .filter-bar .search-box {
+    min-width: 100%;
+  }
+
+  .contact-directory-search-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .contact-dialog,
+  .customer-profile-dialog {
+    max-height: calc(100dvh - env(safe-area-inset-top));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .customer-profile-dialog {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .customer-profile-dialog > .dialog-heading {
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+
+  .customer-profile-dialog .report-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customer-profile-dialog .report-summary article {
+    padding: 11px;
+  }
+
+  .customer-profile-dialog .dialog-actions {
+    position: sticky;
+    bottom: calc(-16px - env(safe-area-inset-bottom));
+    margin: 18px -15px calc(-16px - env(safe-area-inset-bottom));
+    padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.97);
+  }
+
+  .row-actions .icon-button {
+    width: 42px;
+    height: 42px;
+  }
+}

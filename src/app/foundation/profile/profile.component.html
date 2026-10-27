@@ -83,6 +83,15 @@
           </form>
         </section>
 
+        @if (showBusinessSettings && user.companyName && user.businessType) {
+          <app-business-profile-section
+            [companyName]="user.companyName"
+            [businessType]="user.businessType"
+            [saving]="savingBusinessProfile()"
+            (saveChanges)="saveBusinessProfile($event)"
+          />
+        }
+
         <section class="panel security-card">
           <div class="section-heading">
             <div>
@@ -118,10 +127,6 @@
               <strong [class.security-warning]="user.security.lockedUntil">
                 {{ user.security.lockedUntil ? ("Bloqueada hasta " + (user.security.lockedUntil | date: "d MMM y, HH:mm")) : "Sin bloqueo" }}
               </strong>
-            </div>
-            <div class="security-detail">
-              <small>Cambio de contraseña requerido</small>
-              <strong>{{ user.security.mustChangePassword ? "Sí" : "No" }}</strong>
             </div>
           </div>
           <div class="password-row">
@@ -235,7 +240,7 @@
           <p class="eyebrow">PROTECCIÓN DE LA CUENTA</p>
           <h2 id="password-dialog-title">Cambiar contraseña</h2>
         </div>
-        <button class="icon-button" (click)="closePasswordDialog()">
+        <button class="icon-button" (click)="closePasswordDialog()" aria-label="Cerrar">
           <i class="pi pi-times"></i>
         </button>
       </div>

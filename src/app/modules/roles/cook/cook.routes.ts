@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { CookShellComponent } from "./cook-shell.component";
+import { CookShellComponent } from "./shell/cook-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";

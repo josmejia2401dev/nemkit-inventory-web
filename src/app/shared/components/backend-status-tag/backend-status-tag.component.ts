@@ -8,16 +8,7 @@ import { BackendHealthPollProfile, BackendHealthService } from '../../../core/se
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TagModule, TooltipModule],
-  template: `
-    <p-tag
-      [value]="label()"
-      [severity]="severity()"
-      [icon]="icon()"
-      [rounded]="true"
-      [pTooltip]="tooltip()"
-      tooltipPosition="bottom"
-    />
-  `,
+  templateUrl: "./backend-status-tag.component.html",
 })
 export class BackendStatusTagComponent {
   private health = inject(BackendHealthService);

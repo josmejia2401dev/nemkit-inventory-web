@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { CourierShellComponent } from "./courier-shell.component";
+import { CourierShellComponent } from "./shell/courier-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
@@ -15,7 +15,7 @@ export const courierRoutes: Routes = [
       {
         path: "dashboard",
         loadComponent: () =>
-          import("./courier-dashboard.component").then((m) => m.CourierDashboardComponent),
+          import("./dashboard/courier-dashboard.component").then((m) => m.CourierDashboardComponent),
       },
       courierDeliveriesRoute,
       ...foundationProfileRoutes,

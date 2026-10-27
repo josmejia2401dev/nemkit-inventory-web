@@ -3,7 +3,7 @@ import { Route } from "@angular/router";
 export const productCatalogRoute: Route = {
   path: "products",
   loadComponent: () =>
-    import("./product-catalog.component").then(
+    import("./catalog/product-catalog.component").then(
       (module) => module.ProductCatalogComponent,
     ),
 };
@@ -11,7 +11,7 @@ export const productCatalogRoute: Route = {
 export const productManagementRoute: Route = {
   path: "products",
   loadComponent: () =>
-    import("./product-management.component").then(
+    import("./management/product-management.component").then(
       (module) => module.ProductManagementComponent,
     ),
 };

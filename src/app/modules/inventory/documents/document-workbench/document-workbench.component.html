@@ -1,0 +1,307 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">{{ isSale ? "VENTA Y SALIDA DE STOCK" : "ABASTECIMIENTO Y ENTRADA DE STOCK" }}</p>
+    <h1>{{ title }}</h1>
+    <p class="heading-subtitle">{{ isSale ? "Registra ventas y mantén cada salida conectada con las existencias." : "Registra compras y actualiza tus existencias en un solo paso." }}</p>
+  </div>
+  <button class="button button-primary sales-create-button" (click)="openCreate()" [attr.aria-label]="'Registrar ' + singular">
+    <i class="pi pi-plus"></i>
+    <span>Nueva {{ singular }}</span>
+  </button>
+</div>
+
+<section class="document-banner" [class.document-banner--sale]="isSale">
+  <span class="document-banner-icon"><i [class]="isSale ? 'pi pi-receipt' : 'pi pi-truck'"></i></span>
+  <div>
+    <span class="eyebrow">{{ isSale ? "VENTA REGISTRADA" : "COMPRA REGISTRADA" }}</span>
+    <strong>{{ isSale ? "Cada venta descuenta stock automáticamente." : "Cada compra suma stock automáticamente." }}</strong>
+    <p>{{ isSale ? "El cobro se registra por separado; el pedido conserva su trazabilidad." : "El documento y su movimiento de inventario se guardan juntos." }}</p>
+  </div>
+  <span class="document-banner-tag"><i class="pi pi-lock"></i> REGISTRO SEGURO</span>
+</section>
+
+@if (isSale) {
+  <section class="sales-flow-guide" aria-label="Flujos de estados de venta">
+    <div class="sales-flow-guide-heading">
+      <span class="sales-flow-guide-icon"><i class="pi pi-share-alt"></i></span>
+      <div>
+        <strong>Seguimiento del pedido</strong>
+        <small>El mismo flujo para tiendas y restaurantes</small>
+      </div>
+    </div>
+    <div class="sales-flow-options">
+      <div class="sales-flow-option">
+        <span class="sales-flow-mode">En sitio</span>
+        <div class="sales-flow-steps" aria-label="Pendiente, Preparando, Listo, Entregado">
+          <span>Pendiente</span><i class="pi pi-angle-right"></i>
+          <span>Preparando</span><i class="pi pi-angle-right"></i>
+          <span>Listo</span><i class="pi pi-angle-right"></i>
+          <span>Entregado</span>
+        </div>
+      </div>
+      <div class="sales-flow-option">
+        <span class="sales-flow-mode sales-flow-mode--delivery">A domicilio</span>
+        <div class="sales-flow-steps" aria-label="Pendiente, Preparando, Listo, En camino, Entregado">
+          <span>Pendiente</span><i class="pi pi-angle-right"></i>
+          <span>Preparando</span><i class="pi pi-angle-right"></i>
+          <span>Listo</span><i class="pi pi-angle-right"></i>
+          <span>En camino</span><i class="pi pi-angle-right"></i>
+          <span>Entregado</span>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+<section class="panel catalog-panel">
+  <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i [class]="isSale ? 'pi pi-chart-line' : 'pi pi-box'"></i></span><strong>Historial de {{ title.toLowerCase() }}</strong><span class="filter-count">{{ documents().length }}</span></div><button class="icon-button filter-refresh" title="Actualizar" (click)="load()"><i class="pi pi-refresh"></i></button></div>
+  @if (loading()) {
+    <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando {{ title.toLowerCase() }}…</span></div>
+  } @else if (documents().length) {
+    <div class="table-scroll"><table class="inventory-table">
+      <thead><tr><th>DOCUMENTO</th><th>FECHA</th><th>{{ contactLabel.toUpperCase() }}</th><th>ARTÍCULOS</th><th>TOTAL</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
+      <tbody>@for (document of documents(); track document.id || document._id) {
+        <tr>
+          <td data-label="Documento"><strong>#{{ document.id || document._id }}</strong><small class="table-subtext">{{ document.items.length }} {{ document.items.length === 1 ? "producto" : "productos" }}</small></td>
+          <td data-label="Fecha">{{ document.date | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</td>
+          <td [attr.data-label]="contactLabel">{{ documentContact(document) }}</td>
+          <td data-label="Artículos"><div class="document-lines-preview">@for (item of document.items.slice(0, 2); track $index) { <span>{{ item.quantity }} × {{ item.name }}</span> } @if (document.items.length > 2) { <small>+{{ document.items.length - 2 }} más</small> }</div></td>
+          <td data-label="Total"><strong>{{ formatMoney(document.total) }}</strong></td>
+          <td data-label="Estado" class="document-state-cell">
+            <div class="document-state-stack">
+            @if (isSale && document.status === "void") {
+              <span class="document-status document-status--void"><i class="pi pi-ban"></i> Cancelada</span>
+              @if (document.voidReason || document.voidNote) {
+                <small class="table-subtext">{{ cancelReasonLabel(document.voidReason) }}{{ document.voidNote ? (document.voidReason ? " · " : "") + document.voidNote : "" }}</small>
+              }
+            } @else if (isSale && document.paymentStatus === "pending") {
+              <span class="document-status document-status--pending"><i class="pi pi-clock"></i> Por cobrar</span>
+            } @else {
+              <span class="document-status"><i class="pi pi-check-circle"></i> {{ isSale ? "Pagada" : "Registrada" }}</span>
+            }
+            @if (isSale && document.status !== "void") {
+              <div class="document-order-state" [class.document-order-state--delivery]="document.orderChannel === 'delivery'">
+                <i [class]="document.orderChannel === 'delivery' ? 'pi pi-send' : 'pi pi-shopping-bag'"></i>
+                <span>
+                  <small>{{ document.orderChannel === "delivery" ? "Domicilio" : "En sitio" }}</small>
+                  <strong>{{ orderProgressLabel(document) }}</strong>
+                </span>
+              </div>
+              <div class="document-order-progress" [attr.aria-label]="'Progreso: ' + orderProgressLabel(document)">
+                @for (stage of orderStages(document); track stage; let index = $index) {
+                  <span
+                    [class.document-order-progress-step--done]="index < orderProgressIndex(document)"
+                    [class.document-order-progress-step--current]="index === orderProgressIndex(document)"
+                  ></span>
+                }
+              </div>
+            }
+            @if (isSale && (document.orderChannel === "delivery" || document.deliveryStatus)) {
+              @if (document.deliveryCourierName) {
+                <small class="document-status-courier"><i class="pi pi-user"></i> {{ document.deliveryCourierName }}</small>
+              }
+            }
+            </div>
+          </td>
+          <td data-label="Acciones" class="document-actions-cell">
+            <div class="document-actions">
+            @if (canAdvanceOnSiteOrders) {
+              @if (nextOnSiteOrderStatus(document); as nextStatus) {
+                <button class="button button-secondary button-small document-advance-button" title="Avanzar estado del pedido" (click)="advanceOnSiteOrder(document)">
+                  <i class="pi pi-arrow-right"></i>
+                  <span>{{ nextStatus === "preparing" ? "Preparar" : nextStatus === "ready" ? "Marcar listo" : "Entregar" }}</span>
+                </button>
+              }
+            }
+            @if (isPending(document)) {
+              <button class="button button-primary button-small" title="Registrar cobro" (click)="pay(document)"><i class="pi pi-dollar"></i> Cobrar</button>
+            }
+            @if (canCancel(document)) {
+              <button class="button-link-danger" title="Cancelar pedido" (click)="openCancel(document)"><i class="pi pi-ban"></i> Cancelar</button>
+            }
+            <button class="icon-button" title="Ver detalle e imprimir" aria-label="Ver detalle e imprimir" (click)="openDocument(document)"><i class="pi pi-eye"></i></button>
+            </div>
+          </td>
+        </tr>
+      }</tbody>
+    </table></div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="documentCount()" (pageChange)="goToPage($event)" />
+    <p class="table-footer-note">El stock refleja estos registros</p>
+  } @else {
+    <div class="empty-state"><span class="empty-icon"><i [class]="isSale ? 'pi pi-receipt' : 'pi pi-truck'"></i></span><strong>Aún no hay {{ title.toLowerCase() }}</strong><p>{{ isSale ? "Registra tu primera venta y genera un comprobante listo para imprimir." : "Registra una compra para recibir productos y actualizar las existencias." }}</p><button class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Registrar {{ singular }}</button></div>
+  }
+</section>
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
+    <section class="form-dialog transaction-dialog" [class.transaction-dialog--sale]="isSale" role="dialog" aria-modal="true" [attr.aria-label]="'Registrar ' + singular" (click)="$event.stopPropagation()">
+      <div class="dialog-heading transaction-dialog-heading">
+        <div>
+          <p class="eyebrow">{{ isSale ? "NUEVA VENTA" : "NUEVA COMPRA" }}</p>
+          <h2>Registrar {{ singular }}</h2>
+          @if (isSale) {
+            <p class="dialog-subtitle">Asocia el cliente, agrega los productos y revisa el total antes de confirmar.</p>
+          }
+        </div>
+        <button class="icon-button" type="button" aria-label="Cerrar" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button>
+      </div>
+      <form (ngSubmit)="save()" class="dialog-form">
+        @if (isSale) {
+          <div class="transaction-dialog-notice">
+            <span><i class="pi pi-box"></i> El stock se descuenta al confirmar</span>
+            <span><i class="pi pi-wallet"></i> El cobro se registra por separado</span>
+          </div>
+          <div class="transaction-section-heading">
+            <span>01</span>
+            <div><strong>Cliente y pedido</strong><small>Identifica a quién corresponde la venta</small></div>
+          </div>
+        }
+        <div class="form-grid">
+          @if (isSale) {
+            <div class="form-field contact-picker">
+              <div class="contact-picker-heading"><span>Cliente <b>*</b></span><button type="button" class="text-button" (click)="toggleCustomerForm()"><i class="pi pi-user-plus"></i>{{ customerFormOpen() ? "Cancelar" : "Registrar cliente" }}</button></div>
+              <div class="contact-picker-search">
+                <input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" placeholder="Nombre, documento o correo" aria-label="Buscar clientes" />
+                <button type="button" class="button button-secondary button-small" aria-label="Buscar cliente" (click)="searchContacts()"><i class="pi pi-search"></i><span>Buscar</span></button>
+              </div>
+              <select [(ngModel)]="selectedContactId" name="contactId" (ngModelChange)="contactChanged()" required>
+                <option value="">Selecciona un cliente</option>
+                @for (contact of contacts(); track contact.id || contact._id) {
+                  <option [ngValue]="contact.id || contact._id">{{ contact.name }}{{ contact.document ? " · " + contact.document : "" }}</option>
+                }
+              </select>
+            </div>
+          } @else {
+            <div class="form-field"><span>Proveedor <b>*</b></span><div class="product-picker-search"><input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" placeholder="Buscar proveedor" /><button type="button" class="button button-secondary button-small" (click)="searchContacts()">Buscar</button></div><select [(ngModel)]="selectedContactId" name="contactId" required><option value="">Selecciona proveedor</option>@for (contact of contacts(); track contact.id || contact._id) { <option [ngValue]="contact.id || contact._id">{{ contact.name }}{{ contact.document ? " · " + contact.document : "" }}</option> }</select></div>
+          }
+          <label class="form-field"><span>Fecha <b>*</b></span><input type="date" [(ngModel)]="date" name="date" required /></label>
+          <label class="form-field"><span>{{ employeeLabel }}</span><select [(ngModel)]="selectedEmployeeId" name="employeeId"><option value="">Sin asignar</option>@for (employee of employees(); track employee.id || employee._id) { <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option> }</select></label>
+          @if (isSale && isRestaurant) {
+            <label class="form-field"><span>Mesa</span>
+              @if (tables().length) {
+                <select [(ngModel)]="tableNumber" name="tableNumber">
+                  <option value="">Sin mesa / para llevar</option>
+                  @for (table of tables(); track table.id || table._id) {
+                    <option [value]="table.name">{{ table.name }}{{ table.occupied ? " · en uso (puedes agregar)" : " · libre" }}</option>
+                  }
+                </select>
+              } @else {
+                <input [(ngModel)]="tableNumber" name="tableNumber" maxlength="20" placeholder="Ej. Mesa 1" />
+              }
+              <small class="field-hint-inline">Opcional · puedes agregar más pedidos a una mesa en uso</small>
+            </label>
+          }
+        </div>
+
+        @if (isSale && selectedContactId) {
+          <app-customer-sale-summary
+            [profile]="customerProfile()"
+            [loading]="customerProfileLoading()"
+          />
+        }
+
+        @if (isSale) {
+          <div class="transaction-section-heading transaction-section-heading--delivery">
+            <span>02</span>
+            <div><strong>Tipo de entrega</strong><small>Elige en sitio o domicilio</small></div>
+          </div>
+          <label class="delivery-check">
+            <input type="checkbox" [(ngModel)]="isDelivery" name="isDelivery" />
+            <span><strong>Enviar a domicilio</strong><small>Se creará el seguimiento del domicilio asociado a esta venta.</small></span>
+          </label>
+          @if (isDelivery) {
+            <div class="form-grid delivery-fields">
+              <label class="form-field form-field--wide"><span>Dirección de entrega <b>*</b></span><input [(ngModel)]="deliveryAddress" name="deliveryAddress" maxlength="300" autocomplete="street-address" placeholder="Se autocompleta con la del cliente" /></label>
+              <label class="form-field"><span>Domiciliario</span><select [(ngModel)]="selectedCourierId" name="courierId"><option value="">Asignar luego</option>@for (courier of couriers(); track courier.id || courier._id) { <option [ngValue]="courier.id || courier._id">{{ courier.name }}</option> }</select><small class="field-hint-inline">Puedes asignarlo después desde Domicilios; hasta entonces solo aparecerá en la bandeja de gestión.</small></label>
+              <label class="form-field"><span>Latitud</span><input type="number" step="any" [(ngModel)]="deliveryLat" name="deliveryLat" placeholder="4.6097" /></label>
+              <label class="form-field"><span>Longitud</span><input type="number" step="any" [(ngModel)]="deliveryLng" name="deliveryLng" placeholder="-74.0817" /></label>
+            </div>
+          }
+        }
+        @if (isSale && customerFormOpen()) {
+          <div class="customer-quick-form">
+            <div><strong>Nuevo cliente</strong><small>Se guardará y quedará seleccionado en esta venta.</small></div>
+            <div class="customer-quick-fields">
+              <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="customerForm.name" name="newCustomerName" required minlength="2" maxlength="160" /></label>
+              <label class="form-field"><span>Documento</span><input [(ngModel)]="customerForm.document" name="newCustomerDocument" maxlength="40" /></label>
+              <label class="form-field"><span>Teléfono</span><input [(ngModel)]="customerForm.phone" name="newCustomerPhone" type="tel" maxlength="40" /></label>
+              <label class="form-field"><span>Correo</span><input [(ngModel)]="customerForm.email" name="newCustomerEmail" type="email" maxlength="254" /></label>
+            </div>
+            <button type="button" class="button button-secondary button-small" [disabled]="customerSaving()" (click)="createCustomer()"><i [class]="customerSaving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ customerSaving() ? "Creando…" : "Crear y seleccionar" }}</button>
+          </div>
+        }
+        <div class="items-heading">
+          <div>
+            <span class="eyebrow">{{ isSale ? "03 · DETALLE DE VENTA" : "DETALLE" }}</span>
+            <strong>Productos</strong>
+            @if (isSale) { <small>El precio se sugiere desde el catálogo y puedes revisarlo antes de confirmar.</small> }
+          </div>
+          <button type="button" class="button button-secondary button-small" (click)="addItem()"><i class="pi pi-plus"></i> Agregar producto</button>
+        </div>
+        <div class="product-picker-search transaction-product-search">
+          <input [(ngModel)]="productSearch" name="productSearch" (keyup.enter)="searchProducts()" placeholder="Buscar por nombre, SKU o código" aria-label="Buscar productos" />
+          <button type="button" class="button button-secondary button-small" (click)="searchProducts()"><i class="pi pi-search"></i> Buscar</button>
+        </div>
+        <div class="transaction-items">
+          @for (item of items; track $index) {
+            <div class="transaction-item">
+              <label class="form-field transaction-product">
+                <span>Producto</span>
+                <select [(ngModel)]="item.productId" [name]="'product-' + $index" (ngModelChange)="productChanged(item)" required>
+                  <option value="">Selecciona producto</option>
+                  @for (product of products(); track product.id || product._id) {
+                    <option [ngValue]="product.id || product._id" [disabled]="isSale && product.type !== 'prepared' && product.stock < 1">
+                      {{ product.name }} · {{ product.sku }}{{ product.type === "prepared" ? " · Plato" : " · " + product.stock + " disp." }}
+                    </option>
+                  }
+                </select>
+              </label>
+              <label class="form-field transaction-quantity">
+                <span>Cantidad</span>
+                <input type="number" min="1" step="1" [max]="maxSaleQuantity(item)" [(ngModel)]="item.quantity" [name]="'quantity-' + $index" required />
+                @if (isSale && productFor(item); as product) {
+                  <small class="quantity-availability">{{ product.type === "prepared" ? "Plato preparado" : (product.stock + " disponibles") }}</small>
+                }
+              </label>
+              <label class="form-field transaction-price">
+                <span>{{ isSale ? "Precio unitario" : "Costo unitario" }}</span>
+                <input type="number" min="0" step="0.01" [(ngModel)]="item.amount" [name]="'amount-' + $index" required />
+                @if (isSale) {
+                  @if (productFor(item); as product) {
+                    <small class="price-guidance">Compra {{ formatMoney(product.purchasePrice) }} · Catálogo {{ formatMoney(product.salePrice) }}</small>
+                    <strong class="price-margin" [class.price-margin--negative]="(margin(item) ?? 0) < 0">Margen {{ formatMoney(margin(item) ?? 0) }} @if (marginPercent(item) !== null) { ({{ marginPercent(item) | number: "1.0-1" }}%) }</strong>
+                  }
+                }
+              </label>
+              <div class="transaction-line-total"><small>Subtotal</small><strong>{{ formatMoney(lineTotal(item)) }}</strong></div>
+              <button type="button" class="icon-button icon-button--danger transaction-remove" title="Quitar producto" aria-label="Quitar producto" (click)="removeItem($index)" [disabled]="items.length === 1"><i class="pi pi-trash"></i></button>
+            </div>
+          }
+        </div>
+        <label class="form-field transaction-notes"><span>Observaciones</span><textarea [(ngModel)]="notes" name="notes" rows="2" maxlength="1000" placeholder="Notas opcionales"></textarea></label>
+        <div class="transaction-total">
+          <span><small>{{ isSale ? "TOTAL DE LA VENTA" : "TOTAL DE LA COMPRA" }}</small><strong>{{ isSale ? "El cobro se confirma por separado" : "El stock se actualizará al guardar" }}</strong></span>
+          <strong>{{ formatMoney(draftTotal()) }}</strong>
+        </div>
+        <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button><button class="button button-primary" [disabled]="saving() || customerSaving() || (isSale && customerFormOpen())"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Confirmar " + singular }}</button></div>
+      </form>
+    </section>
+  </div>
+}
+
+@if (previewDocument(); as printedDocument) {
+  <app-document-receipt
+    [document]="printedDocument"
+    [kind]="kind"
+    [employeeLabel]="employeeLabel"
+    (closed)="closeDocument()"
+  />
+}
+
+@if (cancellingDocument(); as document) {
+  <app-cancel-order-dialog
+    [title]="'Cancelar pedido #' + (document.id || document._id)"
+    (confirm)="confirmCancel($event)"
+    (cancel)="cancellingDocument.set(null)"
+  />
+}

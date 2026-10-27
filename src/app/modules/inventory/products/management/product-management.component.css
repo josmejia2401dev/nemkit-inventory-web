@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+.type-tabs {
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 15px;
+}
+
+.type-tabs button {
+  min-height: 40px;
+  padding-inline: 15px;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.product-status-select {
+  min-width: 150px;
+  min-height: 42px;
+  padding: 0 11px;
+  border: 1px solid rgba(36, 65, 52, 0.12);
+  border-radius: 10px;
+  color: #42584a;
+  background: #fff;
+  font-size: 12px;
+}
+
+.product-status-select:focus {
+  border-color: #82a38b;
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(39, 102, 80, 0.08);
+}
+
+app-product-table {
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .type-tabs {
+    flex-wrap: nowrap;
+    margin-right: -13px;
+    padding: 2px 13px 8px 2px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  .type-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .type-tabs button {
+    min-height: 44px;
+    flex: 0 0 auto;
+    padding-inline: 14px;
+    font-size: 13px;
+  }
+
+  .product-status-select {
+    min-height: 46px;
+    font-size: 14px;
+  }
+
+  .catalog-panel > app-pagination {
+    display: block;
+    padding-inline: 10px;
+  }
+}

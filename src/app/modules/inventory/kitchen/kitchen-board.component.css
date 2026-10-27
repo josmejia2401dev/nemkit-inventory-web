@@ -1,0 +1,243 @@
+:host {
+  display: block;
+}
+
+.kitchen-mobile-tabs {
+  display: none;
+}
+
+.kitchen-refresh {
+  min-height: 42px;
+  border-radius: 10px;
+}
+
+.kitchen-board {
+  align-items: start;
+}
+
+.kitchen-col {
+  min-width: 0;
+  min-height: 240px;
+  box-shadow: 0 4px 15px rgba(31, 57, 45, 0.035);
+}
+
+.kitchen-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  min-height: 50px;
+  padding: 12px 15px;
+}
+
+.kitchen-col-count {
+  min-width: 25px;
+  height: 24px;
+  font-size: 11px;
+}
+
+.kitchen-col-body {
+  gap: 11px;
+  padding: 12px;
+}
+
+.kitchen-card {
+  padding: 14px;
+  border-radius: 13px;
+  box-shadow: 0 3px 11px rgba(31, 57, 45, 0.035);
+}
+
+.kitchen-card-head strong {
+  font-size: 15px;
+}
+
+.kitchen-items {
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.kitchen-items li {
+  display: flex;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.kitchen-items b {
+  flex: 0 0 auto;
+}
+
+.kitchen-notes {
+  padding: 9px 10px;
+  line-height: 1.45;
+}
+
+.kitchen-advance {
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+.kitchen-mini {
+  min-height: 38px;
+}
+
+@media (min-width: 761px) and (max-width: 1023px) {
+  .kitchen-board {
+    display: flex;
+    gap: 12px;
+    padding-bottom: 8px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+  }
+
+  .kitchen-col {
+    min-width: min(330px, 76vw);
+    flex: 0 0 min(330px, 76vw);
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-heading {
+    align-items: center;
+  }
+
+  .page-heading .heading-subtitle {
+    max-width: 34ch;
+  }
+
+  .kitchen-refresh {
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .kitchen-refresh i {
+    font-size: 15px;
+  }
+
+  .kitchen-mobile-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    margin: 0 0 13px;
+    padding: 5px;
+    border: 1px solid rgba(36, 65, 52, 0.08);
+    border-radius: 13px;
+    background: #f1f5ef;
+  }
+
+  .kitchen-mobile-tabs button {
+    display: grid;
+    min-width: 0;
+    min-height: 50px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: #617168;
+    background: transparent;
+    font-size: 10px;
+    font-weight: 650;
+    text-align: left;
+  }
+
+  .kitchen-mobile-tabs button > span {
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .kitchen-mobile-tabs button > strong {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border-radius: 99px;
+    color: #6c7e70;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 10px;
+  }
+
+  .kitchen-mobile-tabs button.kitchen-mobile-tab--active {
+    border-color: rgba(39, 102, 80, 0.12);
+    color: #28553b;
+    background: #fff;
+    box-shadow: 0 2px 7px rgba(31, 57, 45, 0.06);
+  }
+
+  .kitchen-board {
+    display: block;
+  }
+
+  .kitchen-col {
+    display: none;
+    min-height: 250px;
+    border-radius: 14px;
+  }
+
+  .kitchen-col.kitchen-col--mobile-active {
+    display: flex;
+  }
+
+  .kitchen-col-head {
+    min-height: 52px;
+    padding-inline: 15px;
+  }
+
+  .kitchen-col-body {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .kitchen-card {
+    padding: 14px;
+  }
+
+  .kitchen-card-head strong {
+    font-size: 16px;
+  }
+
+  .kitchen-time {
+    font-size: 12px;
+  }
+
+  .kitchen-items li {
+    padding: 2px 0;
+    font-size: 14px;
+  }
+
+  .kitchen-advance {
+    min-height: 52px;
+    margin-top: 14px;
+    font-size: 15px;
+  }
+
+  .kitchen-card-foot {
+    min-height: 42px;
+  }
+
+  .kitchen-card-foot small {
+    font-size: 11px;
+  }
+
+  .kitchen-mini {
+    min-height: 42px;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .kitchen-mobile-tabs button {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    padding: 6px 4px;
+    text-align: center;
+  }
+
+  .kitchen-mobile-tabs button > strong {
+    display: none;
+  }
+}

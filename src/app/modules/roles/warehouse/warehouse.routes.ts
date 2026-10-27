@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { WarehouseShellComponent } from "./warehouse-shell.component";
+import { WarehouseShellComponent } from "./shell/warehouse-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
@@ -16,7 +16,7 @@ export const warehouseRoutes: Routes = [
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
       {
         path: "dashboard",
-        loadComponent: () => import("./warehouse-dashboard.component").then((m) => m.WarehouseDashboardComponent),
+        loadComponent: () => import("./dashboard/warehouse-dashboard.component").then((m) => m.WarehouseDashboardComponent),
       },
       {
         path: "alerts",

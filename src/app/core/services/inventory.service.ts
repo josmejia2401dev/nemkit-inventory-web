@@ -72,6 +72,7 @@ export interface CustomerProfile {
   customer: InventoryContact;
   analytics: {
     totalOrders: number;
+    cancelledOrders: number;
     paidOrders: number;
     deliveryOrders: number;
     onSiteOrders: number;
@@ -183,7 +184,10 @@ export interface InventoryDocument {
   movementId: number;
   date: string;
   status: "completed" | "void";
-  orderStatus?: OrderStatus | null;
+  orderStatus?: OrderStatus | "served" | "picked_up" | null;
+  orderChannel?: "delivery" | "on_site";
+  deliveryStatus?: DeliveryStatus;
+  deliveryCourierName?: string;
   // Estado de cobro de la venta: "paid" (pagada) o "pending" (por cobrar).
   paymentStatus?: "paid" | "pending";
   paidAt?: string | null;
@@ -191,7 +195,7 @@ export interface InventoryDocument {
   voidReason?: string;
   voidNote?: string;
   voidedAt?: string | null;
-  kitchenStatus?: KitchenStatus | null;
+  kitchenStatus?: KitchenStatus | "served" | null;
   tableNumber?: string;
   notes?: string;
   items: InventoryDocumentItem[];
@@ -328,7 +332,13 @@ export interface InventorySalesByEmployeeRow {
   salesCount: number;
   unitsSold: number;
   revenue: number;
+  collectedValue: number;
+  pendingValue: number;
+  collectedInPeriod: number;
+  collectionsCount: number;
   grossProfit: number;
+  paymentsMade: number;
+  paymentCount: number;
 }
 
 export interface InventorySalesByEmployeeReport {
@@ -338,9 +348,37 @@ export interface InventorySalesByEmployeeReport {
     salesCount: number;
     unitsSold: number;
     revenue: number;
+    collectedValue: number;
+    pendingValue: number;
+    collectedInPeriod: number;
+    collectionsCount: number;
     grossProfit: number;
+    paymentsMade: number;
+    paymentCount: number;
   };
   employees: InventorySalesByEmployeeRow[];
+  payments: InventoryEmployeePaymentSummary;
+}
+
+export interface InventoryEmployeePayment {
+  id: number;
+  employeeId: number;
+  employeeSnapshot: { name: string; documentType?: string; documentNumber?: string };
+  paymentDate: string;
+  periodStart?: string | null;
+  periodEnd?: string | null;
+  type: "salary" | "advance" | "commission" | "bonus" | "other";
+  amount: number;
+  method: "cash" | "bank_transfer" | "other";
+  reference?: string;
+  notes?: string;
+  recordedBySnapshot?: { name?: string };
+}
+
+export interface InventoryEmployeePaymentSummary {
+  generatedAt: string;
+  totals: { employeeCount: number; paymentCount: number; totalPaid: number };
+  employees: Array<{ employeeId: number; employeeName: string; paymentCount: number; totalPaid: number }>;
 }
 
 export interface PageResult<T> {

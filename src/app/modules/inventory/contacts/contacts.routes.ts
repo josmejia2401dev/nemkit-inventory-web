@@ -3,7 +3,7 @@ import { Route } from "@angular/router";
 export const customerDirectoryRoute: Route = {
   path: "customers",
   loadComponent: () =>
-    import("../customers/customers-page.component").then(
+    import("../customers/customers-page/customers-page.component").then(
       (module) => module.CustomersPageComponent,
     ),
 };

@@ -1,0 +1,45 @@
+<div class="filter-bar">
+  @if (hasProductFocus) {
+    <button class="button button-secondary button-small" type="button" (click)="clearProductFocus.emit()">
+      Quitar filtro del producto
+    </button>
+  }
+  <label class="search-box">
+    <i class="pi pi-search" aria-hidden="true"></i>
+    <input
+      [ngModel]="search"
+      (ngModelChange)="searchChange.emit($event)"
+      (keyup.enter)="apply.emit()"
+      aria-label="Buscar productos"
+      placeholder="Buscar por nombre, SKU o código…"
+    />
+    @if (search) {
+      <button class="clear-search" type="button" aria-label="Limpiar búsqueda" (click)="searchChange.emit(''); apply.emit()">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    }
+  </label>
+  <select
+    [ngModel]="categoryFilter"
+    (ngModelChange)="categoryFilterChange.emit($event); apply.emit()"
+    aria-label="Filtrar por categoría"
+  >
+    <option value="">Todas las categorías</option>
+    @for (category of categories; track category.id || category._id) {
+      <option [ngValue]="category.id || category._id">{{ category.name }}</option>
+    }
+  </select>
+  <select
+    [ngModel]="stockState"
+    (ngModelChange)="stockStateChange.emit($event)"
+    aria-label="Filtrar por nivel de stock"
+  >
+    <option value="">Todos los niveles de stock</option>
+    <option value="out_of_stock">Agotados</option>
+    <option value="low_stock">Stock bajo</option>
+  </select>
+  <ng-content />
+  <button class="icon-button filter-refresh" type="button" aria-label="Actualizar productos" (click)="apply.emit()">
+    <i class="pi pi-refresh" aria-hidden="true"></i>
+  </button>
+</div>

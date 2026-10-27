@@ -8,16 +8,25 @@
 </div>
 
 <section class="panel catalog-panel">
-  <div class="filter-bar">
+  <div class="filter-bar employee-filter-bar">
     <div class="filter-title"><span class="panel-icon"><i class="pi pi-id-card"></i></span><strong>Empleados</strong><span class="filter-count">{{ employees().length }}</span></div>
-    <select class="contact-search" [(ngModel)]="roleFilter" (change)="applySearch()" aria-label="Filtrar por cargo">
-      <option value="">Todos los cargos</option>
-      @for (option of roleOptions; track option.value) {
-        <option [value]="option.value">{{ option.label }}</option>
-      }
-    </select>
-    <input class="contact-search" [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Buscar por nombre, documento o correo" aria-label="Buscar empleados" />
-    <button class="icon-button filter-refresh" title="Buscar" (click)="applySearch()"><i class="pi pi-search"></i></button>
+    <div class="employee-filter-controls">
+      <select [(ngModel)]="statusFilter" (change)="applySearch()" aria-label="Filtrar por estado">
+        <option value="active">Activos</option>
+        <option value="inactive">Inactivos</option>
+        <option value="all">Todos los estados</option>
+      </select>
+      <select [(ngModel)]="roleFilter" (change)="applySearch()" aria-label="Filtrar por cargo">
+        <option value="">Todos los cargos</option>
+        @for (option of roleOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      <div class="employee-search-row">
+        <input [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Nombre, documento o correo" aria-label="Buscar empleados" />
+        <button class="button button-secondary" type="button" (click)="applySearch()"><i class="pi pi-search"></i><span>Buscar</span></button>
+      </div>
+    </div>
   </div>
 
   @if (loading()) {
@@ -43,8 +52,19 @@
               </td>
               <td class="row-actions-cell">
                 <div class="row-actions">
+                  <button class="button button-small" title="Ver historial de pagos" (click)="openPayments(employee)"><i class="pi pi-wallet" aria-hidden="true"></i> Pagos</button>
                   <button class="icon-button" title="Editar" (click)="openEdit(employee)"><i class="pi pi-pencil"></i></button>
-                  <button class="icon-button icon-button--danger" title="Desasociar cuenta y empleado" (click)="remove(employee)"><i class="pi pi-link-slash"></i></button>
+                  <button class="button button-small employee-password-action" title="Restablecer contraseña" (click)="openPasswordReset(employee)"><i class="pi pi-key" aria-hidden="true"></i> Clave</button>
+                  <button
+                    class="button button-small employee-access-action"
+                    [class.employee-access-action--reactivate]="employee.status === 'inactive'"
+                    [disabled]="statusUpdatingId() === (employee.id ?? employee._id)"
+                    [attr.aria-label]="employee.status === 'inactive' ? 'Reactivar acceso' : 'Desactivar acceso'"
+                    (click)="changeStatus(employee)"
+                  >
+                    <i [class]="statusUpdatingId() === (employee.id ?? employee._id) ? 'pi pi-spin pi-spinner' : employee.status === 'inactive' ? 'pi pi-refresh' : 'pi pi-ban'" aria-hidden="true"></i>
+                    {{ employee.status === 'inactive' ? 'Reactivar' : 'Desactivar' }}
+                  </button>
                 </div>
               </td>
             </tr>
@@ -56,19 +76,21 @@
   } @else {
     <div class="empty-state">
       <span class="empty-icon"><i class="pi pi-id-card"></i></span>
-      <strong>Aún no tienes empleados</strong>
-      <p>Agrega a tu primer colaborador y asígnale un cargo.</p>
-      <button class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Crear empleado</button>
+      <strong>{{ statusFilter === 'inactive' ? 'No hay empleados inactivos' : 'Aún no tienes empleados' }}</strong>
+      <p>{{ statusFilter === 'inactive' ? 'Los accesos inactivos aparecerán aquí y podrás reactivarlos.' : 'Agrega a tu primer colaborador y asígnale un cargo.' }}</p>
+      @if (statusFilter !== 'inactive') {
+        <button class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Crear empleado</button>
+      }
     </div>
   }
 </section>
 
 @if (dialogOpen()) {
   <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
-    <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <section class="form-dialog form-dialog--narrow employee-dialog" role="dialog" aria-modal="true" [attr.aria-label]="editingId ? 'Editar empleado' : 'Nuevo empleado'" (click)="$event.stopPropagation()">
       <div class="dialog-heading">
         <div><p class="eyebrow">EQUIPO DE TRABAJO</p><h2>{{ editingId ? "Editar" : "Nuevo" }} empleado</h2></div>
-        <button class="icon-button" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button>
+        <button class="icon-button" type="button" aria-label="Cerrar" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button>
       </div>
       <form (ngSubmit)="save()" class="dialog-form">
         <label class="form-field"><span>Nombre completo <b>*</b></span><input [(ngModel)]="form.name" name="name" required minlength="2" maxlength="160" autocomplete="name" /></label>
@@ -99,15 +121,59 @@
           <label class="form-field"><span>Fecha de ingreso</span><input [(ngModel)]="form.hireDate" name="hireDate" type="date" /></label>
           <label class="form-field form-field--wide"><span>Correo @if (!editingId) { <b>*</b> }</span><input [(ngModel)]="form.email" name="email" type="email" maxlength="254" autocomplete="email" [required]="!editingId" [disabled]="!!editingId" /></label>
           @if (!editingId) {
-            <label class="form-field form-field--wide"><span>Contraseña de acceso <b>*</b></span><input [(ngModel)]="form.password" name="password" type="password" minlength="6" maxlength="128" autocomplete="new-password" required /></label>
+            <label class="form-field"><span>Clave temporal <b>*</b></span><input [(ngModel)]="form.password" name="password" type="password" minlength="6" maxlength="128" autocomplete="new-password" required /></label>
+            <label class="form-field"><span>Confirmar clave <b>*</b></span><input [(ngModel)]="form.confirmPassword" name="confirmPassword" type="password" minlength="6" maxlength="128" autocomplete="new-password" required /></label>
           }
         </div>
         @if (!editingId) {
-          <p class="form-hint"><i class="pi pi-info-circle"></i> Con este correo y contraseña el empleado podrá iniciar sesión. Queda activo de inmediato.</p>
+          <p class="form-hint"><i class="pi pi-info-circle"></i> El empleado podrá cambiar esta contraseña después desde su perfil, si lo desea.</p>
         }
         <div class="dialog-actions">
           <button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button>
           <button class="button button-primary" [disabled]="saving()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Guardar" }}</button>
+        </div>
+      </form>
+    </section>
+  </div>
+}
+
+@if (paymentEmployee(); as employee) {
+  @if (employee.id || employee._id) {
+    <app-employee-payments
+      [employeeId]="employee.id || employee._id!"
+      [employeeName]="employee.name"
+      (closed)="paymentEmployee.set(null)"
+    />
+  }
+}
+
+@if (passwordDialogOpen()) {
+  <div class="dialog-backdrop" (click)="passwordDialogOpen.set(false)">
+    <section class="form-dialog form-dialog--narrow employee-dialog" role="dialog" aria-modal="true" aria-labelledby="employee-password-title" (click)="$event.stopPropagation()">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">ACCESO DEL EMPLEADO</p>
+          <h2 id="employee-password-title">Restablecer contraseña</h2>
+          <p class="dialog-subtitle">{{ passwordEmployee()?.name }} podrá usar esta contraseña y cambiarla después desde su perfil si lo desea.</p>
+        </div>
+        <button class="icon-button" (click)="passwordDialogOpen.set(false)" aria-label="Cerrar"><i class="pi pi-times"></i></button>
+      </div>
+      <form class="dialog-form" (ngSubmit)="resetPassword()">
+        <label class="form-field">
+          <span>Nueva clave temporal</span>
+          <input [(ngModel)]="newPassword" name="newPassword" type="password" autocomplete="new-password" minlength="6" maxlength="128" required />
+        </label>
+        <label class="form-field profile-field-spaced">
+          <span>Confirmar clave temporal</span>
+          <input [(ngModel)]="confirmNewPassword" name="confirmNewPassword" type="password" autocomplete="new-password" minlength="6" maxlength="128" required />
+        </label>
+        <p class="form-hint"><i class="pi pi-shield" aria-hidden="true"></i> Las sesiones anteriores se cerrarán. El empleado podrá iniciar sesión con esta clave y cambiarla más adelante si lo desea.</p>
+        <div class="dialog-actions">
+          <button type="button" class="button button-secondary" (click)="passwordDialogOpen.set(false)">Cancelar</button>
+          <button class="button button-primary" [disabled]="resettingPassword()">
+            <i [class]="resettingPassword() ? 'pi pi-spin pi-spinner' : 'pi pi-key'" aria-hidden="true"></i>
+            {{ resettingPassword() ? "Guardando…" : "Asignar clave temporal" }}
+          </button>
         </div>
       </form>
     </section>

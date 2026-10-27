@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.filter-bar {
+  align-items: center;
+}
+
+.search-box input {
+  min-height: 42px;
+  font-size: 13px;
+}
+
+.filter-bar > select {
+  min-height: 42px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.filter-refresh {
+  width: 40px;
+  height: 40px;
+}
+
+@media (min-width: 761px) and (max-width: 1023px) {
+  .filter-bar {
+    flex-wrap: wrap;
+  }
+
+  .search-box {
+    min-width: 100%;
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .filter-bar {
+    align-items: stretch;
+  }
+
+  .search-box {
+    min-height: 46px;
+  }
+
+  .search-box input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .filter-bar > select {
+    min-height: 46px;
+    font-size: 14px;
+  }
+
+  .filter-refresh {
+    width: 46px;
+    height: 46px;
+  }
+}

@@ -1,0 +1,122 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">PLATAFORMA</p>
+    <h1>Resumen</h1>
+    <p class="heading-subtitle">Empresas, equipos y actividad de soporte en toda la plataforma.</p>
+  </div>
+  <button class="button button-secondary" type="button" (click)="load()">
+    <i class="pi pi-refresh" aria-hidden="true"></i>
+    Actualizar
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel" role="status">
+    <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+    <span>Cargando resumen…</span>
+  </div>
+} @else if (data()) {
+  @if (data(); as overview) {
+  <section class="platform-overview-grid" aria-label="Indicadores de plataforma">
+    <a routerLink="/superadmin/companies" class="platform-overview-card">
+      <span class="platform-overview-icon"><i class="pi pi-building" aria-hidden="true"></i></span>
+      <strong>{{ overview.companies }}</strong>
+      <span>Empresas</span>
+    </a>
+    <a routerLink="/superadmin/employees" class="platform-overview-card">
+      <span class="platform-overview-icon"><i class="pi pi-id-card" aria-hidden="true"></i></span>
+      <strong>{{ overview.employees.total }}</strong>
+      <span>Empleados no eliminados</span>
+    </a>
+    <a routerLink="/superadmin/employees" class="platform-overview-card platform-overview-card--success">
+      <span class="platform-overview-icon"><i class="pi pi-check-circle" aria-hidden="true"></i></span>
+      <strong>{{ overview.employees.active }}</strong>
+      <span>Empleados activos</span>
+    </a>
+    <a routerLink="/superadmin/employees" class="platform-overview-card platform-overview-card--warning">
+      <span class="platform-overview-icon"><i class="pi pi-pause-circle" aria-hidden="true"></i></span>
+      <strong>{{ overview.employees.inactive }}</strong>
+      <span>Empleados inactivos</span>
+    </a>
+    <a routerLink="/superadmin/employees" class="platform-overview-card platform-overview-card--muted">
+      <span class="platform-overview-icon"><i class="pi pi-folder" aria-hidden="true"></i></span>
+      <strong>{{ overview.employees.archived }}</strong>
+      <span>Empleados archivados</span>
+    </a>
+    <a routerLink="/superadmin/employees" class="platform-overview-card platform-overview-card--muted">
+      <span class="platform-overview-icon"><i class="pi pi-trash" aria-hidden="true"></i></span>
+      <strong>{{ overview.employees.deleted }}</strong>
+      <span>Bajas lógicas</span>
+    </a>
+    <a routerLink="/superadmin/users" class="platform-overview-card">
+      <span class="platform-overview-icon"><i class="pi pi-users" aria-hidden="true"></i></span>
+      <strong>{{ overview.users }}</strong>
+      <span>Cuentas de plataforma</span>
+    </a>
+    <a routerLink="/superadmin/feedback-inbox" class="platform-overview-card platform-overview-card--warning">
+      <span class="platform-overview-icon"><i class="pi pi-inbox" aria-hidden="true"></i></span>
+      <strong>{{ overview.feedback.open }}</strong>
+      <span>Reportes abiertos</span>
+    </a>
+    <a routerLink="/superadmin/feedback-inbox" class="platform-overview-card">
+      <span class="platform-overview-icon"><i class="pi pi-flag" aria-hidden="true"></i></span>
+      <strong>{{ overview.feedback.total }}</strong>
+      <span>Reportes recibidos</span>
+    </a>
+  </section>
+
+  <section class="panel platform-role-panel">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">EQUIPO DE LA PLATAFORMA</p>
+        <h2>Empleados por cargo</h2>
+        <p>Distribución actual por rol, incluyendo empleados activos e inactivos.</p>
+      </div>
+      <a class="button button-secondary button-small" routerLink="/superadmin/employees">
+        Ver empleados
+        <i class="pi pi-arrow-right" aria-hidden="true"></i>
+      </a>
+    </div>
+
+    @if (overview.employees.byRole.length) {
+      <div class="table-scroll">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th scope="col">CARGO</th>
+              <th scope="col">TOTAL</th>
+              <th scope="col">ACTIVOS</th>
+              <th scope="col">INACTIVOS</th>
+              <th scope="col">ARCHIVADOS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (role of overview.employees.byRole; track role.role) {
+              <tr>
+                <td data-label="Cargo"><strong>{{ roleLabel(role.role) }}</strong></td>
+                <td data-label="Total">{{ role.total }}</td>
+                <td data-label="Activos">{{ role.active }}</td>
+                <td data-label="Inactivos">{{ role.inactive }}</td>
+                <td data-label="Archivados">{{ role.archived }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <span class="empty-icon"><i class="pi pi-id-card" aria-hidden="true"></i></span>
+        <strong>Aún no hay empleados</strong>
+        <p>Cuando las empresas registren su equipo, el resumen por cargo aparecerá aquí.</p>
+      </div>
+    }
+  </section>
+  }
+} @else {
+  <div class="empty-state" role="alert">
+    <span class="empty-icon"><i class="pi pi-exclamation-circle" aria-hidden="true"></i></span>
+    <strong>No se pudo cargar el resumen</strong>
+    <p>Comprueba la conexión e inténtalo de nuevo.</p>
+    <button class="button button-primary button-small" type="button" (click)="load()">Intentar de nuevo</button>
+  </div>
+}

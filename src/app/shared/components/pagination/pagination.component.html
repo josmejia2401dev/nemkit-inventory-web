@@ -1,0 +1,58 @@
+<nav class="pagination" aria-label="Paginación de resultados">
+  <p class="pagination__summary" aria-live="polite">
+    @if (totalItems > 0) {
+      Mostrando <strong>{{ firstItem | number }}</strong>–<strong>{{ lastItem | number }}</strong>
+      de <strong>{{ totalItems | number }}</strong> {{ itemLabel }}
+    } @else {
+      <strong>0</strong> {{ itemLabel }}
+    }
+  </p>
+
+  <div class="pagination__controls">
+    <button
+      type="button"
+      class="pagination__button"
+      [disabled]="!canGoPrevious"
+      (click)="goTo(1)"
+      aria-label="Ir a la primera página"
+      title="Primera página"
+    >
+      <i class="pi pi-angle-double-left" aria-hidden="true"></i>
+    </button>
+    <button
+      type="button"
+      class="pagination__button"
+      [disabled]="!canGoPrevious"
+      (click)="goTo(page - 1)"
+      aria-label="Ir a la página anterior"
+      title="Anterior"
+    >
+      <i class="pi pi-angle-left" aria-hidden="true"></i>
+      <span>Anterior</span>
+    </button>
+
+    <span class="pagination__page" aria-current="page">Página {{ page }} de {{ totalPages }}</span>
+
+    <button
+      type="button"
+      class="pagination__button"
+      [disabled]="!canGoNext"
+      (click)="goTo(page + 1)"
+      aria-label="Ir a la página siguiente"
+      title="Siguiente"
+    >
+      <span>Siguiente</span>
+      <i class="pi pi-angle-right" aria-hidden="true"></i>
+    </button>
+    <button
+      type="button"
+      class="pagination__button"
+      [disabled]="!canGoNext"
+      (click)="goTo(totalPages)"
+      aria-label="Ir a la última página"
+      title="Última página"
+    >
+      <i class="pi pi-angle-double-right" aria-hidden="true"></i>
+    </button>
+  </div>
+</nav>

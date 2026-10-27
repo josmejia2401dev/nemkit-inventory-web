@@ -2,11 +2,11 @@
   <div>
     <p class="eyebrow">LOGÍSTICA Y ENTREGAS</p>
     <h1>Domicilios</h1>
-    <p class="heading-subtitle">Los domicilios se crean al registrar una venta con entrega. Aquí los gestionas: asigna domiciliarios y sigue cada entrega.</p>
+    <p class="heading-subtitle">{{ mode === "operations" ? "Asigna domiciliarios y avanza cada pedido hasta confirmar la entrega." : "Consulta tus pedidos asignados y actualiza su avance en ruta." }}</p>
   </div>
 </div>
 
-<section class="panel catalog-panel">
+<section class="panel catalog-panel delivery-board-panel">
   <div class="delivery-status-tabs" role="tablist" aria-label="Filtrar por estado">
     @for (filter of statusFilters; track filter.value) {
       <button [class.delivery-status-tab--active]="statusFilter === filter.value" (click)="applyFilter(filter.value)">{{ filter.label }}</button>
@@ -23,6 +23,23 @@
             <div><strong>#{{ delivery.id }}</strong><small>{{ delivery.createdAt | date: "d MMM, HH:mm" : "" : "es-CO" }}</small></div>
             <span class="status-pill status-pill--{{ delivery.status }}">{{ statusLabel(delivery.status) }}</span>
           </header>
+
+          @if (delivery.status !== "cancelled") {
+            <div class="delivery-flow-progress" [attr.aria-label]="'Pedido ' + statusLabel(delivery.status)">
+              <div class="delivery-flow-progress-label">
+                <small>AVANCE DEL PEDIDO</small>
+                <strong>{{ statusLabel(delivery.status) }}</strong>
+              </div>
+              <div class="delivery-flow-progress-track">
+                @for (stage of ["pending", "preparing", "ready", "on_route", "delivered"]; track stage; let index = $index) {
+                  <span
+                    [class.delivery-flow-progress-step--done]="index < progressIndex(delivery)"
+                    [class.delivery-flow-progress-step--current]="index === progressIndex(delivery)"
+                  ></span>
+                }
+              </div>
+            </div>
+          }
 
           <div class="delivery-card-body">
             <p class="delivery-customer"><i class="pi pi-user"></i> <strong>{{ delivery.customerSnapshot.name }}</strong>@if (delivery.customerSnapshot.phone) { <span>· {{ delivery.customerSnapshot.phone }}</span> }</p>
@@ -41,11 +58,11 @@
                   }
                 </select>
               }
-              @if (isWaitingForKitchen(delivery)) {
-                <small class="delivery-waiting"><i class="pi pi-clock"></i> Esperando a que la cocina marque "listo"</small>
+              @if (isWaitingForPreparation(delivery)) {
+                <small class="delivery-waiting"><i class="pi pi-clock"></i> {{ preparationWaitMessage(delivery) }}</small>
               }
               @if (nextStatusLabel(delivery); as nextLabel) {
-                <button class="button button-primary button-small" (click)="advance(delivery)"><i class="pi pi-arrow-right"></i> {{ nextLabel }}</button>
+                <button class="button button-primary button-small delivery-primary-action" (click)="advance(delivery)"><i class="pi pi-arrow-right"></i> {{ nextLabel }}</button>
               }
               @if (mode === "operations") {
                 <button class="button button-secondary button-small" (click)="cancel(delivery)">Cancelar pedido</button>

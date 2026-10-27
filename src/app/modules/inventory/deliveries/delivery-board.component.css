@@ -1,0 +1,235 @@
+:host {
+  display: block;
+}
+
+.delivery-board-panel {
+  border-radius: 17px;
+}
+
+.delivery-status-tabs button {
+  min-height: 38px;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.delivery-card {
+  border-color: rgba(36, 65, 52, 0.1);
+  box-shadow: 0 4px 15px rgba(31, 57, 45, 0.035);
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.delivery-card:hover {
+  border-color: rgba(39, 102, 80, 0.2);
+  box-shadow: 0 9px 22px rgba(31, 57, 45, 0.07);
+  transform: translateY(-1px);
+}
+
+.delivery-card-head {
+  min-height: 58px;
+  padding: 13px 15px;
+}
+
+.delivery-card-head > div {
+  display: grid;
+  gap: 3px;
+}
+
+.delivery-card-head > div > strong {
+  color: #294533;
+  font-size: 14px;
+}
+
+.delivery-card-head small {
+  font-size: 10px;
+}
+
+.delivery-card-head .status-pill {
+  padding: 6px 9px;
+  font-size: 10px;
+}
+
+.delivery-flow-progress {
+  display: grid;
+  gap: 8px;
+  padding: 11px 15px 12px;
+  border-bottom: 1px solid rgba(36, 65, 52, 0.06);
+  background: linear-gradient(90deg, #fbfcfa, #fff);
+}
+
+.delivery-flow-progress-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.delivery-flow-progress-label small {
+  color: #87938b;
+  font-size: 8px;
+  font-weight: 750;
+  letter-spacing: 0.65px;
+}
+
+.delivery-flow-progress-label strong {
+  color: #426b50;
+  font-size: 10px;
+}
+
+.delivery-flow-progress-track {
+  display: flex;
+  gap: 4px;
+}
+
+.delivery-flow-progress-track span {
+  height: 4px;
+  flex: 1 1 0;
+  border-radius: 99px;
+  background: #e5ebe5;
+}
+
+.delivery-flow-progress-track .delivery-flow-progress-step--done {
+  background: #85aa8a;
+}
+
+.delivery-flow-progress-track .delivery-flow-progress-step--current {
+  background: #276650;
+  box-shadow: 0 0 0 2px rgba(39, 102, 80, 0.12);
+}
+
+.delivery-customer {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 7px;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.delivery-address {
+  margin: 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.delivery-meta {
+  margin: 4px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(36, 65, 52, 0.07);
+}
+
+.delivery-meta strong {
+  color: #294f38;
+  font-size: 14px;
+}
+
+.delivery-courier {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  margin: 0;
+  padding: 7px 9px;
+  border-radius: 9px;
+  background: #f6f8f5;
+  font-size: 10px;
+}
+
+.delivery-card-actions {
+  gap: 8px;
+}
+
+.delivery-primary-action {
+  min-height: 42px;
+  flex: 1 1 160px;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.delivery-courier-select {
+  min-height: 42px;
+  padding-inline: 11px;
+  font-size: 13px;
+}
+
+.delivery-card-actions > .button-secondary {
+  min-height: 40px;
+}
+
+.delivery-waiting {
+  padding: 4px 0;
+  line-height: 1.45;
+}
+
+@media (max-width: 1023px) {
+  .delivery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .delivery-board-panel {
+    border-radius: 14px;
+  }
+
+  .delivery-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 11px;
+  }
+
+  .delivery-card {
+    border-radius: 14px;
+  }
+
+  .delivery-card:hover {
+    transform: none;
+  }
+
+  .delivery-card-head {
+    min-height: 60px;
+    padding: 13px 14px;
+  }
+
+  .delivery-card-head > div > strong {
+    font-size: 15px;
+  }
+
+  .delivery-flow-progress {
+    padding: 11px 14px 12px;
+  }
+
+  .delivery-card-body {
+    gap: 10px;
+    padding: 14px;
+    font-size: 13px;
+  }
+
+  .delivery-meta {
+    padding-top: 12px;
+  }
+
+  .delivery-card-actions {
+    padding: 13px 14px calc(13px + env(safe-area-inset-bottom, 0px));
+    gap: 9px;
+  }
+
+  .delivery-primary-action,
+  .delivery-card-actions .button-secondary {
+    min-height: 46px;
+    font-size: 12px;
+  }
+
+  .delivery-courier-select {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .delivery-waiting {
+    width: 100%;
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delivery-card,
+  .delivery-status-tabs button {
+    transition: none;
+  }
+}

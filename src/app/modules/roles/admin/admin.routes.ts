@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { AdminShellComponent } from "./admin-shell.component";
+import { AdminShellComponent } from "./shell/admin-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
@@ -29,13 +29,6 @@ export const adminRoutes: Routes = [
         loadComponent: () => import("../../inventory/reports/reports.component").then((m) => m.ReportsComponent),
       },
       productManagementRoute,
-      {
-        path: "business",
-        loadComponent: () =>
-          import("../../../foundation/business-settings/business-settings.component").then(
-            (module) => module.BusinessSettingsComponent,
-          ),
-      },
       {
         path: "categories",
         loadComponent: () => import("../../inventory/categories/categories.component").then((m) => m.CategoriesComponent),

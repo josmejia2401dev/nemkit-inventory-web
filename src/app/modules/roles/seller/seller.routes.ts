@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { SellerShellComponent } from "./seller-shell.component";
+import { SellerShellComponent } from "./shell/seller-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
@@ -17,7 +17,7 @@ export const sellerRoutes: Routes = [
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
       {
         path: "dashboard",
-        loadComponent: () => import("./seller-dashboard.component").then((m) => m.SellerDashboardComponent),
+        loadComponent: () => import("./dashboard/seller-dashboard.component").then((m) => m.SellerDashboardComponent),
       },
       salesRoute,
       deliveryOperationsRoute,

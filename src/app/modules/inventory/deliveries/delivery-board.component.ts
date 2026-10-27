@@ -10,22 +10,24 @@ import {
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
+import { AuthStore } from "../../../core/store/auth.store";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 import { ORDER_STATUS_LABELS } from "../order-status.constants";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 const STATUS_LABELS: Record<DeliveryStatus, string> = ORDER_STATUS_LABELS;
+const DELIVERY_FLOW: DeliveryStatus[] = ["pending", "preparing", "ready", "on_route", "delivered"];
 
 /** Siguiente paso de reparto una vez el domiciliario tiene el pedido. */
 const REPARTO_NEXT: Partial<Record<DeliveryStatus, DeliveryStatus>> = {
-  ready: "picked_up",
-  picked_up: "on_route",
+  ready: "on_route",
   on_route: "delivered",
 };
 
 /** Etiqueta del botón para avanzar al siguiente estado de reparto. */
 const NEXT_ACTION_LABELS: Partial<Record<DeliveryStatus, string>> = {
-  picked_up: "Marcar recogido",
+  preparing: "Iniciar preparación",
+  ready: "Marcar listo",
   on_route: "Salir en camino",
   delivered: "Marcar entregado",
 };
@@ -37,12 +39,14 @@ export type DeliveryBoardMode = "operations" | "courier";
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, PaginationComponent],
   templateUrl: "./delivery-board.component.html",
+  styleUrls: ["./delivery-board.component.css"],
 })
 export class DeliveryBoardComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
+  private store = inject(AuthStore);
   @Input({ required: true }) mode!: DeliveryBoardMode;
 
   readonly statusFilters: Array<{ value: "" | DeliveryStatus; label: string }> = [
@@ -50,7 +54,6 @@ export class DeliveryBoardComponent implements OnInit {
     { value: "pending", label: "Pendientes" },
     { value: "preparing", label: "Preparando" },
     { value: "ready", label: "Listos" },
-    { value: "picked_up", label: "Recogidos" },
     { value: "on_route", label: "En camino" },
     { value: "delivered", label: "Entregados" },
     { value: "cancelled", label: "Cancelados" },
@@ -80,16 +83,23 @@ export class DeliveryBoardComponent implements OnInit {
     return STATUS_LABELS[status];
   }
 
-  /**
-   * Siguiente estado que puede fijar el domiciliario para este pedido.
-   * - Restaurante (fromKitchen): solo puede recoger cuando la cocina marca
-   *   "listo". En pending/preparing no hay acción (espera a la cocina).
-   * - Tienda (sin cocina): puede recoger directamente desde "pending".
-   */
+  progressIndex(delivery: InventoryDelivery): number {
+    return DELIVERY_FLOW.indexOf(delivery.status);
+  }
+
+  get canManagePreparation(): boolean {
+    const roles = this.store.user()?.roles ?? [];
+    return roles.includes("ADMIN") || roles.includes("SELLER");
+  }
+
+  /** Administración/ventas pueden avanzar preparación desde Domicilios. */
   private nextStatusFor(delivery: InventoryDelivery): DeliveryStatus | null {
     const s = delivery.status;
+    if (this.mode === "operations" && this.canManagePreparation) {
+      if (s === "pending") return "preparing";
+      if (s === "preparing") return "ready";
+    }
     if (REPARTO_NEXT[s]) return REPARTO_NEXT[s]!;
-    if (!delivery.fromKitchen && (s === "pending" || s === "preparing")) return "picked_up";
     return null;
   }
 
@@ -98,9 +108,17 @@ export class DeliveryBoardComponent implements OnInit {
     return next ? (NEXT_ACTION_LABELS[next] ?? STATUS_LABELS[next]) : null;
   }
 
-  /** En restaurante, el pedido sigue en cocina y el domiciliario debe esperar. */
-  isWaitingForKitchen(delivery: InventoryDelivery): boolean {
-    return !!delivery.fromKitchen && (delivery.status === "pending" || delivery.status === "preparing");
+  isWaitingForPreparation(delivery: InventoryDelivery): boolean {
+    const stillPreparing = delivery.status === "pending" || delivery.status === "preparing";
+    if (!stillPreparing) return false;
+    return this.mode === "courier"
+      || !this.canManagePreparation;
+  }
+
+  preparationWaitMessage(delivery: InventoryDelivery): string {
+    return this.store.company()?.businessType === "restaurant"
+      ? "Esperando que cocina o administración avance la preparación"
+      : "Esperando que vendedor o administración avance la preparación";
   }
 
   money(value: number | undefined): string {
@@ -162,8 +180,8 @@ export class DeliveryBoardComponent implements OnInit {
   advance(delivery: InventoryDelivery): void {
     const next = this.nextStatusFor(delivery);
     if (!next) return;
-    if ((next === "picked_up" || next === "on_route") && !delivery.courierId) {
-      this.notifications.warn("Asigna un domiciliario", "Antes de recoger o despachar el pedido.");
+    if (next === "on_route" && !delivery.courierId) {
+      this.notifications.warn("Asigna un domiciliario", "El pedido necesita un domiciliario antes de salir a ruta.");
       return;
     }
     this.changeStatus(delivery, next);

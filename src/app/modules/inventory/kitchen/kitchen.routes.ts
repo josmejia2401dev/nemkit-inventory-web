@@ -3,7 +3,7 @@ import { Route } from "@angular/router";
 export const kitchenServiceRoute: Route = {
   path: "kitchen",
   loadComponent: () =>
-    import("./kitchen-service-page.component").then(
+    import("./kitchen-service-page/kitchen-service-page.component").then(
       (module) => module.KitchenServicePageComponent,
     ),
 };
@@ -11,7 +11,7 @@ export const kitchenServiceRoute: Route = {
 export const kitchenPreparationRoute: Route = {
   path: "kitchen",
   loadComponent: () =>
-    import("./kitchen-preparation-page.component").then(
+    import("./kitchen-preparation-page/kitchen-preparation-page.component").then(
       (module) => module.KitchenPreparationPageComponent,
     ),
 };

@@ -5,7 +5,7 @@ import { ContactDirectoryComponent } from "../contacts/contact-directory.compone
   selector: "app-suppliers-page",
   standalone: true,
   imports: [ContactDirectoryComponent],
-  template: `<app-inventory-contacts [kind]="'suppliers'" />`,
+  templateUrl: "./suppliers-page.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SuppliersPageComponent {}

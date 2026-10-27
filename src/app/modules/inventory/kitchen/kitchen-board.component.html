@@ -2,9 +2,23 @@
   <div>
     <p class="eyebrow">COCINA</p>
     <h1>Comandas</h1>
-    <p class="heading-subtitle">Los pedidos aparecen aquí al tomarse. Avanza cada uno según lo preparas.</p>
+    <p class="heading-subtitle">Revisa lo pendiente, prepara cada pedido y márcalo listo para entregar.</p>
   </div>
-  <button class="button button-secondary" (click)="load()"><i class="pi pi-refresh"></i> Actualizar</button>
+  <button class="button button-secondary kitchen-refresh" aria-label="Actualizar comandas" (click)="load()"><i class="pi pi-refresh"></i><span>Actualizar</span></button>
+</div>
+
+<div class="kitchen-mobile-tabs" role="group" aria-label="Filtrar comandas por estado">
+  @for (column of columns; track column) {
+    <button
+      type="button"
+      [class.kitchen-mobile-tab--active]="mobileColumn() === column"
+      [attr.aria-pressed]="mobileColumn() === column"
+      (click)="selectMobileColumn(column)"
+    >
+      <span>{{ statusLabels[column] }}</span>
+      <strong>{{ ordersFor(column).length }}</strong>
+    </button>
+  }
 </div>
 
 @if (loading()) {
@@ -12,7 +26,7 @@
 } @else {
   <div class="kitchen-board">
     @for (col of columns; track col) {
-      <section class="kitchen-col kitchen-col--{{ col }}">
+      <section class="kitchen-col kitchen-col--{{ col }}" [class.kitchen-col--mobile-active]="mobileColumn() === col">
         <header class="kitchen-col-head">
           <span>{{ statusLabels[col] }}</span>
           <span class="kitchen-col-count">{{ ordersFor(col).length }}</span>
@@ -47,9 +61,6 @@
               <div class="kitchen-card-foot">
                 <small>{{ order.employeeSnapshot?.name || "—" }}</small>
                 <span class="kitchen-card-actions">
-                  @if (order.kitchenStatus !== "ready") {
-                    <button class="kitchen-mini" (click)="serve(order)" title="Marcar como servido">✓ Servir</button>
-                  }
                   @if (mode === "service" && order.paymentStatus === "pending") {
                     <button class="kitchen-mini kitchen-mini--pay" (click)="pay(order)" title="Cobrar"><i class="pi pi-dollar"></i> Cobrar</button>
                   }

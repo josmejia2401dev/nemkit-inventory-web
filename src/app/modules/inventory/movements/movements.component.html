@@ -32,7 +32,7 @@
       ><strong>Historial</strong
       ><span class="filter-count">{{ movementCount() }}</span>
     </div>
-    <select [(ngModel)]="filterType" (change)="loadMovements()">
+    <select class="movement-type-filter" [(ngModel)]="filterType" (change)="loadMovements()" aria-label="Filtrar movimientos por tipo">
       <option value="">Todos los movimientos</option>
       @for (entry of labels | keyvalue; track entry.key) {
         <option [value]="entry.key">{{ entry.value }}</option>

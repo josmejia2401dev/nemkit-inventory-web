@@ -1,0 +1,100 @@
+.platform-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.platform-overview-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 18px;
+  border: 1px solid rgba(36, 65, 52, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  color: #27402f;
+  text-decoration: none;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.platform-overview-card:hover {
+  transform: translateY(-2px);
+  border-color: #9fc3ab;
+}
+
+.platform-overview-card strong {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.platform-overview-card > span:last-child {
+  color: #647a6c;
+  font-size: 12px;
+}
+
+.platform-overview-icon {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  background: #edf5ee;
+  color: #3a7d55;
+  font-size: 18px;
+}
+
+.platform-overview-card--success .platform-overview-icon {
+  background: #eaf6ee;
+  color: #2e8050;
+}
+
+.platform-overview-card--warning .platform-overview-icon {
+  background: #fff5df;
+  color: #a96f08;
+}
+
+.platform-overview-card--muted .platform-overview-icon {
+  background: #f1f3f2;
+  color: #68746d;
+}
+
+.platform-role-panel {
+  padding: 20px;
+}
+
+.platform-role-panel .section-heading {
+  margin-bottom: 14px;
+}
+
+.platform-role-panel .section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.platform-role-panel .section-heading p:not(.eyebrow) {
+  margin-top: 5px;
+}
+
+@media (max-width: 640px) {
+  .platform-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .platform-overview-card {
+    padding: 14px;
+  }
+
+  .platform-role-panel {
+    padding: 14px;
+  }
+
+  .platform-role-panel .section-heading {
+    align-items: flex-start;
+  }
+}

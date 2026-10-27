@@ -1,0 +1,91 @@
+<div class="dialog-backdrop receipt-backdrop" (click)="closed.emit()">
+  <section
+    class="form-dialog receipt-dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Comprobante de ' + (isSale ? 'venta' : 'compra')"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="receipt-actions">
+      <span class="document-status">
+        <i class="pi pi-check-circle"></i>
+        {{ isSale ? "Venta" : "Compra" }} registrada
+      </span>
+      <button class="icon-button" (click)="closed.emit()" aria-label="Cerrar">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <article #printContent class="print-document">
+      <div class="receipt-brand">
+        <span class="brand-mark">
+        <img
+          src="/icons/inventory-mark.svg"
+          alt=""
+          aria-hidden="true"
+        />
+      </span>
+        <div>
+          <strong>Nemkit Inventory</strong>
+          <small>COMPROBANTE DE {{ isSale ? "VENTA" : "COMPRA" }}</small>
+        </div>
+      </div>
+      <div class="receipt-meta">
+        <span>Documento <b>#{{ document.id || document._id }}</b></span>
+        <span>Fecha <b>{{ document.date | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</b></span>
+      </div>
+
+      @if (isSale) {
+        <div class="receipt-customer">
+          <small>CLIENTE</small>
+          <strong>{{ document.customerSnapshot?.name || "Cliente" }}</strong>
+          @if (document.customerSnapshot?.document) {
+            <span>{{ document.customerSnapshot?.document }}</span>
+          }
+        </div>
+      } @else {
+        <div class="receipt-customer">
+          <small>PROVEEDOR</small>
+          <strong>{{ document.supplierSnapshot?.name || "Proveedor" }}</strong>
+          @if (document.supplierSnapshot?.document) {
+            <span>{{ document.supplierSnapshot?.document }}</span>
+          }
+          @if (document.supplierSnapshot?.phone) {
+            <span>{{ document.supplierSnapshot?.phone }}</span>
+          }
+        </div>
+      }
+
+      @if (document.employeeSnapshot?.name) {
+        <div class="receipt-customer">
+          <small>{{ employeeLabel.toUpperCase() }}</small>
+          <strong>{{ document.employeeSnapshot?.name }}</strong>
+        </div>
+      }
+
+      <div class="receipt-items">
+        @for (item of document.items; track $index) {
+          <div class="receipt-item">
+            <div>
+              <strong>{{ item.name }}</strong>
+              <small>{{ item.sku }} · {{ item.quantity }} × {{ formatMoney(isSale ? item.unitPrice : item.unitCost) }}</small>
+            </div>
+            <b>{{ formatMoney(item.lineTotal) }}</b>
+          </div>
+        }
+      </div>
+      <div class="receipt-total"><span>Total</span><strong>{{ formatMoney(document.total) }}</strong></div>
+      @if (document.notes) {
+        <p class="receipt-notes">{{ document.notes }}</p>
+      }
+      <p class="receipt-thanks">Nemkit Inventory · {{ isSale ? "Gracias por tu compra" : "Detalle de compra" }}</p>
+    </article>
+
+    <div class="dialog-actions receipt-screen-actions">
+      <button class="button button-secondary" (click)="closed.emit()">Cerrar</button>
+      <button class="button button-primary" (click)="print()">
+        <i class="pi pi-print"></i> Imprimir / Guardar PDF
+      </button>
+    </div>
+  </section>
+</div>

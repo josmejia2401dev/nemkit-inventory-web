@@ -1,0 +1,57 @@
+<div class="table-scroll">
+  <table class="inventory-table">
+    <thead>
+      <tr>
+        <th scope="col">PRODUCTO</th>
+        <th scope="col">SKU / CÓDIGO</th>
+        <th scope="col">CATEGORÍA</th>
+        <th scope="col">PRECIO VENTA</th>
+        <th scope="col">STOCK</th>
+        <th scope="col">ESTADO</th>
+        @if (rowActions) { <th scope="col">ACCIONES</th> }
+      </tr>
+    </thead>
+    <tbody>
+      @for (product of products; track product.id || product._id) {
+        <tr>
+          <td data-label="Producto">
+            <div class="product-cell">
+              <span class="product-thumb">
+                @if (product.image?.url) { <img [src]="product.image?.url" [alt]="product.name" /> }
+                @else { <i class="pi pi-box" aria-hidden="true"></i> }
+              </span>
+              <span>
+                <strong>
+                  {{ product.name }}
+                  @if (product.type === "ingredient") { <span class="type-chip type-chip--ingredient">Insumo</span> }
+                  @else if (product.type === "prepared") { <span class="type-chip type-chip--prepared">Plato</span> }
+                </strong>
+                <small>{{ product.description || "Sin descripción" }}</small>
+              </span>
+            </div>
+          </td>
+          <td data-label="SKU / código">
+            <strong class="sku-code">{{ product.sku }}</strong>
+            <small class="table-subtext">{{ product.barcode || "—" }}</small>
+          </td>
+          <td data-label="Categoría">{{ categoryName(product.categoryId) }}</td>
+          <td class="price-cell" data-label="Precio de venta">{{ formatMoney(product.salePrice) }}</td>
+          <td data-label="Stock">
+            <span class="stock-value" [class.stock-value--low]="product.stock <= product.minimumStock">{{ product.stock }}</span>
+            <small class="table-subtext">mín. {{ product.minimumStock }}</small>
+          </td>
+          <td data-label="Estado">
+            <span class="status-pill" [class.status-pill--off]="product.status === 'inactive'">
+              <i aria-hidden="true"></i>{{ product.status === "active" ? "Activo" : "Inactivo" }}
+            </span>
+          </td>
+          @if (rowActions) {
+            <td data-label="Acciones">
+              <div class="row-actions" [ngTemplateOutlet]="rowActions" [ngTemplateOutletContext]="{ $implicit: product }"></div>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,15 @@
+<p-dialog [header]="confirmService.options().title"
+          [visible]="confirmService.visible()"
+          (visibleChange)="onVisibleChange($event)"
+          [modal]="true" [closable]="false" [draggable]="false"
+          [style]="{width: '400px'}">
+  <p class="text-sm" style="color: var(--deploy-text-muted)">{{ confirmService.options().message }}</p>
+  <ng-template #footer>
+    <div class="flex justify-end gap-2 mt-4">
+      <p-button [label]="confirmService.options().cancelLabel ?? 'Cancel'" [text]="true" (onClick)="confirmService.reject()" />
+      <p-button [label]="confirmService.options().confirmLabel ?? 'Confirm'"
+                [severity]="confirmService.options().severity === 'danger' ? 'danger' : 'primary'"
+                (onClick)="confirmService.accept()" />
+    </div>
+  </ng-template>
+</p-dialog>

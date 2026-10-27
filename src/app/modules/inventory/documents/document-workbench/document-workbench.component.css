@@ -1,0 +1,781 @@
+:host {
+  display: block;
+}
+
+.sales-create-button {
+  min-height: 46px;
+  padding-inline: 18px;
+  border-radius: 12px;
+  box-shadow: 0 7px 18px rgba(39, 102, 80, 0.14);
+}
+
+.sales-flow-guide {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 18px;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(36, 65, 52, 0.1);
+  border-radius: 15px;
+  background: linear-gradient(120deg, #fff 0%, #f8faf6 100%);
+  box-shadow: 0 4px 14px rgba(31, 57, 45, 0.035);
+}
+
+.sales-flow-guide-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.sales-flow-guide-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  color: #276650;
+  background: #eaf2eb;
+  font-size: 15px;
+}
+
+.sales-flow-guide-heading > div,
+.sales-flow-option {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sales-flow-guide-heading strong {
+  color: #2d4838;
+  font-size: 12px;
+}
+
+.sales-flow-guide-heading small,
+.sales-flow-option small {
+  color: #829087;
+  font-size: 10px;
+}
+
+.sales-flow-options {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sales-flow-option {
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.sales-flow-mode {
+  width: fit-content;
+  padding: 5px 8px;
+  border-radius: 99px;
+  color: #487052;
+  background: #edf4ec;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sales-flow-mode--delivery {
+  color: #426b84;
+  background: #eaf2f7;
+}
+
+.sales-flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: #627168;
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sales-flow-steps i {
+  color: #b3bdb5;
+  font-size: 9px;
+}
+
+.document-state-stack {
+  display: grid;
+  justify-items: start;
+  gap: 7px;
+  min-width: 128px;
+  white-space: normal;
+}
+
+.document-order-state {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #4d7157;
+}
+
+.document-order-state > i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  color: inherit;
+  background: #edf4ec;
+  font-size: 12px;
+}
+
+.document-order-state--delivery {
+  color: #426b84;
+}
+
+.document-order-state--delivery > i {
+  background: #eaf2f7;
+}
+
+.document-order-state > span {
+  display: grid;
+  gap: 2px;
+}
+
+.document-order-state small {
+  color: #89968d;
+  font-size: 8px;
+}
+
+.document-order-state strong {
+  color: #385543;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.document-order-state--delivery strong {
+  color: #3f6177;
+}
+
+.document-order-progress {
+  display: flex;
+  width: 100%;
+  max-width: 150px;
+  gap: 3px;
+}
+
+.document-order-progress span {
+  height: 4px;
+  flex: 1 1 0;
+  border-radius: 99px;
+  background: #e7ece7;
+}
+
+.document-order-progress .document-order-progress-step--done {
+  background: #85aa8a;
+}
+
+.document-order-progress .document-order-progress-step--current {
+  background: #276650;
+  box-shadow: 0 0 0 2px rgba(39, 102, 80, 0.12);
+}
+
+.document-actions-cell {
+  white-space: normal;
+}
+
+.document-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 126px;
+}
+
+.document-advance-button {
+  min-height: 36px;
+  padding-inline: 10px;
+  white-space: nowrap;
+}
+
+.transaction-dialog {
+  width: min(100%, 940px);
+}
+
+.transaction-dialog-heading {
+  align-items: flex-start;
+  padding-bottom: 17px;
+}
+
+.transaction-dialog-heading .dialog-subtitle {
+  max-width: 52ch;
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.transaction-dialog-notice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 0 20px;
+  padding: 11px 13px;
+  border: 1px solid rgba(39, 102, 80, 0.1);
+  border-radius: 11px;
+  color: #54705c;
+  background: #f6f9f5;
+}
+
+.transaction-dialog-notice span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.transaction-dialog-notice i {
+  color: #52815f;
+}
+
+.transaction-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 3px 0 13px;
+}
+
+.transaction-section-heading > span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  color: #3e7050;
+  background: #edf4ec;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.transaction-section-heading > div {
+  display: grid;
+  gap: 2px;
+}
+
+.transaction-section-heading strong {
+  color: #354e3e;
+  font-size: 11px;
+}
+
+.transaction-section-heading small {
+  color: #8a968e;
+  font-size: 9px;
+}
+
+.transaction-section-heading--delivery {
+  margin-top: 21px;
+}
+
+.transaction-dialog--sale .contact-picker {
+  align-content: start;
+}
+
+.contact-picker-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.contact-picker-search input {
+  min-height: 43px;
+  font-size: 13px;
+}
+
+.contact-picker-search .button {
+  min-height: 43px;
+  flex: 0 0 auto;
+}
+
+.transaction-dialog--sale .contact-picker > .button {
+  min-height: 40px;
+}
+
+.transaction-dialog--sale .items-heading {
+  margin-top: 22px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(36, 65, 52, 0.08);
+}
+
+.items-heading > div > small {
+  max-width: 52ch;
+  color: #87938b;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.transaction-product-search {
+  display: flex;
+  align-items: center;
+  margin-bottom: 13px;
+}
+
+.transaction-product-search input {
+  min-height: 43px;
+  font-size: 13px;
+}
+
+.transaction-item {
+  grid-template-areas: "product quantity price subtotal remove";
+  grid-template-columns: minmax(170px, 1fr) 90px 150px 110px 38px;
+  gap: 11px;
+  padding: 13px;
+  border-color: rgba(36, 65, 52, 0.1);
+  background: #fbfcfa;
+}
+
+.transaction-product { grid-area: product; }
+.transaction-quantity { grid-area: quantity; }
+.transaction-price { grid-area: price; }
+.transaction-line-total { grid-area: subtotal; }
+.transaction-remove { grid-area: remove; }
+
+.transaction-item .form-field > span {
+  color: #64756a;
+  font-size: 9px;
+}
+
+.transaction-item .form-field input,
+.transaction-item .form-field select {
+  min-height: 43px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.transaction-line-total {
+  min-height: 43px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(36, 65, 52, 0.08);
+}
+
+.transaction-line-total small,
+.quantity-availability {
+  color: #849188;
+  font-size: 9px;
+}
+
+.transaction-line-total strong {
+  color: #315c41;
+  font-size: 12px;
+}
+
+.transaction-remove {
+  width: 38px;
+  height: 38px;
+  margin-bottom: 3px;
+}
+
+.transaction-total {
+  gap: 12px;
+  min-height: 70px;
+  margin-top: 17px;
+  padding: 14px 17px;
+  border: 1px solid rgba(39, 102, 80, 0.1);
+  border-radius: 13px;
+  background: linear-gradient(120deg, #f3f7f1, #f8faf6);
+}
+
+.transaction-total > span {
+  display: grid;
+  gap: 4px;
+}
+
+.transaction-total > span > small {
+  color: #6d8172;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.7px;
+}
+
+.transaction-total > span > strong {
+  color: #829087;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.transaction-total > strong {
+  color: #244b35;
+  font-size: clamp(18px, 2.4vw, 24px);
+  white-space: nowrap;
+}
+
+@media (max-width: 1023px) {
+  .sales-flow-guide {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .sales-flow-guide-heading small {
+    font-size: 11px;
+  }
+
+  .transaction-dialog {
+    width: min(100%, 800px);
+  }
+
+  .transaction-item {
+    grid-template-areas: "product product remove" "quantity price subtotal";
+    grid-template-columns: minmax(0, 1fr) minmax(130px, 1fr) 105px;
+  }
+
+  .transaction-line-total {
+    padding-left: 9px;
+  }
+}
+
+@media (max-width: 760px) {
+  .sales-create-button {
+    min-height: 44px;
+    padding-inline: 13px;
+    font-size: 12px;
+  }
+
+  .sales-flow-guide {
+    gap: 12px;
+    margin-bottom: 13px;
+    padding: 14px;
+    overflow: hidden;
+  }
+
+  .sales-flow-guide-heading {
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(36, 65, 52, 0.08);
+  }
+
+  .sales-flow-options {
+    margin-right: -14px;
+    padding-right: 14px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+
+  .sales-flow-option {
+    grid-template-columns: 82px max-content;
+    min-width: max-content;
+    gap: 9px;
+  }
+
+  .sales-flow-steps {
+    gap: 5px;
+    font-size: 10px;
+  }
+
+  .document-banner {
+    gap: 11px;
+    padding: 14px;
+  }
+
+  .document-banner-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .document-banner strong {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .document-banner p {
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .document-banner-tag {
+    display: none;
+  }
+
+  .document-state-cell {
+    display: block !important;
+    padding: 10px 0 !important;
+    text-align: left !important;
+  }
+
+  .document-state-cell::before {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .document-state-stack {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  .document-order-state {
+    width: fit-content;
+  }
+
+  .document-order-progress {
+    max-width: 100%;
+  }
+
+  .document-order-progress span {
+    height: 5px;
+  }
+
+  .document-actions-cell {
+    display: block !important;
+    padding-top: 10px !important;
+    text-align: left !important;
+  }
+
+  .document-actions-cell::before {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .document-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .document-actions .button {
+    min-height: 44px;
+  }
+
+  .document-actions .icon-button {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(36, 65, 52, 0.11);
+    background: #fafbf8;
+  }
+
+  .transaction-dialog--sale {
+    max-height: calc(100dvh - env(safe-area-inset-top));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .transaction-dialog--sale .transaction-dialog-heading {
+    padding: 16px 18px 13px;
+  }
+
+  .transaction-dialog--sale .dialog-subtitle {
+    max-width: 36ch;
+    font-size: 11px;
+  }
+
+  .transaction-dialog--sale .dialog-form {
+    padding: 13px 16px calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .transaction-dialog-notice {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 17px;
+    padding: 11px;
+  }
+
+  .transaction-dialog-notice span {
+    font-size: 11px;
+  }
+
+  .transaction-section-heading {
+    margin-bottom: 11px;
+  }
+
+  .contact-picker-search input {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .contact-picker-search .button {
+    min-height: 48px;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+
+  .transaction-dialog--sale .contact-picker > .button {
+    min-height: 44px;
+  }
+
+  .transaction-dialog--sale .delivery-check {
+    min-height: 60px;
+    align-items: center;
+    padding: 13px;
+  }
+
+  .transaction-dialog--sale .delivery-check input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+  }
+
+  .transaction-dialog--sale .delivery-check strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+  }
+
+  .transaction-dialog--sale .delivery-check small {
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .transaction-dialog--sale .delivery-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .transaction-dialog--sale .items-heading {
+    align-items: flex-start;
+    margin-top: 19px;
+    padding-top: 15px;
+  }
+
+  .transaction-dialog--sale .items-heading strong {
+    font-size: 15px;
+  }
+
+  .transaction-dialog--sale .items-heading > div > small {
+    max-width: 33ch;
+    font-size: 10px;
+  }
+
+  .transaction-dialog--sale .items-heading > .button {
+    min-height: 42px;
+    flex: 0 0 auto;
+    padding-inline: 10px;
+    font-size: 11px;
+  }
+
+  .transaction-dialog--sale .transaction-product-search {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .transaction-dialog--sale .transaction-product-search input {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .transaction-dialog--sale .transaction-product-search .button {
+    min-height: 48px;
+    flex: 0 0 auto;
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+
+  .transaction-dialog--sale .transaction-item {
+    grid-template-areas: "product product remove" "quantity price price" "subtotal subtotal subtotal";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px;
+    align-items: start;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(31, 57, 45, 0.045);
+  }
+
+  .transaction-dialog--sale .transaction-product {
+    grid-column: 1 / 3;
+  }
+
+  .transaction-dialog--sale .transaction-quantity,
+  .transaction-dialog--sale .transaction-price {
+    min-width: 0;
+  }
+
+  .transaction-dialog--sale .transaction-item .form-field > span {
+    font-size: 11px;
+  }
+
+  .transaction-dialog--sale .transaction-item .form-field input,
+  .transaction-dialog--sale .transaction-item .form-field select {
+    min-height: 48px;
+    padding-inline: 10px;
+    font-size: 16px;
+  }
+
+  .transaction-dialog--sale .transaction-remove {
+    width: 40px;
+    height: 40px;
+    margin: 0;
+  }
+
+  .transaction-dialog--sale .transaction-line-total {
+    display: flex;
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 2px 0;
+    border-top: 1px solid rgba(36, 65, 52, 0.08);
+    border-left: 0;
+  }
+
+  .transaction-dialog--sale .transaction-line-total small {
+    font-size: 10px;
+  }
+
+  .transaction-dialog--sale .transaction-line-total strong {
+    font-size: 14px;
+  }
+
+  .transaction-dialog--sale .price-guidance,
+  .transaction-dialog--sale .price-margin {
+    font-size: 9px;
+  }
+
+  .transaction-dialog--sale .transaction-total {
+    align-items: flex-end;
+    margin-top: 14px;
+    padding: 13px;
+  }
+
+  .transaction-dialog--sale .transaction-total > span > small {
+    font-size: 9px;
+  }
+
+  .transaction-dialog--sale .transaction-total > span > strong {
+    max-width: 25ch;
+    font-size: 9px;
+    line-height: 1.4;
+  }
+
+  .transaction-dialog--sale .dialog-actions {
+    bottom: calc(-20px - env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 380px) {
+  .transaction-dialog--sale .transaction-product-search {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .transaction-dialog--sale .transaction-product-search .button {
+    width: 100%;
+  }
+
+  .transaction-dialog--sale .items-heading > .button {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .transaction-dialog--sale .items-heading > .button i {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sales-create-button,
+  .document-order-progress span {
+    transition: none;
+  }
+}

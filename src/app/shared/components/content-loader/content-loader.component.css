@@ -1,0 +1,14 @@
+.content-loader {
+  min-height: 16rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  color: var(--deploy-text-muted);
+  font-size: 0.8125rem;
+}
+
+.content-loader__icon {
+  color: var(--deploy-primary);
+  font-size: 1rem;
+}

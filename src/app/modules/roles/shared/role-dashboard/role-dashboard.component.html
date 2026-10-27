@@ -1,0 +1,18 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">{{ eyebrow }}</p>
+    <h1>Hola {{ name() }}</h1>
+    <p class="heading-subtitle">{{ subtitle }}</p>
+  </div>
+</div>
+<section class="panel">
+  <div class="quick-actions-grid">
+    @for (item of shortcuts; track item.path) {
+      <a [routerLink]="item.path" class="quick-action">
+        <span class="quick-action-icon quick-action-icon--sage"><i [class]="item.icon"></i></span>
+        <span><strong>{{ item.label }}</strong><small>{{ item.description }}</small></span>
+        <i class="pi pi-arrow-right"></i>
+      </a>
+    }
+  </div>
+</section>

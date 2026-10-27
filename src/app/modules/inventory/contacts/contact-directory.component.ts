@@ -19,6 +19,7 @@ export type ContactKind = "suppliers" | "customers";
   standalone: true,
   imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./contact-directory.component.html",
+  styleUrls: ["./contact-directory.component.css"],
 })
 export class ContactDirectoryComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;

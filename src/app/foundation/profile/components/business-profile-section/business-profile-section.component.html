@@ -1,0 +1,44 @@
+<section class="panel profile-settings-card">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">DETALLES DE LA EMPRESA</p>
+      <h3>Negocio</h3>
+      <p>Configura el nombre y el tipo de operación de tu empresa.</p>
+    </div>
+    <span class="section-mark"><i class="pi pi-shop" aria-hidden="true"></i></span>
+  </div>
+
+  <form class="profile-form" (ngSubmit)="submit()">
+    <label class="form-field">
+      <span>Nombre del negocio <b>*</b></span>
+      <input
+        [(ngModel)]="name"
+        name="companyName"
+        autocomplete="organization"
+        maxlength="160"
+        minlength="2"
+        required
+      />
+    </label>
+
+    <label class="form-field profile-field-spaced">
+      <span>Tipo de negocio</span>
+      <select [(ngModel)]="type" name="businessType" required>
+        <option value="retail">Tienda / comercio</option>
+        <option value="restaurant">Restaurante</option>
+      </select>
+    </label>
+
+    <p class="form-hint">
+      <i class="pi pi-info-circle" aria-hidden="true"></i>
+      Si cambias el tipo de negocio, cierra sesión y vuelve a entrar para actualizar la navegación.
+    </p>
+
+    <div class="profile-form-footer">
+      <button class="button button-primary" [disabled]="saving">
+        <i [class]="saving ? 'pi pi-spin pi-spinner' : 'pi pi-check'" aria-hidden="true"></i>
+        {{ saving ? "Guardando…" : "Guardar negocio" }}
+      </button>
+    </div>
+  </form>
+</section>

@@ -1,0 +1,83 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">PLATAFORMA</p>
+    <h1>Empresas</h1>
+    <p class="heading-subtitle">Cuentas registradas en la plataforma.</p>
+  </div>
+  <button class="button button-secondary" type="button" (click)="load()">
+    <i class="pi pi-refresh" aria-hidden="true"></i>
+    Actualizar
+  </button>
+</div>
+
+<section class="panel">
+  <div class="filter-bar">
+    <div class="filter-title">
+      <span class="panel-icon"><i class="pi pi-building" aria-hidden="true"></i></span>
+      <strong>Empresas</strong>
+      <span class="filter-count">{{ total() }}</span>
+    </div>
+    <div class="feedback-filters">
+      <input
+        [(ngModel)]="search"
+        name="search"
+        (keyup.enter)="reload()"
+        placeholder="Buscar por nombre, dueño o correo"
+        aria-label="Buscar empresas"
+      />
+      <button class="button button-secondary button-small" type="button" (click)="reload()">
+        <i class="pi pi-search" aria-hidden="true"></i>
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-panel" role="status">
+      <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+      <span>Cargando empresas…</span>
+    </div>
+  } @else if (companies().length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th scope="col">EMPRESA</th>
+            <th scope="col">DUEÑO</th>
+            <th scope="col">CORREO</th>
+            <th scope="col">TIPO</th>
+            <th scope="col">MIEMBROS</th>
+            <th scope="col">ACCIONES</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (company of companies(); track company.id) {
+            <tr>
+              <td data-label="Empresa"><strong>{{ company.companyName }}</strong></td>
+              <td data-label="Dueño">{{ company.ownerName }}</td>
+              <td data-label="Correo">{{ company.ownerEmail }}</td>
+              <td data-label="Tipo">
+                <span class="feedback-tag feedback-tag--other">
+                  {{ company.businessType === "restaurant" ? "Restaurante" : "Tienda" }}
+                </span>
+              </td>
+              <td data-label="Miembros">{{ company.memberCount }}</td>
+              <td data-label="Acciones">
+                <a class="icon-button" [routerLink]="['/superadmin/companies', company.id]" title="Ver detalle" aria-label="Ver detalle de empresa">
+                  <i class="pi pi-eye" aria-hidden="true"></i>
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="total()" (pageChange)="goToPage($event)" />
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-building" aria-hidden="true"></i></span>
+      <strong>Sin empresas</strong>
+      <p>No hay empresas que coincidan con el filtro.</p>
+    </div>
+  }
+</section>

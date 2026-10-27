@@ -24,6 +24,7 @@ const MOVEMENT_LABELS: Record<string, string> = {
   standalone: true,
   imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./movements.component.html",
+  styleUrls: ["./movements.component.css"],
 })
 export class MovementsComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;

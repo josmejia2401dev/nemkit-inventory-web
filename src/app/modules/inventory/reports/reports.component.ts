@@ -37,6 +37,7 @@ const MOVEMENT_LABELS: Record<string, string> = {
   standalone: true,
   imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./reports.component.html",
+  styleUrl: "./reports.component.css",
 })
 export class ReportsComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
@@ -65,6 +66,7 @@ export class ReportsComponent implements OnInit {
   movementType = "";
   productId = "";
   productSearch = "";
+  periodPreset = "custom";
 
   ngOnInit(): void {
     this.searchProducts();
@@ -96,6 +98,34 @@ export class ReportsComponent implements OnInit {
     this.employeesPage.set(1);
     this.cancellationsReport.set(null);
     this.load();
+  }
+
+  setPeriodPreset(preset: string): void {
+    this.periodPreset = preset;
+    const today = new Date();
+    const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const currentMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    let start = currentMonthStart;
+    let end = currentMonthEnd;
+
+    if (preset === "this-week" || preset === "last-week") {
+      const mondayOffset = (today.getDay() + 6) % 7;
+      start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - mondayOffset);
+      if (preset === "last-week") start.setDate(start.getDate() - 7);
+      end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+    } else if (preset === "previous-month") {
+      start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      end = new Date(today.getFullYear(), today.getMonth(), 0);
+    } else if (preset === "first-half") {
+      start = currentMonthStart;
+      end = new Date(today.getFullYear(), today.getMonth(), 15);
+    } else if (preset === "second-half") {
+      start = new Date(today.getFullYear(), today.getMonth(), 16);
+      end = currentMonthEnd;
+    }
+
+    this.from = this.dateString(start);
+    this.to = this.dateString(end);
   }
 
   inventoryItems(items: InventoryReportProduct[]): InventoryReportProduct[] {
@@ -296,6 +326,40 @@ export class ReportsComponent implements OnInit {
     XLSX.writeFile(workbook, `inventario-${this.to}.xlsx`);
   }
 
+  exportEmployeesExcel(): void {
+    const report = this.employeesReport();
+    if (!report) return;
+    const rows = report.employees.map((employee) => ({
+      Empleado: employee.employeeName,
+      Ventas: employee.salesCount,
+      "Unidades vendidas": employee.unitsSold,
+      "Valor vendido": employee.revenue,
+      "Pendiente por cobrar": employee.pendingValue,
+      "Recaudado en el período": employee.collectedInPeriod,
+      "Utilidad bruta estimada": employee.grossProfit,
+      "Pagos registrados": employee.paymentCount,
+      "Total pagado al empleado": employee.paymentsMade,
+    }));
+    rows.push({
+      Empleado: "TOTALES",
+      Ventas: report.totals.salesCount,
+      "Unidades vendidas": report.totals.unitsSold,
+      "Valor vendido": report.totals.revenue,
+      "Pendiente por cobrar": report.totals.pendingValue,
+      "Recaudado en el período": report.totals.collectedInPeriod,
+      "Utilidad bruta estimada": report.totals.grossProfit,
+      "Pagos registrados": report.totals.paymentCount,
+      "Total pagado al empleado": report.totals.paymentsMade,
+    });
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    worksheet["!cols"] = [
+      { wch: 28 }, { wch: 12 }, { wch: 18 }, { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 24 }, { wch: 18 }, { wch: 25 },
+    ];
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Ventas y pagos");
+    XLSX.writeFile(workbook, `ventas-pagos-empleados-${this.from}-${this.to}.xlsx`);
+  }
+
   exportInventoryPdf(): void {
     const report = this.inventoryReport();
     if (!report) return;
@@ -324,6 +388,11 @@ export class ReportsComponent implements OnInit {
   private localDate(offsetDays: number): string {
     const date = new Date();
     date.setDate(date.getDate() + offsetDays);
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+  }
+
+  private dateString(date: Date): string {
     const offset = date.getTimezoneOffset() * 60000;
     return new Date(date.getTime() - offset).toISOString().slice(0, 10);
   }

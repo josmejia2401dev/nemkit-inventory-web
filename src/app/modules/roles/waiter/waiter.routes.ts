@@ -1,5 +1,5 @@
 import { Routes } from "@angular/router";
-import { WaiterShellComponent } from "./waiter-shell.component";
+import { WaiterShellComponent } from "./shell/waiter-shell.component";
 import { roleGuard } from "../../../core/guards/role.guard";
 import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
 import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
@@ -18,7 +18,7 @@ export const waiterRoutes: Routes = [
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
       {
         path: "dashboard",
-        loadComponent: () => import("./waiter-dashboard.component").then((m) => m.WaiterDashboardComponent),
+        loadComponent: () => import("./dashboard/waiter-dashboard.component").then((m) => m.WaiterDashboardComponent),
       },
       salesRoute,
       kitchenServiceRoute,

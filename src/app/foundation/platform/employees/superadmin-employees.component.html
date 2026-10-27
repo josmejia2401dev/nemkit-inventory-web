@@ -1,0 +1,86 @@
+<div class="page-heading">
+      <div>
+        <p class="eyebrow">PLATAFORMA</p>
+        <h1>Empleados</h1>
+        <p class="heading-subtitle">Directorio global de empleados de todas las empresas, incluidos los inactivos.</p>
+      </div>
+      <button class="button button-secondary" type="button" (click)="load()">
+        <i class="pi pi-refresh" aria-hidden="true"></i> Actualizar
+      </button>
+    </div>
+
+    <section class="panel">
+      <div class="filter-bar">
+        <div class="filter-title">
+          <span class="panel-icon"><i class="pi pi-id-card" aria-hidden="true"></i></span>
+          <strong>Empleados</strong>
+          <span class="filter-count">{{ total() }}</span>
+        </div>
+        <div class="feedback-filters">
+          <input
+            [(ngModel)]="search"
+            name="search"
+            (keyup.enter)="reload()"
+            placeholder="Buscar por nombre, correo, documento o teléfono"
+            aria-label="Buscar empleados"
+          />
+          <select [(ngModel)]="role" name="role" (ngModelChange)="reload()" aria-label="Filtrar por cargo">
+            <option value="">Todos los cargos</option>
+            @for (option of roleOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+          <select [(ngModel)]="status" name="status" (ngModelChange)="reload()" aria-label="Filtrar por estado de empleado">
+            <option value="">Todos los estados</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+          <select [(ngModel)]="recordStatus" name="recordStatus" (ngModelChange)="reload()" aria-label="Filtrar por estado de registro">
+            <option value="">Todos los registros</option>
+            <option value="active">Vigentes</option>
+            <option value="inactive">Inactivos (registro)</option>
+            <option value="archived">Archivados</option>
+            <option value="deleted">Eliminados</option>
+          </select>
+          <button class="button button-secondary button-small" type="button" (click)="reload()">
+            <i class="pi pi-search" aria-hidden="true"></i> Buscar
+          </button>
+        </div>
+      </div>
+
+      @if (loading()) {
+        <div class="loading-panel" role="status"><i class="pi pi-spin pi-spinner"></i><span>Cargando empleados…</span></div>
+      } @else if (employees().length) {
+        <div class="table-scroll">
+          <table class="inventory-table">
+            <thead>
+              <tr><th>NOMBRE</th><th>CORREO</th><th>EMPRESA</th><th>CARGO</th><th>ESTADO</th><th>REGISTRO</th><th>INGRESO</th></tr>
+            </thead>
+            <tbody>
+              @for (employee of employees(); track employee.id) {
+                <tr>
+                  <td data-label="Nombre"><strong>{{ employee.fullName }}</strong></td>
+                  <td data-label="Correo">{{ employee.email }}</td>
+                  <td data-label="Empresa">{{ employee.companyName }}</td>
+                  <td data-label="Cargo"><span class="feedback-tag feedback-tag--other">{{ roleLabel(employee.role) }}</span></td>
+                  <td data-label="Estado">
+                    <span class="feedback-status" [class.feedback-status--resolved]="employee.status === 'active' && employee.recordStatus === 'active'" [class.feedback-status--open]="employee.status !== 'active' || employee.recordStatus !== 'active'">
+                      {{ statusLabel(employee) }}
+                    </span>
+                  </td>
+                  <td data-label="Registro">{{ employee.recordStatus === "deleted" ? "Eliminado" : employee.recordStatus }}</td>
+                  <td data-label="Ingreso">{{ employee.createdAt ? (employee.createdAt | date: "d MMM y" : "" : "es-CO") : "—" }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="total()" (pageChange)="goToPage($event)" />
+      } @else {
+        <div class="empty-state">
+          <span class="empty-icon"><i class="pi pi-id-card" aria-hidden="true"></i></span>
+          <strong>No hay empleados</strong>
+          <p>No encontramos empleados con los filtros seleccionados.</p>
+        </div>
+      }
+    </section>

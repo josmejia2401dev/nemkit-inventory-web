@@ -10,7 +10,7 @@ import { homeForRoles } from "./role-home";
  *   SU propio home (no a login), evitando el acceso cruzado por URL.
  *
  * ADMIN puede acceder a los bloques operativos de la empresa. SUPERADMIN tiene
- * su propio espacio de plataforma y no entra al tenant operativo.
+ * su propio espacio de plataforma y no entra al empresa operativa.
  *
  * @param allowed roles de usuario (MAYÚSCULAS) autorizados para el bloque.
  */

@@ -14,6 +14,7 @@ import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/componen
   standalone: true,
   imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: "./categories.component.html",
+  styleUrls: ["./categories.component.css"],
 })
 export class CategoriesComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;

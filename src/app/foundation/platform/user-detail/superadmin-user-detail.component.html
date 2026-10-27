@@ -1,0 +1,109 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">PLATAFORMA · USUARIO</p>
+    <h1>{{ user()?.fullName || "Usuario" }}</h1>
+    <p class="heading-subtitle">Detalle de la cuenta del usuario.</p>
+  </div>
+  <a class="button button-secondary" routerLink="/superadmin/users">
+    <i class="pi pi-arrow-left" aria-hidden="true"></i>
+    Volver
+  </a>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel" role="status">
+    <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+    <span>Cargando usuario…</span>
+  </div>
+} @else if (user()) {
+  @if (user(); as user) {
+  <section class="panel detail-panel">
+    <div class="detail-grid">
+      <div><small>Nombre</small><strong>{{ user.fullName }}</strong></div>
+      <div><small>Correo</small><strong>{{ user.email }}</strong></div>
+      <div>
+        <small>Roles</small>
+        <div class="role-chips">
+          @for (role of user.roles; track role) {
+            <span class="role-chip">{{ role }}</span>
+          }
+        </div>
+      </div>
+      <div><small>Tipo de cuenta</small><strong>{{ user.accountLabel }}</strong></div>
+      <div><small>Empresa</small><strong>{{ user.companyName || "—" }}</strong></div>
+      <div>
+        <small>Tipo de negocio</small>
+        <strong>{{ user.businessType === "restaurant" ? "Restaurante" : "Tienda" }}</strong>
+      </div>
+      <div><small>Estado</small><strong>{{ user.recordStatus }}</strong></div>
+      <div>
+        <small>Último acceso</small>
+        <strong>{{ user.security?.lastLoginAt ? (user.security?.lastLoginAt | date: "d MMM yyyy, HH:mm" : "" : "es-CO") : "Nunca" }}</strong>
+      </div>
+      <div>
+        <small>Creado</small>
+        <strong>{{ user.createdAt | date: "d MMM yyyy" : "" : "es-CO" }}</strong>
+      </div>
+      @if (user.isEmployee && user.userId) {
+        <div>
+          <small>Empresa actual</small>
+          <a [routerLink]="['/superadmin/companies', user.userId]">
+            {{ user.companyName || "Ver empresa #" + user.userId }}
+          </a>
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (user.isOwner && user.employees?.length) {
+    <section class="panel">
+      <div class="filter-bar">
+        <div class="filter-title">
+          <span class="panel-icon"><i class="pi pi-id-card" aria-hidden="true"></i></span>
+          <strong>Empleados</strong>
+          <span class="filter-count">{{ user.employees?.length ?? 0 }}</span>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th scope="col">NOMBRE</th>
+              <th scope="col">CORREO</th>
+              <th scope="col">ROLES</th>
+              <th scope="col">ESTADO</th>
+              <th scope="col">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (employee of user.employees; track employee.id) {
+              <tr>
+                <td data-label="Nombre">{{ employee.fullName }}</td>
+                <td data-label="Correo">{{ employee.email }}</td>
+                <td data-label="Roles">
+                  <div class="role-chips">
+                    @for (role of employee.roles; track role) {
+                      <span class="role-chip">{{ role }}</span>
+                    }
+                  </div>
+                </td>
+                <td data-label="Estado">{{ employee.recordStatus }}</td>
+                <td data-label="Acciones">
+                  <a class="icon-button" [routerLink]="['/superadmin/users', employee.id]" aria-label="Ver detalle del usuario">
+                    <i class="pi pi-eye" aria-hidden="true"></i>
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+  }
+} @else {
+  <div class="empty-state" role="alert">
+    <span class="empty-icon"><i class="pi pi-user" aria-hidden="true"></i></span>
+    <strong>Usuario no encontrado</strong>
+  </div>
+}
