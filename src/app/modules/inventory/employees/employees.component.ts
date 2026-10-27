@@ -59,11 +59,7 @@ export class EmployeesComponent implements OnInit {
   pageCount = signal(1);
   employeeCount = signal(0);
   saving = signal(false);
-  associationSaving = signal(false);
   dialogOpen = signal(false);
-  associationOpen = signal(false);
-  associationEmail = "";
-  associationRole: EmployeeRole | "" = "";
   editingId: number | null = null;
   search = "";
   roleFilter = "";
@@ -192,43 +188,20 @@ export class EmployeesComponent implements OnInit {
     });
   }
 
-  associateExisting(): void {
-    const email = this.associationEmail.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !this.associationRole) {
-      this.notifications.warn("Revisa los datos", "Indica el correo de la cuenta y el cargo del empleado.");
-      return;
-    }
-    this.associationSaving.set(true);
-    this.inventory.post<InventoryEmployee>("/employees/associate", {
-      email,
-      role: this.associationRole,
-    }).subscribe({
-      next: () => {
-        this.associationSaving.set(false);
-        this.associationOpen.set(false);
-        this.associationEmail = "";
-        this.associationRole = "";
-        this.notifications.success("Cuenta asociada", "El usuario recuperó acceso a esta empresa.");
-        this.load();
-      },
-      error: () => this.associationSaving.set(false),
-    });
-  }
-
   async remove(employee: InventoryEmployee): Promise<void> {
     const id = employee.id ?? employee._id;
     if (!id) return;
     const ok = await this.confirm.ask({
-      title: "Desasociar empleado",
-      message: `La cuenta de ${employee.name} quedará inactiva y perderá acceso a esta empresa. Podrá volver a ingresar si otra empresa o esta misma la asocia nuevamente.`,
-      confirmLabel: "Desasociar",
+      title: "Eliminar empleado",
+      message: `${employee.name} dejará de tener acceso al sistema. Esta acción da de baja su cuenta.`,
+      confirmLabel: "Eliminar",
       cancelLabel: "Cancelar",
       severity: "danger",
     });
     if (!ok) return;
     this.inventory.delete(`/employees/${id}`).subscribe({
       next: () => {
-        this.notifications.success("Empleado desasociado", "La cuenta quedó inactiva y se puede asociar nuevamente.");
+        this.notifications.success("Empleado eliminado", "La cuenta quedó dada de baja.");
         this.load();
       },
     });

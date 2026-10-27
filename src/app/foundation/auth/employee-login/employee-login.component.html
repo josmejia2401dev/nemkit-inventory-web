@@ -1,0 +1,96 @@
+<main class="auth-page">
+  <div class="auth-art">
+    <a routerLink="/employee/login" class="brand brand--light"
+      ><span class="brand-mark"><i class="pi pi-box"></i></span
+      ><span class="brand-copy"
+        ><strong>nemkit</strong><small>EQUIPO</small></span
+      ></a
+    >
+    <div class="auth-art-copy">
+      <span class="art-kicker"
+        ><i class="pi pi-id-card"></i> ACCESO DEL EQUIPO</span
+      >
+      <h1>Tu turno,<br /><em>empieza aquí.</em></h1>
+      <p>
+        Entra con tu cuenta de empleado para tomar pedidos, cocinar, entregar o
+        cobrar según tu rol.
+      </p>
+    </div>
+    <div class="art-orbit orbit-one"></div>
+    <div class="art-orbit orbit-two"></div>
+    <div class="art-card art-card--one">
+      <span class="art-card-icon"><i class="pi pi-users"></i></span
+      ><span
+        ><small>TU EQUIPO</small><strong>Cada quien en lo suyo</strong></span
+      ><i class="pi pi-check-circle art-check"></i>
+    </div>
+    <div class="art-card art-card--two">
+      <span class="mini-bars"><i></i><i></i><i></i><i></i><i></i></span
+      ><span
+        ><small>OPERACIÓN</small><strong>Rápido y claro</strong></span
+      >
+    </div>
+    <span class="art-footer">CADA ROL, SU ESPACIO.</span>
+  </div>
+  <section class="auth-form-side">
+    <div class="auth-mobile-brand">
+      <a routerLink="/employee/login" class="brand"
+        ><span class="brand-mark"><i class="pi pi-box"></i></span
+        ><span class="brand-copy"
+          ><strong>nemkit</strong><small>EQUIPO</small></span
+        ></a
+      >
+    </div>
+    <div class="auth-form-wrap">
+      <span class="auth-overline">HOLA DE NUEVO</span>
+      <h2>Acceso de empleados</h2>
+      <p class="auth-lead">Ingresa con tu cuenta de empleado.</p>
+      @if (error()) {
+        <p-message severity="error" [text]="error()!" class="auth-message" />
+      }
+      <form (ngSubmit)="onSubmit()" class="auth-form">
+        <label class="field-label" for="email">Correo electrónico</label>
+        <span class="input-wrap"
+          ><i class="pi pi-envelope"></i
+          ><input
+            id="email"
+            pInputText
+            [(ngModel)]="email"
+            name="email"
+            type="email"
+            placeholder="tu@correo.com"
+            autocomplete="email"
+            required
+        /></span>
+        <label class="field-label" for="password">Contraseña</label>
+        <p-password
+          inputId="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="Tu contraseña"
+          autocomplete="current-password"
+          [toggleMask]="true"
+          [feedback]="false"
+          styleClass="auth-password"
+          inputStyleClass="auth-password-input"
+          required
+        />
+        <p-button
+          type="submit"
+          label="Entrar"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          [loading]="loading()"
+          styleClass="auth-submit"
+        />
+      </form>
+      <p class="auth-switch">
+        ¿Eres una empresa?
+        <a routerLink="/login">Inicia sesión aquí <i class="pi pi-arrow-up-right"></i></a>
+      </p>
+    </div>
+    <span class="auth-legal"
+      >Tu acceso depende del rol que te asignó tu empresa.</span
+    >
+  </section>
+</main>

@@ -20,7 +20,7 @@ export function roleGuard(allowed: string[]): CanActivateFn {
     const router = inject(Router);
 
     if (!store.isLoggedIn()) {
-      router.navigate(["/login"]);
+      router.navigateByUrl(store.loginPath());
       return false;
     }
 

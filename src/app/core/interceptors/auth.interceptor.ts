@@ -25,6 +25,9 @@ const PUBLIC_PATHS = [
   "/auth/register",
   "/auth/refresh",
   "/auth/forgot-password",
+  "/auth/employee/login",
+  "/auth/employee/refresh",
+  "/auth/employee/forgot-password",
 ];
 
 let isRefreshing = false;
@@ -43,8 +46,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const token = store.accessToken();
   if (!token) {
+    const loginPath = store.loginPath();
     store.clear();
-    router.navigate(["/login"]);
+    router.navigateByUrl(loginPath);
     return throwError(() => new Error("No token"));
   }
 
@@ -90,8 +94,13 @@ function doRefresh(
   isRefreshing = true;
   refreshSubject.next(null);
 
+  // El empleado refresca contra su propio endpoint.
+  const refreshUrl = store.sessionType() === "employee"
+    ? "/auth/employee/refresh"
+    : "/auth/refresh";
+
   return api
-    .post<any>("/auth/refresh", { refreshToken: store.refreshToken() })
+    .post<any>(refreshUrl, { refreshToken: store.refreshToken() })
     .pipe(
       switchMap((res) => {
         isRefreshing = false;
@@ -103,8 +112,9 @@ function doRefresh(
       catchError((err) => {
         isRefreshing = false;
         refreshSubject.next(null);
+        const loginPath = store.loginPath();
         store.clear();
-        router.navigate(["/login"]);
+        router.navigateByUrl(loginPath);
         return throwError(() => err);
       }),
     );

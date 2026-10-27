@@ -45,6 +45,7 @@ export class LoginComponent {
             res.data.accessToken,
             res.data.refreshToken,
             res.data.company,
+            "company",
           );
           this.router.navigateByUrl(homeForRoles(res.data.user?.roles));
         },

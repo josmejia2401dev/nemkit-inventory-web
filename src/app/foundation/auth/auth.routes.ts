@@ -13,4 +13,11 @@ export const foundationAuthRoutes: Routes = [
         (module) => module.RegisterComponent,
       ),
   },
+  {
+    path: "employee/login",
+    loadComponent: () =>
+      import("./employee-login/employee-login.component").then(
+        (module) => module.EmployeeLoginComponent,
+      ),
+  },
 ];

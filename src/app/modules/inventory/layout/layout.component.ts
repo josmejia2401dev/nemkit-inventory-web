@@ -127,8 +127,10 @@ export class LayoutComponent implements OnInit {
   }
 
   logout(): void {
+    // Capturar la ruta de login antes de limpiar (clear resetea el sessionType).
+    const loginPath = this.store.loginPath();
     this.store.clear();
-    this.router.navigate(["/login"]);
+    this.router.navigateByUrl(loginPath);
   }
 
   private refreshAlertCount(): void {

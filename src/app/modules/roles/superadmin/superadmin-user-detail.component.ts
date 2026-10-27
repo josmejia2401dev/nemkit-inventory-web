@@ -56,25 +56,6 @@ import { PlatformService, PlatformUser } from "../../../core/services/platform.s
         </section>
       }
 
-      @if (u.employmentHistory; as employmentHistory) {
-        @if (employmentHistory.length) {
-          <section class="panel">
-            <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i class="pi pi-history"></i></span><strong>Historial de asociaciones</strong><span class="filter-count">{{ employmentHistory.length }}</span></div></div>
-            <div class="table-scroll"><table class="inventory-table">
-              <thead><tr><th>EMPRESA</th><th>CARGO</th><th>DESDE</th><th>HASTA</th><th>ESTADO</th></tr></thead>
-              <tbody>@for (membership of employmentHistory; track membership.employeeId) {
-                <tr>
-                  <td data-label="Empresa"><a [routerLink]="['/superadmin/companies', membership.companyId]">{{ membership.companyName }}</a></td>
-                  <td data-label="Cargo">{{ membership.role }}</td>
-                  <td data-label="Desde">{{ membership.associatedAt | date: "d MMM yyyy" : "" : "es-CO" }}</td>
-                  <td data-label="Hasta">{{ membership.disassociatedAt ? (membership.disassociatedAt | date: "d MMM yyyy" : "" : "es-CO") : "—" }}</td>
-                  <td data-label="Estado">{{ membership.isCurrent ? "Asociado" : "Finalizado" }}</td>
-                </tr>
-              }</tbody>
-            </table></div>
-          </section>
-        }
-      }
       }
     } @else {
       <div class="empty-state"><span class="empty-icon"><i class="pi pi-user"></i></span><strong>Usuario no encontrado</strong></div>
@@ -94,14 +75,6 @@ export class SuperadminUserDetailComponent implements OnInit {
       next: (response) => {
         this.user.set(response.data);
         this.loading.set(false);
-        this.platform.getEmploymentHistory(id).subscribe({
-          next: (history) => this.user.update((user) => user
-            ? { ...user, employmentHistory: history.data ?? [] }
-            : user),
-          error: () => this.user.update((user) => user
-            ? { ...user, employmentHistory: [] }
-            : user),
-        });
       },
       error: () => this.loading.set(false),
     });
