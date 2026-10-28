@@ -67,6 +67,7 @@
             autocomplete="name"
             required
             minlength="2"
+            maxlength="100"
         /></span>
         <label class="field-label" for="companyName">Nombre de tu empresa</label>
         <span class="input-wrap"
@@ -78,7 +79,7 @@
             name="companyName"
             placeholder="Mi negocio"
             autocomplete="organization"
-            maxlength="160"
+            maxlength="100"
         /></span>
         <label class="field-label" for="businessType">Tipo de negocio</label>
         <span class="input-wrap"
@@ -99,6 +100,7 @@
             placeholder="tu@negocio.com"
             autocomplete="email"
             required
+            maxlength="254"
         /></span>
         <label class="field-label" for="password">Contraseña</label>
         <p-password
@@ -109,6 +111,7 @@
           autocomplete="new-password"
           [toggleMask]="true"
           [feedback]="false"
+          [maxLength]="128"
           styleClass="auth-password"
           inputStyleClass="auth-password-input"
           required

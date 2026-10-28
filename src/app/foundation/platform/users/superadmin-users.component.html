@@ -24,6 +24,7 @@
         (keyup.enter)="reload()"
         placeholder="Buscar por nombre, correo o empresa"
         aria-label="Buscar usuarios"
+        maxlength="100"
       />
       <select [(ngModel)]="kind" name="kind" (ngModelChange)="reload()" aria-label="Filtrar por tipo">
         <option value="">Todos</option>

@@ -71,6 +71,7 @@
             placeholder="tu@correo.com"
             autocomplete="email"
             required
+            maxlength="254"
         /></span>
         <label class="field-label" for="password">Contraseña</label>
         <p-password
@@ -81,6 +82,7 @@
           autocomplete="current-password"
           [toggleMask]="true"
           [feedback]="false"
+          [maxLength]="128"
           styleClass="auth-password"
           inputStyleClass="auth-password-input"
           required

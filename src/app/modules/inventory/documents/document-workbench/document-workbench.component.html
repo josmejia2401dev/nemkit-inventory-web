@@ -161,7 +161,7 @@
             <div class="form-field contact-picker">
               <div class="contact-picker-heading"><span>Cliente <b>*</b></span><button type="button" class="text-button" (click)="toggleCustomerForm()"><i class="pi pi-user-plus"></i>{{ customerFormOpen() ? "Cancelar" : "Registrar cliente" }}</button></div>
               <div class="contact-picker-search">
-                <input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" placeholder="Nombre, documento o correo" aria-label="Buscar clientes" />
+                <input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" maxlength="100" placeholder="Nombre, documento o correo" aria-label="Buscar clientes" />
                 <button type="button" class="button button-secondary button-small" aria-label="Buscar cliente" (click)="searchContacts()"><i class="pi pi-search"></i><span>Buscar</span></button>
               </div>
               <select [(ngModel)]="selectedContactId" name="contactId" (ngModelChange)="contactChanged()" required>
@@ -172,7 +172,7 @@
               </select>
             </div>
           } @else {
-            <div class="form-field"><span>Proveedor <b>*</b></span><div class="product-picker-search"><input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" placeholder="Buscar proveedor" /><button type="button" class="button button-secondary button-small" (click)="searchContacts()">Buscar</button></div><select [(ngModel)]="selectedContactId" name="contactId" required><option value="">Selecciona proveedor</option>@for (contact of contacts(); track contact.id || contact._id) { <option [ngValue]="contact.id || contact._id">{{ contact.name }}{{ contact.document ? " · " + contact.document : "" }}</option> }</select></div>
+            <div class="form-field"><span>Proveedor <b>*</b></span><div class="product-picker-search"><input [(ngModel)]="contactSearch" name="contactSearch" (keyup.enter)="searchContacts()" maxlength="100" placeholder="Buscar proveedor" /><button type="button" class="button button-secondary button-small" (click)="searchContacts()">Buscar</button></div><select [(ngModel)]="selectedContactId" name="contactId" required><option value="">Selecciona proveedor</option>@for (contact of contacts(); track contact.id || contact._id) { <option [ngValue]="contact.id || contact._id">{{ contact.name }}{{ contact.document ? " · " + contact.document : "" }}</option> }</select></div>
           }
           <label class="form-field"><span>Fecha <b>*</b></span><input type="date" [(ngModel)]="date" name="date" required /></label>
           <label class="form-field"><span>{{ employeeLabel }}</span><select [(ngModel)]="selectedEmployeeId" name="employeeId"><option value="">Sin asignar</option>@for (employee of employees(); track employee.id || employee._id) { <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option> }</select></label>
@@ -222,7 +222,7 @@
           <div class="customer-quick-form">
             <div><strong>Nuevo cliente</strong><small>Se guardará y quedará seleccionado en esta venta.</small></div>
             <div class="customer-quick-fields">
-              <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="customerForm.name" name="newCustomerName" required minlength="2" maxlength="160" /></label>
+              <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="customerForm.name" name="newCustomerName" required minlength="2" maxlength="100" /></label>
               <label class="form-field"><span>Documento</span><input [(ngModel)]="customerForm.document" name="newCustomerDocument" maxlength="40" /></label>
               <label class="form-field"><span>Teléfono</span><input [(ngModel)]="customerForm.phone" name="newCustomerPhone" type="tel" maxlength="40" /></label>
               <label class="form-field"><span>Correo</span><input [(ngModel)]="customerForm.email" name="newCustomerEmail" type="email" maxlength="254" /></label>
@@ -239,7 +239,7 @@
           <button type="button" class="button button-secondary button-small" (click)="addItem()"><i class="pi pi-plus"></i> Agregar producto</button>
         </div>
         <div class="product-picker-search transaction-product-search">
-          <input [(ngModel)]="productSearch" name="productSearch" (keyup.enter)="searchProducts()" placeholder="Buscar por nombre, SKU o código" aria-label="Buscar productos" />
+          <input [(ngModel)]="productSearch" name="productSearch" (keyup.enter)="searchProducts()" maxlength="100" placeholder="Buscar por nombre, SKU o código" aria-label="Buscar productos" />
           <button type="button" class="button button-secondary button-small" (click)="searchProducts()"><i class="pi pi-search"></i> Buscar</button>
         </div>
         <div class="transaction-items">

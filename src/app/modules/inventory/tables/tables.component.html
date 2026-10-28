@@ -43,8 +43,8 @@
     <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
       <div class="dialog-heading"><div><p class="eyebrow">SALÓN</p><h2>{{ editingId ? "Editar" : "Nueva" }} mesa</h2></div><button class="icon-button" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button></div>
       <form (ngSubmit)="save()" class="dialog-form">
-        <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="form.name" name="name" required maxlength="40" placeholder="Ej. Mesa 1" /></label>
-        <label class="form-field"><span>Descripción</span><input [(ngModel)]="form.description" name="description" maxlength="200" placeholder="Opcional · ej. Terraza, 4 puestos" /></label>
+        <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="form.name" name="name" required maxlength="100" placeholder="Ej. Mesa 1" /></label>
+        <label class="form-field"><span>Descripción</span><input [(ngModel)]="form.description" name="description" maxlength="1000" placeholder="Opcional · ej. Terraza, 4 puestos" /></label>
         <div class="dialog-actions"><button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button><button class="button button-primary" [disabled]="saving()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Guardando…" : "Guardar" }}</button></div>
       </form>
     </section>

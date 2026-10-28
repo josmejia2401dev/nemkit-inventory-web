@@ -23,7 +23,7 @@
         }
       </select>
       <div class="employee-search-row">
-        <input [(ngModel)]="search" (keyup.enter)="applySearch()" placeholder="Nombre, documento o correo" aria-label="Buscar empleados" />
+        <input [(ngModel)]="search" (keyup.enter)="applySearch()" maxlength="100" placeholder="Nombre, documento o correo" aria-label="Buscar empleados" />
         <button class="button button-secondary" type="button" (click)="applySearch()"><i class="pi pi-search"></i><span>Buscar</span></button>
       </div>
     </div>
@@ -94,7 +94,7 @@
         <button class="icon-button" type="button" aria-label="Cerrar" (click)="dialogOpen.set(false)"><i class="pi pi-times"></i></button>
       </div>
       <form (ngSubmit)="save()" class="dialog-form">
-        <label class="form-field"><span>Nombre completo <b>*</b></span><input [(ngModel)]="form.name" name="name" required minlength="2" maxlength="160" autocomplete="name" /></label>
+        <label class="form-field"><span>Nombre completo <b>*</b></span><input [(ngModel)]="form.name" name="name" required minlength="2" maxlength="100" autocomplete="name" /></label>
         <div class="form-grid">
           <label class="form-field"><span>Tipo de documento</span>
             <select [(ngModel)]="form.documentType" name="documentType">

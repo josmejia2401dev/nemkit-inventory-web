@@ -29,13 +29,13 @@
 
       <label class="form-field">
         <span>Título <b>*</b></span>
-        <input [(ngModel)]="title" name="title" maxlength="160" required placeholder="Ej. No puedo guardar una venta" />
+        <input [(ngModel)]="title" name="title" maxlength="100" required placeholder="Ej. No puedo guardar una venta" />
       </label>
 
       <label class="form-field">
         <span>Descripción <b>*</b></span>
-        <textarea [(ngModel)]="description" name="description" rows="6" maxlength="4000" required placeholder="¿Qué pasó? ¿Qué esperabas que pasara? Pasos para reproducirlo si aplica."></textarea>
-        <small class="field-hint-inline">{{ description.length }}/4000</small>
+        <textarea [(ngModel)]="description" name="description" rows="6" maxlength="1000" required placeholder="¿Qué pasó? ¿Qué esperabas que pasara? Pasos para reproducirlo si aplica."></textarea>
+        <small class="field-hint-inline">{{ description.length }}/1000</small>
       </label>
 
       <div class="dialog-actions">

@@ -199,7 +199,7 @@
             <i class="pi pi-plus"></i> Agregar producto
           </button>
         </div>
-        <div class="product-picker-search"><input [(ngModel)]="productSearch" name="productSearch" (keyup.enter)="searchProducts()" placeholder="Buscar producto por nombre, SKU o código" aria-label="Buscar productos" /><button type="button" class="button button-secondary button-small" (click)="searchProducts()">Buscar producto</button></div>
+        <div class="product-picker-search"><input [(ngModel)]="productSearch" name="productSearch" (keyup.enter)="searchProducts()" maxlength="100" placeholder="Buscar producto por nombre, SKU o código" aria-label="Buscar productos" /><button type="button" class="button button-secondary button-small" (click)="searchProducts()">Buscar producto</button></div>
         <div class="movement-item-list">
           @for (item of items; track $index) {
             <div class="movement-item-row">

@@ -11,6 +11,7 @@
       (ngModelChange)="searchChange.emit($event)"
       (keyup.enter)="apply.emit()"
       aria-label="Buscar productos"
+      maxlength="100"
       placeholder="Buscar por nombre, SKU o código…"
     />
     @if (search) {

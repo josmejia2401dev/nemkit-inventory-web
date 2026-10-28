@@ -116,6 +116,7 @@
             ><input
               [(ngModel)]="form.name"
               name="name"
+              maxlength="100"
               placeholder="Ej. Café molido 500 g"
               required
           /></label>
@@ -124,6 +125,7 @@
             ><input
               [(ngModel)]="form.sku"
               name="sku"
+              maxlength="64"
               placeholder="CAF-001"
               required
           /></label>
@@ -132,6 +134,7 @@
             ><input
               [(ngModel)]="form.barcode"
               name="barcode"
+              maxlength="64"
               placeholder="Opcional"
           /></label>
           <label class="form-field"
@@ -198,6 +201,7 @@
               type="url"
               [(ngModel)]="form.image"
               name="image"
+              maxlength="2048"
               placeholder="https://…"
           /></label>
           <label class="form-field form-field--wide"
@@ -206,6 +210,7 @@
               [(ngModel)]="form.description"
               name="description"
               rows="3"
+              maxlength="1000"
               placeholder="Detalles que te ayuden a identificarlo"
             ></textarea>
           </label>

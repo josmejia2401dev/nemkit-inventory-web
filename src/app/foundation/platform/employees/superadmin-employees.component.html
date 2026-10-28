@@ -23,6 +23,7 @@
             (keyup.enter)="reload()"
             placeholder="Buscar por nombre, correo, documento o teléfono"
             aria-label="Buscar empleados"
+            maxlength="100"
           />
           <select [(ngModel)]="role" name="role" (ngModelChange)="reload()" aria-label="Filtrar por cargo">
             <option value="">Todos los cargos</option>
