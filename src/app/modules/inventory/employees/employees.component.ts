@@ -11,6 +11,7 @@ import { NotificationService } from "../../../core/services/notification.service
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 import { EmployeePaymentsComponent } from "./payments/employee-payments.component";
+import { EmployeeActivityComponent } from "./activity/employee-activity.component";
 
 interface EmployeeForm {
   name: string;
@@ -28,7 +29,7 @@ interface EmployeeForm {
 @Component({
   selector: "app-inventory-employees",
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent, EmployeePaymentsComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, EmployeePaymentsComponent, EmployeeActivityComponent],
   templateUrl: "./employees.component.html",
   styleUrls: ["./employees.component.css"],
 })
@@ -67,6 +68,7 @@ export class EmployeesComponent implements OnInit {
   resettingPassword = signal(false);
   passwordEmployee = signal<InventoryEmployee | null>(null);
   paymentEmployee = signal<InventoryEmployee | null>(null);
+  activityEmployee = signal<InventoryEmployee | null>(null);
   dialogOpen = signal(false);
   editingId: number | null = null;
   search = "";
@@ -243,6 +245,10 @@ export class EmployeesComponent implements OnInit {
 
   openPayments(employee: InventoryEmployee): void {
     this.paymentEmployee.set(employee);
+  }
+
+  openActivity(employee: InventoryEmployee): void {
+    this.activityEmployee.set(employee);
   }
 
   resetPassword(): void {

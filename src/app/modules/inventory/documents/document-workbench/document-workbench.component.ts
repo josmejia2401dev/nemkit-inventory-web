@@ -279,7 +279,7 @@ export class DocumentWorkbenchComponent implements OnInit {
       const customerId = customer.id ?? customer._id;
       if (customerId) {
         this.customerProfileLoading.set(true);
-        this.inventory.get<CustomerProfile>(`/customers/${customerId}/profile`, { limit: 1 }).subscribe({
+        this.inventory.get<CustomerProfile>(`/statistics/customers/${customerId}/profile`, { limit: 1 }).subscribe({
           next: (response) => {
             if (Number(this.selectedContactId) === customerId) {
               this.customerProfile.set(response.data);

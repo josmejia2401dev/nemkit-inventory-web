@@ -161,7 +161,7 @@ export class ReportsComponent implements OnInit {
   load(): void {
     if (this.kind === "inventory") {
       this.loading.set(true);
-      this.inventory.get<InventoryReport>("/reports/inventory").subscribe({
+      this.inventory.get<InventoryReport>("/statistics/reports/inventory").subscribe({
         next: (response) => {
           this.inventoryReport.set(response.data);
           this.loading.set(false);
@@ -180,7 +180,7 @@ export class ReportsComponent implements OnInit {
     const range = { from: this.from, to: this.to };
     if (this.kind === "movements") {
       this.movementError.set(false);
-      this.inventory.list<InventoryReportMovement>("/reports/movements", {
+      this.inventory.list<InventoryReportMovement>("/statistics/reports/movements", {
         ...range,
         page: this.page(),
         limit: this.pageSize,
@@ -208,7 +208,7 @@ export class ReportsComponent implements OnInit {
     }
 
     if (this.kind === "employees") {
-      this.inventory.get<InventorySalesByEmployeeReport>("/reports/sales-by-employee", {
+      this.inventory.get<InventorySalesByEmployeeReport>("/statistics/employees/sales", {
         ...range,
       }).subscribe({
         next: (response) => {
@@ -222,7 +222,7 @@ export class ReportsComponent implements OnInit {
 
     if (this.kind === "cancellations") {
       this.cancellationError.set(false);
-      this.inventory.get<InventoryCancelledSalesReport>("/reports/cancelled-sales", {
+      this.inventory.get<InventoryCancelledSalesReport>("/statistics/reports/cancelled-sales", {
         ...range,
         page: this.page(),
         limit: this.pageSize,
@@ -248,7 +248,7 @@ export class ReportsComponent implements OnInit {
       return;
     }
 
-    this.inventory.get<InventorySalesReport>("/reports/sales", {
+    this.inventory.get<InventorySalesReport>("/statistics/reports/sales", {
       ...range,
       groupBy: this.groupBy,
     }).subscribe({
@@ -336,6 +336,8 @@ export class ReportsComponent implements OnInit {
       "Valor vendido": employee.revenue,
       "Pendiente por cobrar": employee.pendingValue,
       "Recaudado en el período": employee.collectedInPeriod,
+      Cancelaciones: employee.cancellationCount,
+      "Valor cancelado": employee.cancelledValue,
       "Utilidad bruta estimada": employee.grossProfit,
       "Pagos registrados": employee.paymentCount,
       "Total pagado al empleado": employee.paymentsMade,
@@ -347,13 +349,15 @@ export class ReportsComponent implements OnInit {
       "Valor vendido": report.totals.revenue,
       "Pendiente por cobrar": report.totals.pendingValue,
       "Recaudado en el período": report.totals.collectedInPeriod,
+      Cancelaciones: report.totals.cancellationCount,
+      "Valor cancelado": report.totals.cancelledValue,
       "Utilidad bruta estimada": report.totals.grossProfit,
       "Pagos registrados": report.totals.paymentCount,
       "Total pagado al empleado": report.totals.paymentsMade,
     });
     const worksheet = XLSX.utils.json_to_sheet(rows);
     worksheet["!cols"] = [
-      { wch: 28 }, { wch: 12 }, { wch: 18 }, { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 24 }, { wch: 18 }, { wch: 25 },
+      { wch: 28 }, { wch: 12 }, { wch: 18 }, { wch: 20 }, { wch: 22 }, { wch: 22 }, { wch: 16 }, { wch: 20 }, { wch: 24 }, { wch: 18 }, { wch: 25 },
     ];
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Ventas y pagos");

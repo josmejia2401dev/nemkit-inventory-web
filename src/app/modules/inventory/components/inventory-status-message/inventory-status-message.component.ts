@@ -37,7 +37,7 @@ export class InventoryStatusMessageComponent implements OnInit {
 
   refresh(): void {
     this.inventory
-      .get<{ outOfStock: number; lowStock: number }>("/dashboard/alerts")
+      .get<{ outOfStock: number; lowStock: number }>("/statistics/dashboard/alerts")
       .pipe(timeout(15_000))
       .subscribe({
         next: ({ data }) => {

@@ -50,6 +50,12 @@ export interface InventoryCategory {
 
 export type LoyaltyTier = "bronze" | "silver" | "gold" | "platinum";
 
+export interface InventoryLoyaltyRule {
+  tier: LoyaltyTier;
+  minSpent: number;
+  minPurchases: number;
+}
+
 export interface InventoryContact {
   id?: number;
   _id?: number;
@@ -70,6 +76,7 @@ export interface InventoryContact {
 
 export interface CustomerProfile {
   customer: InventoryContact;
+  loyaltyRules: InventoryLoyaltyRule[];
   analytics: {
     totalOrders: number;
     cancelledOrders: number;
@@ -93,6 +100,9 @@ export interface CustomerProfile {
       orderStatus?: string | null;
       kitchenStatus?: string | null;
       tableNumber?: string;
+      status?: "completed" | "void";
+      voidReason?: string;
+      voidNote?: string;
     }>;
     pagination: { page: number; limit: number; total: number; totalPages: number };
   };
@@ -336,6 +346,8 @@ export interface InventorySalesByEmployeeRow {
   pendingValue: number;
   collectedInPeriod: number;
   collectionsCount: number;
+  cancellationCount: number;
+  cancelledValue: number;
   grossProfit: number;
   paymentsMade: number;
   paymentCount: number;
@@ -352,6 +364,8 @@ export interface InventorySalesByEmployeeReport {
     pendingValue: number;
     collectedInPeriod: number;
     collectionsCount: number;
+    cancellationCount: number;
+    cancelledValue: number;
     grossProfit: number;
     paymentsMade: number;
     paymentCount: number;

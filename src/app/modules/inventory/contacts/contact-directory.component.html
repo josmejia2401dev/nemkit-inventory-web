@@ -30,6 +30,8 @@
       </button>
     </form>
   </section>
+
+  <app-customer-loyalty-guide [rules]="loyaltyRules()" [expanded]="true" />
 }
 
 <section class="panel catalog-panel">
@@ -51,11 +53,22 @@
   } @else if (contacts().length) {
     <div class="table-scroll">
       <table class="inventory-table">
-        <thead><tr><th>NOMBRE</th><th>DOCUMENTO</th><th>TELÉFONO</th><th>CORREO</th>@if (isSupplier) { <th>DIRECCIÓN</th> }<th></th></tr></thead>
+        <thead><tr><th>{{ isSupplier ? "NOMBRE" : "CLIENTE" }}</th><th>DOCUMENTO</th><th>TELÉFONO</th><th>CORREO</th>@if (isSupplier) { <th>DIRECCIÓN</th> }<th></th></tr></thead>
         <tbody>
           @for (contact of contacts(); track contact.id || contact._id) {
             <tr>
-              <td data-label="Nombre"><strong>{{ contact.name }}</strong></td>
+              <td [attr.data-label]="isSupplier ? 'Nombre' : 'Cliente'">
+                <strong>{{ contact.name }}</strong>
+                @if (!isSupplier) {
+                  <div class="customer-list-insights">
+                    <span class="loyalty-badge loyalty-badge--{{ contact.loyaltyTier || 'bronze' }}">
+                      @for (star of [].constructor(tierStars(contact.loyaltyTier)); track $index) { <i class="pi pi-star-fill"></i> }
+                      {{ tierLabel(contact.loyaltyTier) }}
+                    </span>
+                    <small>{{ contact.stats?.purchaseCount ?? 0 }} compras</small>
+                  </div>
+                }
+              </td>
               <td data-label="Documento">{{ contact.document || "—" }}</td>
               <td data-label="Teléfono">{{ contact.phone || "—" }}</td>
               <td data-label="Correo">{{ contact.email || "—" }}</td>
@@ -107,29 +120,34 @@
         @if (data.customer.document) { <span class="customer-profile-contact"><i class="pi pi-id-card"></i> {{ data.customer.document }}</span> }
       </div>
 
+      <app-customer-loyalty-guide [rules]="data.loyaltyRules" />
+
       <div class="report-summary">
         <article><small>Pedidos</small><strong>{{ data.analytics.totalOrders }}</strong></article>
         <article><small>Domicilios</small><strong>{{ data.analytics.deliveryOrders }}</strong></article>
         <article><small>En sitio</small><strong>{{ data.analytics.onSiteOrders }}</strong></article>
         <article><small>Compras pagadas</small><strong>{{ data.analytics.paidOrders }}</strong></article>
+        <article><small>Cancelaciones</small><strong>{{ data.analytics.cancelledOrders }}</strong></article>
+        <article><small>Tasa de cancelación</small><strong>{{ cancellationRate(data.analytics) }}%</strong></article>
         <article><small>Total comprado</small><strong>{{ money(data.analytics.totalSpent) }}</strong></article>
         <article><small>Promedio por compra</small><strong>{{ money(data.analytics.averageOrderValue) }}</strong></article>
         <article><small>Frecuencia</small><strong>{{ purchaseFrequency(data.analytics.averageDaysBetweenPurchases) }}</strong></article>
         <article><small>Última compra</small><strong>{{ data.analytics.lastOrderAt ? (data.analytics.lastOrderAt | date: "d MMM yyyy" : "" : "es-CO") : "—" }}</strong></article>
       </div>
 
-      @if (data.analytics.totalOrders === 0) {
+      @if (data.analytics.totalOrders + data.analytics.cancelledOrders === 0) {
         <div class="customer-first-visit"><i class="pi pi-sparkles"></i><span><strong>Primera visita</strong><small>Aún no hay pedidos anteriores. Es una buena oportunidad para darle la bienvenida.</small></span></div>
       }
 
       <div class="items-heading"><div><span class="eyebrow">HISTORIAL</span><strong>Compras recientes</strong></div></div>
       @if (data.history.data.length) {
         <div class="table-scroll"><table class="inventory-table">
-          <thead><tr><th>PEDIDO</th><th>FECHA</th><th>ARTÍCULOS</th><th>TOTAL</th></tr></thead>
+          <thead><tr><th>PEDIDO</th><th>FECHA</th><th>ESTADO</th><th>ARTÍCULOS</th><th>TOTAL</th></tr></thead>
           <tbody>@for (sale of data.history.data; track sale.id) {
             <tr>
               <td data-label="Pedido"><strong>#{{ sale.id }}</strong></td>
               <td data-label="Fecha">{{ sale.date | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</td>
+              <td data-label="Estado"><span class="status-pill" [class.status-pill--off]="sale.status === 'void'">{{ sale.status === "void" ? "Cancelada" : "Completada" }}</span>@if (sale.status === "void" && sale.voidNote) { <small class="table-subtext">{{ sale.voidNote }}</small> }</td>
               <td data-label="Artículos">{{ sale.items.length }} {{ sale.items.length === 1 ? "producto" : "productos" }}</td>
               <td data-label="Total"><strong>{{ money(sale.total) }}</strong></td>
             </tr>

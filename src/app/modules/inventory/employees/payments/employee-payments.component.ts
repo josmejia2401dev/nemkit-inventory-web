@@ -61,7 +61,7 @@ export class EmployeePaymentsComponent {
       next: (response: PageResult<InventoryEmployeePayment>) => {
         this.records.set(response.data ?? []);
         this.total.set(response.pagination?.total ?? response.data.length);
-        this.inventory.get<InventoryEmployeePaymentSummary>("/employee-payments/summary", {
+        this.inventory.get<InventoryEmployeePaymentSummary>("/statistics/employees/payments", {
           employeeId: this.employeeId,
         }).subscribe({
           next: (summary) => {

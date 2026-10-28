@@ -1,11 +1,12 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { CustomerProfile, LoyaltyTier } from "../../../../core/services/inventory.service";
+import { CustomerLoyaltyGuideComponent } from "../../contacts/loyalty-guide/customer-loyalty-guide.component";
 
 @Component({
   selector: "app-customer-sale-summary",
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, CustomerLoyaltyGuideComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./customer-sale-summary.component.html",
 })

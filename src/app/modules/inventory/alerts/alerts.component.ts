@@ -45,7 +45,7 @@ export class AlertsComponent implements OnInit {
   refresh(): void {
     this.loading.set(true);
     this.page.set(1);
-    this.inventory.get<InventoryStockAlerts>("/dashboard/alerts").subscribe({
+    this.inventory.get<InventoryStockAlerts>("/statistics/dashboard/alerts").subscribe({
       next: (response) => {
         this.alerts.set(response.data);
         this.loading.set(false);

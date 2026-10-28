@@ -1,0 +1,35 @@
+<div class="dialog-backdrop employee-activity-backdrop" (click)="closed.emit()">
+  <section class="form-dialog employee-activity-dialog" role="dialog" aria-modal="true" aria-labelledby="employee-activity-title" (click)="$event.stopPropagation()">
+    <header class="dialog-heading">
+      <div><p class="eyebrow">ACTIVIDAD DEL EQUIPO</p><h2 id="employee-activity-title">{{ employeeName }}</h2><p class="dialog-subtitle">Ventas, cancelaciones y pagos registrados en el período.</p></div>
+      <button class="icon-button" type="button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+    </header>
+
+    <div class="employee-activity-filters">
+      <label class="form-field"><span>Desde</span><input type="date" [(ngModel)]="from" /></label>
+      <label class="form-field"><span>Hasta</span><input type="date" [(ngModel)]="to" /></label>
+      <button class="button button-primary" type="button" (click)="load()"><i class="pi pi-chart-bar"></i> Consultar</button>
+    </div>
+
+    @if (loading()) {
+      <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Calculando actividad…</span></div>
+    } @else if (failed()) {
+      <div class="empty-state" role="alert"><strong>No pudimos cargar la actividad</strong><p>Revisa el período y vuelve a intentarlo.</p><button class="button button-primary button-small" (click)="load()">Reintentar</button></div>
+    } @else {
+      @if (metrics(); as data) {
+      <div class="employee-activity-grid">
+        <article><small>Ventas</small><strong>{{ data.salesCount | number }}</strong><span>{{ data.unitsSold | number }} unidades</span></article>
+        <article><small>Valor vendido</small><strong>{{ money(data.revenue) }}</strong><span>Pedidos no cancelados</span></article>
+        <article><small>Por cobrar</small><strong>{{ money(data.pendingValue) }}</strong><span>Ventas aún pendientes</span></article>
+        <article><small>Recaudado en período</small><strong>{{ money(data.collectedInPeriod) }}</strong><span>{{ data.collectionsCount }} cobros registrados</span></article>
+        <article class="employee-activity-card--alert"><small>Cancelaciones</small><strong>{{ data.cancellationCount | number }}</strong><span>{{ money(data.cancelledValue) }} en pedidos cancelados</span></article>
+        <article><small>Utilidad bruta estimada</small><strong>{{ money(data.grossProfit) }}</strong><span>Según costo registrado</span></article>
+        <article class="employee-activity-card--paid"><small>Pagado al empleado</small><strong>{{ money(data.paymentsMade) }}</strong><span>{{ data.paymentCount }} pagos registrados en el período</span></article>
+      </div>
+      <p class="employee-activity-note"><i class="pi pi-info-circle"></i> Las ventas se agrupan por fecha de venta; los cobros y pagos al empleado, por fecha de registro. El valor de ventas no determina el pago del empleado.</p>
+      } @else {
+      <div class="empty-state"><span class="empty-icon"><i class="pi pi-chart-line"></i></span><strong>Sin actividad en este período</strong><p>Prueba con otras fechas para consultar el historial del empleado.</p></div>
+      }
+    }
+  </section>
+</div>

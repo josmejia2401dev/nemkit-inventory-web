@@ -6,6 +6,22 @@
   border-radius: 17px;
 }
 
+.delivery-payment-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 8px 0 0;
+  color: #687a6d;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.delivery-payment-note i {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #568369;
+}
+
 .delivery-status-tabs button {
   min-height: 38px;
   transition: color 150ms ease, background 150ms ease, border-color 150ms ease;

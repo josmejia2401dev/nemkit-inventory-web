@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import {
   CustomerProfile,
   InventoryContact,
+  InventoryLoyaltyRule,
   LoyaltyTier,
   InventoryService,
 } from "../../../core/services/inventory.service";
@@ -11,13 +12,14 @@ import { NotificationService } from "../../../core/services/notification.service
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { CustomerLoyaltyGuideComponent } from "./loyalty-guide/customer-loyalty-guide.component";
 
 export type ContactKind = "suppliers" | "customers";
 
 @Component({
   selector: "app-inventory-contacts",
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, CustomerLoyaltyGuideComponent],
   templateUrl: "./contact-directory.component.html",
   styleUrls: ["./contact-directory.component.css"],
 })
@@ -44,6 +46,7 @@ export class ContactDirectoryComponent implements OnInit {
   lookupTerm = "";
   lookupLoading = signal(false);
   profile = signal<CustomerProfile | null>(null);
+  loyaltyRules = signal<InventoryLoyaltyRule[]>([]);
   profileOpen = signal(false);
   profilePage = signal(1);
   readonly profilePageSize = DEFAULT_PAGE_SIZE;
@@ -69,6 +72,13 @@ export class ContactDirectoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    if (!this.isSupplier) this.loadLoyaltyRules();
+  }
+
+  private loadLoyaltyRules(): void {
+    this.inventory.get<InventoryLoyaltyRule[]>("/statistics/customers/loyalty-rules").subscribe({
+      next: (response) => this.loyaltyRules.set(response.data ?? []),
+    });
   }
 
   load(): void {
@@ -209,7 +219,7 @@ export class ContactDirectoryComponent implements OnInit {
   }
 
   private loadCustomerProfile(customerId: number, page: number): void {
-    this.inventory.get<CustomerProfile>(`/customers/${customerId}/profile`, {
+    this.inventory.get<CustomerProfile>(`/statistics/customers/${customerId}/profile`, {
       page,
       limit: this.profilePageSize,
     }).subscribe({
@@ -241,6 +251,11 @@ export class ContactDirectoryComponent implements OnInit {
     if (days < 14) return "Cada semana";
     if (days < 45) return "Cada mes";
     return `Cada ${Math.round(days)} días`;
+  }
+
+  cancellationRate(analytics: CustomerProfile["analytics"]): number {
+    const total = analytics.totalOrders + analytics.cancelledOrders;
+    return total ? Math.round((analytics.cancelledOrders / total) * 100) : 0;
   }
 
   money(value?: number): string {

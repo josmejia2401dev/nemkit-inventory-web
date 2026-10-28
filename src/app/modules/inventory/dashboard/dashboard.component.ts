@@ -30,7 +30,7 @@ export class DashboardComponent implements OnInit {
 
   refresh(): void {
     this.loading.set(true);
-    this.inventory.get<InventoryDashboardSummary>("/dashboard/summary").subscribe({
+    this.inventory.get<InventoryDashboardSummary>("/statistics/dashboard/summary").subscribe({
       next: (response) => {
         this.summary.set(response.data);
         this.loading.set(false);

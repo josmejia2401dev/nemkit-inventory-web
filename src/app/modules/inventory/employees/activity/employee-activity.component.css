@@ -1,0 +1,125 @@
+.employee-activity-backdrop {
+  z-index: 1000;
+}
+
+.employee-activity-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(100%, 820px);
+  max-height: min(92dvh, 900px);
+  overflow: auto;
+  padding: clamp(18px, 3vw, 30px);
+}
+
+.employee-activity-dialog .dialog-heading {
+  margin: 0;
+}
+
+.employee-activity-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(36, 65, 52, 0.08);
+  border-radius: 14px;
+  background: #f8faf7;
+}
+
+.employee-activity-filters .button {
+  min-height: 42px;
+}
+
+.employee-activity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.employee-activity-grid article {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  padding: 16px;
+  border: 1px solid rgba(36, 65, 52, 0.08);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.employee-activity-grid small {
+  color: #718177;
+  font-size: 12px;
+}
+
+.employee-activity-grid strong {
+  overflow-wrap: anywhere;
+  color: #203d30;
+  font-size: clamp(17px, 2vw, 22px);
+}
+
+.employee-activity-grid span {
+  color: #849188;
+  font-size: 11px;
+}
+
+.employee-activity-grid .employee-activity-card--alert {
+  border-color: #f1dfca;
+  background: #fffaf4;
+}
+
+.employee-activity-grid .employee-activity-card--alert strong {
+  color: #9b5f2d;
+}
+
+.employee-activity-grid .employee-activity-card--paid {
+  border-color: #dcebe1;
+  background: #f5faf6;
+}
+
+.employee-activity-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: #748278;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.employee-activity-note i {
+  margin-top: 2px;
+  color: #5a8069;
+}
+
+@media (max-width: 680px) {
+  .employee-activity-dialog {
+    width: 100%;
+    max-height: calc(100dvh - env(safe-area-inset-top));
+    padding: 16px;
+  }
+
+  .employee-activity-filters {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px;
+  }
+
+  .employee-activity-filters .button {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .employee-activity-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .employee-activity-grid article {
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .employee-activity-grid strong {
+    font-size: 16px;
+  }
+}

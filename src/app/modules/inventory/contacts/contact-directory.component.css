@@ -46,6 +46,27 @@
   transform: scale(0.96);
 }
 
+.customer-list-insights {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.customer-list-insights .loyalty-badge {
+  padding: 3px 7px;
+  font-size: 9px;
+}
+
+.customer-list-insights .loyalty-badge i {
+  font-size: 8px;
+}
+
+.customer-list-insights small {
+  color: #7a897f;
+  font-size: 10px;
+}
+
 .contact-dialog {
   width: min(100%, 600px);
 }

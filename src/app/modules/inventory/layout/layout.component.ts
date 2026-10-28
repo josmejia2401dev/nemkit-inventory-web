@@ -51,7 +51,7 @@ export class LayoutComponent implements OnInit {
   }
 
   private refreshAlertCount(): void {
-    this.inventory.get<InventoryStockAlerts>("/dashboard/alerts").subscribe({
+    this.inventory.get<InventoryStockAlerts>("/statistics/dashboard/alerts").subscribe({
       next: (response) => this.alertCount.set(response.data.outOfStock + response.data.lowStock),
       error: () => this.alertCount.set(0),
     });

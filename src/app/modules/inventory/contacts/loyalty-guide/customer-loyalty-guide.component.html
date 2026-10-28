@@ -1,0 +1,11 @@
+<details class="loyalty-guide" [open]="expanded">
+  <summary>Niveles de compra y fidelidad</summary>
+  <div class="loyalty-guide-content">
+    <p>Se asigna el nivel más alto que cumpla por total gastado o cantidad de compras pagadas. Las ventas anuladas no cuentan.</p>
+    <ul>
+      @for (rule of displayRules; track rule.tier) {
+        <li><span class="loyalty-guide-tier loyalty-guide-tier--{{ rule.tier }}">{{ tierLabels[rule.tier] }}</span><span>{{ threshold(rule) }}</span></li>
+      }
+    </ul>
+  </div>
+</details>
