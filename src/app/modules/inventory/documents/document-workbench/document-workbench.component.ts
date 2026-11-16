@@ -264,43 +264,44 @@ export class DocumentWorkbenchComponent implements OnInit {
 
     if (!this.dialogOpen()) this.openCreate();
 
-    this.productBarcode.lookup(value).subscribe({
-      next: (product) => {
-        if (!product) {
-          this.offerQuickCreate(value);
-          return;
-        }
-
-        if (!this.productBarcode.isActive(product)) {
-          this.notifications.warn(
-            "Producto inactivo",
-            `"${product.name}" está inactivo. Actívalo en el catálogo para usarlo.`,
+    this.productBarcode
+      .resolveForScan(value, this.isSale ? "sale" : "purchase")
+      .subscribe({
+        next: (outcome) => {
+          switch (outcome.status) {
+            case "found":
+              this.addScannedProduct(outcome.product);
+              break;
+            case "not-found":
+              this.offerQuickCreate(outcome.code);
+              break;
+            case "inactive":
+              this.notifications.warn(
+                "Producto inactivo",
+                `"${outcome.product.name}" está inactivo. Actívalo en el catálogo para usarlo.`,
+              );
+              break;
+            case "not-sellable":
+              this.notifications.warn(
+                "Producto no disponible",
+                `"${outcome.product.name}" es un insumo y no se vende suelto.`,
+              );
+              break;
+            case "not-purchasable":
+              this.notifications.warn(
+                "Producto no disponible",
+                `"${outcome.product.name}" es un plato y no se compra.`,
+              );
+              break;
+          }
+        },
+        error: () => {
+          this.notifications.error(
+            "No se pudo buscar el código",
+            "Revisa tu conexión e intenta de nuevo.",
           );
-          return;
-        }
-
-        const allowed = this.isSale
-          ? this.productBarcode.isSellable(product)
-          : this.productBarcode.isPurchasable(product);
-        if (!allowed) {
-          this.notifications.warn(
-            "Producto no disponible",
-            this.isSale
-              ? `"${product.name}" es un insumo y no se vende suelto.`
-              : `"${product.name}" es un plato y no se compra.`,
-          );
-          return;
-        }
-
-        this.addScannedProduct(product);
-      },
-      error: () => {
-        this.notifications.error(
-          "No se pudo buscar el código",
-          "Revisa tu conexión e intenta de nuevo.",
-        );
-      },
-    });
+        },
+      });
   }
 
   private offerQuickCreate(barcode: string): void {

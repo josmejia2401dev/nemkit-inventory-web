@@ -117,27 +117,28 @@ export class MovementsComponent implements OnInit {
 
     if (!this.dialogOpen()) this.openCreate();
 
-    this.productBarcode.lookup(value).subscribe({
-      next: (product) => {
-        if (!product) {
-          this.offerQuickCreate(value);
-          return;
+    this.productBarcode.resolveForScan(value, "purchase").subscribe({
+      next: (outcome) => {
+        switch (outcome.status) {
+          case "found":
+            this.addScannedProduct(outcome.product);
+            break;
+          case "not-found":
+            this.offerQuickCreate(outcome.code);
+            break;
+          case "inactive":
+            this.notifications.warn(
+              "Producto inactivo",
+              `"${outcome.product.name}" está inactivo. Actívalo en el catálogo para usarlo.`,
+            );
+            break;
+          case "not-purchasable":
+            this.notifications.warn(
+              "Producto no disponible",
+              `"${outcome.product.name}" es un plato preparado; registra su receta como insumos.`,
+            );
+            break;
         }
-        if (!this.productBarcode.isActive(product)) {
-          this.notifications.warn(
-            "Producto inactivo",
-            `"${product.name}" está inactivo. Actívalo en el catálogo para usarlo.`,
-          );
-          return;
-        }
-        if (!this.productBarcode.isPurchasable(product)) {
-          this.notifications.warn(
-            "Producto no disponible",
-            `"${product.name}" es un plato preparado; registra su receta como insumos.`,
-          );
-          return;
-        }
-        this.addScannedProduct(product);
       },
       error: () => {
         this.notifications.error(

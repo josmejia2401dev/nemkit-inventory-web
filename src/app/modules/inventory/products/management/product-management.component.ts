@@ -196,14 +196,13 @@ export class ProductManagementComponent implements OnInit {
 
     if (this.dialogOpen()) {
       this.form.barcode = value;
-      this.productBarcode.lookup(value).subscribe({
-        next: (product) => {
-          if (product) {
-            this.notifications.warn(
-              "Código ya registrado",
-              `"${value}" pertenece a ${product.name}.`,
-            );
-          }
+      this.productBarcode.resolveForScan(value, "catalog").subscribe({
+        next: (outcome) => {
+          if (outcome.status !== "found") return;
+          this.notifications.warn(
+            "Código ya registrado",
+            `"${value}" pertenece a ${outcome.product.name}.`,
+          );
         },
         error: () => undefined,
       });
@@ -216,9 +215,9 @@ export class ProductManagementComponent implements OnInit {
     this.loadProducts();
 
     // Si el código no existe, el listado ofrece crearlo sin salir de aquí.
-    this.productBarcode.lookup(value).subscribe({
-      next: (product) => {
-        if (!product) this.offerQuickCreate(value);
+    this.productBarcode.resolveForScan(value, "catalog").subscribe({
+      next: (outcome) => {
+        if (outcome.status === "not-found") this.offerQuickCreate(outcome.code);
       },
       error: () => undefined,
     });
