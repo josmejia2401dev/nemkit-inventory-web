@@ -54,7 +54,7 @@
 }
 
 <section class="panel catalog-panel">
-  <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i [class]="isSale ? 'pi pi-chart-line' : 'pi pi-box'"></i></span><strong>Historial de {{ title.toLowerCase() }}</strong><span class="filter-count">{{ documents().length }}</span></div><button class="icon-button filter-refresh" title="Actualizar" (click)="load()"><i class="pi pi-refresh"></i></button></div>
+  <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i [class]="isSale ? 'pi pi-chart-line' : 'pi pi-box'"></i></span><strong>Historial de {{ title.toLowerCase() }}</strong><span class="filter-count">{{ documents().length }}</span></div><app-barcode-scan-tools [cameraLabel]="'Escanear producto para una nueva ' + singular" cameraText="Cámara" (scanned)="applyBarcode($event)" /><button class="icon-button filter-refresh" title="Actualizar" (click)="load()"><i class="pi pi-refresh"></i></button></div>
   @if (loading()) {
     <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando {{ title.toLowerCase() }}…</span></div>
   } @else if (documents().length) {
@@ -241,6 +241,11 @@
         <div class="product-picker-search transaction-product-search">
           <input [(ngModel)]="productSearch" name="productSearch" (keyup.enter)="searchProducts()" maxlength="100" placeholder="Buscar por nombre, SKU o código" aria-label="Buscar productos" />
           <button type="button" class="button button-secondary button-small" (click)="searchProducts()"><i class="pi pi-search"></i> Buscar</button>
+          <app-barcode-scan-tools
+            cameraLabel="Escanear producto con la cámara"
+            cameraText="Cámara"
+            (scanned)="applyBarcode($event)"
+          />
         </div>
         <div class="transaction-items">
           @for (item of items; track $index) {
@@ -303,5 +308,14 @@
     [title]="'Cancelar pedido #' + (document.id || document._id)"
     (confirm)="confirmCancel($event)"
     (cancel)="cancellingDocument.set(null)"
+  />
+}
+
+@if (quickCreateBarcode(); as barcode) {
+  <app-product-quick-create-dialog
+    [barcode]="barcode"
+    [contextLabel]="isSale ? 'venta' : 'compra'"
+    (created)="onProductCreated($event)"
+    (cancelled)="quickCreateBarcode.set(null)"
   />
 }

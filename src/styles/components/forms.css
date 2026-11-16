@@ -1,0 +1,27 @@
+/* ═══════════════════════════════════════════════════
+   Page header
+   ═══════════════════════════════════════════════════ */
+
+.deploy-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.deploy-page-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--deploy-text);
+  letter-spacing: -0.02em;
+}
+
+/* ═══════════════════════════════════════════════════
+   Form validation
+   ═══════════════════════════════════════════════════ */
+
+.ng-invalid-border,
+input.p-inputtext.ng-touched.ng-invalid {
+  border-color: var(--deploy-error) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}

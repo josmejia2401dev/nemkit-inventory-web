@@ -1,0 +1,91 @@
+:host {
+  display: block;
+}
+
+.barcode-discovery {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 42px 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--deploy-primary-50, #e9f2ed);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f3f8f4, #edf5ef);
+  box-shadow: var(--deploy-shadow-sm, 0 4px 18px rgba(31, 57, 45, .045));
+}
+
+.barcode-discovery__icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #276650;
+  color: #fff;
+  font-size: 15px;
+}
+
+.barcode-discovery__copy {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.barcode-discovery__copy strong {
+  color: #1b3028;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -.2px;
+}
+
+.barcode-discovery__copy span {
+  color: #68756e;
+  font-size: 11px;
+}
+
+.barcode-discovery__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.barcode-discovery__dismiss {
+  color: #68756e;
+}
+
+@media (max-width: 900px) {
+  .barcode-discovery {
+    margin: 0 16px 4px;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .barcode-discovery__copy span,
+  .barcode-discovery__actions .button-secondary {
+    display: none;
+  }
+
+  .barcode-discovery__copy strong {
+    font-size: 12px;
+  }
+
+  .barcode-discovery__actions .button-small {
+    min-height: 32px;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  .barcode-discovery {
+    flex-wrap: nowrap;
+  }
+
+  .barcode-discovery__actions .button-primary {
+    display: none;
+  }
+}

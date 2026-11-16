@@ -1,0 +1,75 @@
+<div class="dialog-backdrop" (click)="cancel()">
+  <section
+    class="form-dialog product-quick-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="product-quick-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="dialog-heading">
+      <div>
+        <p class="eyebrow">CÓDIGO NO REGISTRADO</p>
+        <h2 id="product-quick-title">Crear producto</h2>
+        <p class="dialog-subtitle">
+          El código <strong>{{ barcode() }}</strong> no existe. Créalo sin salir de este {{ contextLabel() }}.
+        </p>
+      </div>
+      <button type="button" class="icon-button" (click)="cancel()" aria-label="Cerrar">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <form class="dialog-form" (ngSubmit)="save()">
+      <div class="form-grid">
+        <label class="form-field form-field--wide">
+          <span>Código de barras</span>
+          <input [ngModel]="barcode()" name="barcode" readonly />
+        </label>
+        <label class="form-field form-field--wide">
+          <span>Nombre del producto <b>*</b></span>
+          <input [(ngModel)]="form.name" name="name" maxlength="100" required autocomplete="off" />
+        </label>
+        <label class="form-field">
+          <span>SKU <b>*</b></span>
+          <input [(ngModel)]="form.sku" name="sku" maxlength="64" required autocomplete="off" />
+        </label>
+        <label class="form-field">
+          <span>Categoría <b>*</b></span>
+          <select [(ngModel)]="form.categoryId" name="categoryId" required>
+            <option value="">Selecciona una categoría</option>
+            @for (category of categories(); track category.id || category._id) {
+              <option [ngValue]="category.id || category._id">{{ category.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Precio de venta <b>*</b></span>
+          <input type="number" min="0" step="0.01" [(ngModel)]="form.salePrice" name="salePrice" required />
+        </label>
+        <label class="form-field">
+          <span>Precio de compra</span>
+          <input type="number" min="0" step="0.01" [(ngModel)]="form.purchasePrice" name="purchasePrice" />
+        </label>
+      </div>
+
+      @if (error(); as message) {
+        <p class="product-quick-error" role="alert">
+          <i class="pi pi-exclamation-circle"></i>{{ message }}
+        </p>
+      }
+
+      <p class="product-quick-note">
+        <i class="pi pi-info-circle"></i>
+        El producto se crea con stock 0 y queda disponible para este {{ contextLabel() }}.
+      </p>
+
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" (click)="cancel()">Cancelar</button>
+        <button type="submit" class="button button-primary" [disabled]="saving()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>
+          {{ saving() ? "Creando…" : "Crear y agregar" }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

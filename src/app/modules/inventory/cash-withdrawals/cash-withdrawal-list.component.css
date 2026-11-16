@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.filter-bar {
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.filter-bar .form-field {
+  min-width: 150px;
+  flex: 0 1 170px;
+}
+
+.row-actions {
+  width: 1%;
+  white-space: nowrap;
+  justify-content: flex-end;
+}
+
+.dialog-form .table-footer-note {
+  padding: 10px 0 0;
+}

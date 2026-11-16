@@ -1,0 +1,25 @@
+<div class="barcode-scan-tools">
+  <button
+    type="button"
+    class="barcode-scan-tools__gun barcode-scan-tools__gun--{{ state() }}"
+    [title]="statusTitle()"
+    [attr.aria-label]="statusTitle()"
+    (click)="openConfig()"
+  >
+    <i class="pi pi-barcode" aria-hidden="true"></i>
+    <span class="barcode-scan-tools__copy">
+      <strong>Pistola</strong>
+      @if (showStatusText()) {
+        <small>{{ statusLabel() }}</small>
+      }
+    </span>
+    <span class="barcode-scan-tools__dot" aria-hidden="true"></span>
+  </button>
+
+  <app-barcode-camera-bar
+    [label]="cameraLabel()"
+    [text]="cameraText()"
+    [withLabel]="true"
+    (scanned)="scanned.emit($event)"
+  />
+</div>

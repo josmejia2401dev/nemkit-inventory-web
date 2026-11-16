@@ -1,7 +1,54 @@
+import { ApiEndpointConfig } from "../app/core/http/backend-endpoint.policy";
+
+/**
+ * Servidor de casa expuesto por Tailscale Funnel.
+ * Mientras esté vacío, la app usa solo Render y el failover queda inactivo:
+ * así nunca se prueba un host inexistente en producción. Configúralo en el
+ * despliegue con el dominio real, por ejemplo:
+ *   "https://nemkit-casa.tailXXXX.ts.net"
+ */
+const HOME_API_ORIGIN = "";
+
+const RENDER_ORIGIN = "https://nemkit-inventory-api.onrender.com";
+
+const homeEndpoints: ApiEndpointConfig[] = HOME_API_ORIGIN
+  ? [
+      {
+        name: "casa",
+        baseUrl: `${HOME_API_ORIGIN}/api/v1`,
+        readyUrl: `${HOME_API_ORIGIN}/ready`,
+        priority: 1,
+      },
+    ]
+  : [];
+
+const apiEndpoints: ApiEndpointConfig[] = [
+  ...homeEndpoints,
+  {
+    name: "render",
+    baseUrl: `${RENDER_ORIGIN}/api/v1`,
+    readyUrl: `${RENDER_ORIGIN}/ready`,
+    // Si hay servidor de casa es el respaldo; si no, es el único nodo.
+    priority: homeEndpoints.length ? 2 : 1,
+  },
+];
+
 export const environment = {
   production: true,
-  apiUrl: 'https://nemkit-inventory-api.onrender.com/api/v1',
-  healthUrl: 'https://nemkit-inventory-api.onrender.com/health',
-  appName: 'Nemkit Inventory',
+  apiEndpoints,
+  /** Corte corto del primario: red local o Tailscale. */
+  probeTimeoutMs: 2_500,
+  /** Render free duerme; su primer request puede tardar ~90 s. */
+  coldStartTimeoutMs: 90_000,
+  /** Cada 30 s se revisa el primario (2 probes sanos ⇒ vuelve en ≤ 60 s). */
+  primaryRecheckMs: 30_000,
+  appName: "Nemkit Inventory",
   tokenRefreshThresholdMs: 2 * 60 * 1000,
+
+  /** @deprecated usar `apiEndpoints`. */
+  get apiUrl(): string {
+    return apiEndpoints[0].baseUrl;
+  },
+  /** @deprecated usar `apiEndpoints`. */
+  healthUrl: `${RENDER_ORIGIN}/health`,
 };

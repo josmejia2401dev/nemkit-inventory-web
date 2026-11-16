@@ -1,6 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { RouterLink } from "@angular/router";
 import * as XLSX from "xlsx";
 import {
   InventoryProduct,
@@ -13,9 +14,10 @@ import {
   PageResult,
 } from "../../../core/services/inventory.service";
 import { formatCurrency } from "../../../shared/utils/currency.util";
+import { CashFlowReport, CashWithdrawalsService } from "../../../core/services/cash-withdrawals.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
-type ReportKind = "inventory" | "movements" | "sales" | "employees" | "cancellations";
+type ReportKind = "inventory" | "movements" | "sales" | "employees" | "cancellations" | "cashflow";
 interface InventoryReport {
   generatedAt: string;
   totals: { productCount: number; units: number; inventoryCost: number; potentialSales: number };
@@ -35,13 +37,14 @@ const MOVEMENT_LABELS: Record<string, string> = {
 @Component({
   selector: "app-inventory-reports",
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PaginationComponent],
   templateUrl: "./reports.component.html",
   styleUrl: "./reports.component.css",
 })
 export class ReportsComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
   private inventory = inject(InventoryService);
+  private cashWithdrawals = inject(CashWithdrawalsService);
 
   kind: ReportKind = "inventory";
   loading = signal(false);
@@ -50,6 +53,8 @@ export class ReportsComponent implements OnInit {
   salesReport = signal<InventorySalesReport | null>(null);
   employeesReport = signal<InventorySalesByEmployeeReport | null>(null);
   cancellationsReport = signal<InventoryCancelledSalesReport | null>(null);
+  cashFlowReport = signal<CashFlowReport | null>(null);
+  cashFlowError = signal(false);
   products = signal<InventoryProduct[]>([]);
   page = signal(1);
   pageCount = signal(1);
@@ -97,6 +102,7 @@ export class ReportsComponent implements OnInit {
     this.salesPage.set(1);
     this.employeesPage.set(1);
     this.cancellationsReport.set(null);
+    this.cashFlowReport.set(null);
     this.load();
   }
 
@@ -242,6 +248,21 @@ export class ReportsComponent implements OnInit {
         },
         error: () => {
           this.cancellationError.set(true);
+          this.loading.set(false);
+        },
+      });
+      return;
+    }
+
+    if (this.kind === "cashflow") {
+      this.cashFlowError.set(false);
+      this.cashWithdrawals.cashFlow(this.from, this.to).subscribe({
+        next: (response) => {
+          this.cashFlowReport.set(response.data);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.cashFlowError.set(true);
           this.loading.set(false);
         },
       });

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, Input, OnInit, signal } from "@angular/core";
+import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import {
   CustomerProfile,
@@ -10,8 +10,13 @@ import {
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
+import { LimitsService } from "../../../core/services/limits.service";
+import { BarcodeDispatcherService } from "../../../core/barcode/barcode-dispatcher.service";
+import { BarcodeScan } from "../../../core/barcode/barcode.types";
+import { BarcodeScanToolsComponent } from "../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
 import { formatCurrency } from "../../../shared/utils/currency.util";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { PlanLimitBannerComponent } from "../../../shared/components/plan-limit-banner/plan-limit-banner.component";
 import { CustomerLoyaltyGuideComponent } from "./loyalty-guide/customer-loyalty-guide.component";
 
 export type ContactKind = "suppliers" | "customers";
@@ -19,7 +24,7 @@ export type ContactKind = "suppliers" | "customers";
 @Component({
   selector: "app-inventory-contacts",
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent, CustomerLoyaltyGuideComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, PlanLimitBannerComponent, CustomerLoyaltyGuideComponent, BarcodeScanToolsComponent],
   templateUrl: "./contact-directory.component.html",
   styleUrls: ["./contact-directory.component.css"],
 })
@@ -28,6 +33,9 @@ export class ContactDirectoryComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
+  private barcodeDispatcher = inject(BarcodeDispatcherService);
+  private destroyRef = inject(DestroyRef);
+  readonly limits = inject(LimitsService);
 
   @Input({ required: true }) kind!: ContactKind;
   contacts = signal<InventoryContact[]>([]);
@@ -71,8 +79,33 @@ export class ContactDirectoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.limits.load().subscribe({ error: () => undefined });
+    const unregister = this.barcodeDispatcher.register((scan) => this.onBarcodeScan(scan));
+    this.destroyRef.onDestroy(unregister);
     this.load();
     if (!this.isSupplier) this.loadLoyaltyRules();
+  }
+
+  private onBarcodeScan(scan: BarcodeScan): void {
+    this.applyScannedTerm(scan.code);
+  }
+
+  /**
+   * En clientes el código escaneado se usa como celular/documento. En
+   * proveedores se usa como término de búsqueda del listado.
+   */
+  applyScannedTerm(code: string): void {
+    const value = code.trim();
+    if (!value) return;
+
+    if (this.isSupplier) {
+      this.search = value;
+      this.applySearch();
+      return;
+    }
+
+    this.lookupTerm = value;
+    this.lookup();
   }
 
   private loadLoyaltyRules(): void {
@@ -120,6 +153,10 @@ export class ContactDirectoryComponent implements OnInit {
   }
 
   openCreate(): void {
+    if (!this.limits.canCreate("contacts")) {
+      this.notifications.warn("Límite del plan alcanzado", "No puedes crear más clientes ni proveedores con tu plan actual.");
+      return;
+    }
     this.editingId = null;
     this.form = this.emptyForm();
     this.dialogOpen.set(true);
@@ -150,6 +187,7 @@ export class ContactDirectoryComponent implements OnInit {
       address: this.form.address.trim(),
     };
     this.saving.set(true);
+    const isCreate = !this.editingId;
     const request = this.editingId
       ? this.inventory.put<InventoryContact>(`/${this.kind}/${this.editingId}`, body)
       : this.inventory.post<InventoryContact>(`/${this.kind}`, body);
@@ -159,6 +197,7 @@ export class ContactDirectoryComponent implements OnInit {
         this.dialogOpen.set(false);
         this.notifications.success(this.editingId ? "Registro actualizado" : "Registro creado");
         this.load();
+        if (isCreate) this.limits.load(true).subscribe({ error: () => undefined });
       },
       error: () => this.saving.set(false),
     });
@@ -179,6 +218,7 @@ export class ContactDirectoryComponent implements OnInit {
       next: () => {
         this.notifications.success("Registro eliminado");
         this.load();
+        this.limits.load(true).subscribe({ error: () => undefined });
       },
     });
   }

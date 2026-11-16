@@ -15,6 +15,7 @@ export class AdminShellComponent {
     { path: "/admin/dashboard", label: "Resumen", icon: "pi pi-chart-pie" },
     { path: "/admin/alerts", label: "Alertas", icon: "pi pi-bell" },
     { path: "/admin/reports", label: "Reportes", icon: "pi pi-chart-bar" },
+    { path: "/admin/cash-withdrawals", label: "Retiros", icon: "pi pi-wallet" },
     { path: "/admin/products", label: "Productos", icon: "pi pi-box" },
     { path: "/admin/purchases", label: "Compras", icon: "pi pi-truck" },
     { path: "/admin/sales", label: "Ventas", icon: "pi pi-receipt" },

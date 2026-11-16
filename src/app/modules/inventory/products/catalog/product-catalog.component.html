@@ -20,7 +20,12 @@
     [hasProductFocus]="!!specificProductId"
     (clearProductFocus)="clearProductFocus()"
     (apply)="applyFilters()"
-  />
+  >
+    <app-barcode-scan-tools
+      cameraLabel="Escanear producto con la cámara"
+      (scanned)="applyBarcode($event)"
+    />
+  </app-product-filter-bar>
 
   @if (loading()) {
     <div class="loading-panel" role="status" aria-live="polite">

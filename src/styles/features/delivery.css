@@ -1,0 +1,36 @@
+/* Domicilios */
+.delivery-board-panel { padding: 18px; }
+.delivery-status-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.delivery-status-tabs button { padding: 7px 14px; border: 1px solid rgba(36,65,52,.12); background: #fafbf8; border-radius: 99px; font-size: 12px; font-weight: 600; color: #64756a; cursor: pointer; }
+.delivery-status-tab--active { background: #244134 !important; color: #fff !important; border-color: #244134 !important; }
+.delivery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.delivery-card { display: flex; flex-direction: column; border: 1px solid rgba(36,65,52,.1); border-radius: 14px; background: #fff; overflow: hidden; }
+.delivery-card-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid rgba(36,65,52,.07); }
+.delivery-card-head small { display: block; color: #a0aaa3; font-size: 10px; }
+.delivery-card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #4c6554; }
+.delivery-card-body i { color: #66886c; margin-right: 4px; }
+.delivery-address { color: #64756a; }
+.delivery-meta { display: flex; justify-content: space-between; align-items: center; }
+.delivery-courier { color: #78897e; }
+.delivery-card-actions { margin-top: auto; padding: 12px 14px; border-top: 1px solid rgba(36,65,52,.07); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.delivery-courier-select { flex: 1 1 100%; min-height: 34px; border: 1px solid rgba(36,65,52,.14); border-radius: 8px; padding: 0 8px; font-size: 12px; }
+.delivery-delivered-at { color: #a0aaa3; font-size: 10px; }
+.delivery-waiting { display: inline-flex; align-items: center; gap: 5px; color: #8a7636; font-size: 10px; font-weight: 600; }
+.delivery-draft-total { display: flex; justify-content: space-between; align-items: center; margin: 14px 0; padding-top: 12px; border-top: 1px solid rgba(36,65,52,.08); font-size: 14px; }
+.status-pill--pending { color: #8a7636; background: #f6f0dd; }
+.status-pill--preparing { color: #5b6672; background: #e7ebef; }
+.status-pill--ready { color: #2f7c52; background: #e3f1e8; }
+.status-pill--on_route { color: #2f5a86; background: #dceaf6; }
+.status-pill--delivered { color: #397453; background: #edf5ee; }
+.status-pill--cancelled { color: #a85a4a; background: #f6e6e1; }
+
+@media (max-width: 760px) {
+  .delivery-board-panel { padding: 12px; }
+  .delivery-status-tabs { flex-wrap: nowrap; margin-right: -12px; padding: 2px 12px 8px 2px; overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-width: none; }
+  .delivery-status-tabs::-webkit-scrollbar { display: none; }
+  .delivery-status-tabs button { min-height: 40px; flex: 0 0 auto; padding: 0 14px; }
+  .delivery-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .delivery-card-head, .delivery-card-body, .delivery-card-actions { padding-right: 15px; padding-left: 15px; }
+  .delivery-card-actions .button { min-height: 42px; }
+  .dashboard-extra-grid { grid-template-columns: minmax(0, 1fr); }
+}

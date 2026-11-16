@@ -28,6 +28,10 @@ export const adminRoutes: Routes = [
         path: "reports",
         loadComponent: () => import("../../inventory/reports/reports.component").then((m) => m.ReportsComponent),
       },
+      {
+        path: "cash-withdrawals",
+        loadComponent: () => import("../../inventory/cash-withdrawals/cash-withdrawal-list.component").then((m) => m.CashWithdrawalListComponent),
+      },
       productManagementRoute,
       {
         path: "categories",

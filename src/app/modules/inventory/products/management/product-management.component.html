@@ -6,10 +6,12 @@
       Una vista completa de lo que tienes y cómo se mueve.
     </p>
   </div>
-  <button class="button button-primary" (click)="openCreate()">
+  <button class="button button-primary" [disabled]="!limits.canCreate('products')" (click)="openCreate()">
     <i class="pi pi-plus"></i> Nuevo producto
   </button>
 </div>
+
+<app-plan-limit-banner label="productos" [plan]="limits.usage()?.plan?.name ?? 'Gratuito'" [limit]="limits.status('products')" />
 
 <div class="type-tabs" role="tablist" aria-label="Filtrar por tipo de producto">
   @for (tab of typeFilters; track tab.value) {
@@ -35,6 +37,11 @@
       <option value="active">Activos</option>
       <option value="inactive" [disabled]="!!stockState">Inactivos</option>
     </select>
+    <app-barcode-scan-tools
+      cameraLabel="Escanear producto con la cámara"
+      cameraText="Cámara"
+      (scanned)="applyBarcode($event)"
+    />
   </app-product-filter-bar>
 
   @if (loading()) {
@@ -72,6 +79,7 @@
       @if (!search && !categoryFilter && !statusFilter && !stockState) {
         <button
           class="button button-primary button-small"
+          [disabled]="!limits.canCreate('products')"
           (click)="openCreate()"
         >
           <i class="pi pi-plus"></i> Crear primer producto
@@ -80,6 +88,15 @@
     </div>
   }
 </section>
+
+@if (quickCreateBarcode(); as barcode) {
+  <app-product-quick-create-dialog
+    [barcode]="barcode"
+    contextLabel="catálogo"
+    (created)="onProductCreated($event)"
+    (cancelled)="quickCreateBarcode.set(null)"
+  />
+}
 
 @if (dialogOpen()) {
   <div class="dialog-backdrop" (click)="closeDialog()">
@@ -129,14 +146,19 @@
               placeholder="CAF-001"
               required
           /></label>
-          <label class="form-field"
-            ><span>Código de barras</span
-            ><input
-              [(ngModel)]="form.barcode"
-              name="barcode"
-              maxlength="64"
-              placeholder="Opcional"
-          /></label>
+          <div class="form-field">
+            <span>Código de barras</span>
+            <div class="barcode-input-row">
+              <input
+                [(ngModel)]="form.barcode"
+                name="barcode"
+                maxlength="64"
+                placeholder="Opcional"
+                aria-label="Código de barras"
+              />
+              <app-barcode-camera-bar label="Escanear código de barras" (scanned)="applyBarcode($event)" />
+            </div>
+          </div>
           <label class="form-field"
             ><span>Categoría <b>*</b></span
             ><select [(ngModel)]="form.categoryId" name="categoryId" required>

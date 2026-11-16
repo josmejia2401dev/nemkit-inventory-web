@@ -1,0 +1,50 @@
+.product-quick-dialog {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.product-quick-dialog .dialog-subtitle strong {
+  color: #32684f;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.product-quick-dialog .form-field input[readonly] {
+  color: #66866c;
+  background: #f2f6ef;
+  font-weight: 650;
+}
+
+.product-quick-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(178, 88, 69, 0.18);
+  border-radius: 9px;
+  color: #9a4c3f;
+  background: #fdf4f1;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.product-quick-error i {
+  margin-top: 1px;
+  font-size: 10px;
+}
+
+.product-quick-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  color: #94a097;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.product-quick-note i {
+  margin-top: 1px;
+  color: #6d8a74;
+  font-size: 9px;
+}

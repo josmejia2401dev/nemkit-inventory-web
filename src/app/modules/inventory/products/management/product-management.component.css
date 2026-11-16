@@ -25,6 +25,17 @@
   font-size: 12px;
 }
 
+.barcode-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.barcode-input-row input {
+  min-width: 0;
+  flex: 1;
+}
+
 .product-status-select:focus {
   border-color: #82a38b;
   outline: 0;

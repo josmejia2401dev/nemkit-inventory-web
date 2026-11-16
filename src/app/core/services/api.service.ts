@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { BackendEndpointService } from './backend-endpoint.service';
 
 export interface ApiResponse<T> { success: boolean; message: string; data: T; metadata?: any; }
 export interface PaginatedResponse<T> { success: boolean; data: T[]; pagination: any; }
@@ -9,7 +9,12 @@ export interface PaginatedResponse<T> { success: boolean; data: T[]; pagination:
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
-  private base = environment.apiUrl;
+  private endpoint = inject(BackendEndpointService);
+
+  /** Getter: cada request se construye contra el nodo activo del balanceador. */
+  private get base(): string {
+    return this.endpoint.apiUrl;
+  }
 
   get<T>(path: string, params?: Record<string, unknown>): Observable<ApiResponse<T>> {
     return this.http.get<ApiResponse<T>>(`${this.base}${path}`, { params: this.toParams(params) });

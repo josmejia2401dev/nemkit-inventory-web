@@ -1,0 +1,16 @@
+/* ═══════════════════════════════════════════════════
+   Utility classes
+   ═══════════════════════════════════════════════════ */
+
+.deploy-status-running { color: var(--deploy-success); }
+.deploy-status-stopped { color: var(--deploy-error); }
+.deploy-status-pending { color: var(--deploy-warning); }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--deploy-surface-3); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--deploy-surface-4); }
+
+/* Selection */
+::selection { background: var(--deploy-primary-glow); }

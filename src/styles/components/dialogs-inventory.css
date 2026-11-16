@@ -1,0 +1,24 @@
+.dialog-backdrop { position: fixed; z-index: 80; inset: 0; display: flex; align-items: center; justify-content: center; padding: 22px; background: rgba(20,39,30,.42); backdrop-filter: blur(4px); }
+.form-dialog { width: min(100%, 690px); max-height: min(90vh, 850px); overflow-y: auto; border: 1px solid rgba(255,255,255,.7); border-radius: 17px; background: #fff; box-shadow: 0 24px 80px rgba(16,42,28,.24); animation: dialog-in .18s ease-out; }
+.form-dialog--narrow { width: min(100%, 480px); }
+.movement-dialog { width: min(100%, 760px); }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: none; } }
+.dialog-heading { position: sticky; z-index: 2; top: 0; display: flex; align-items: center; justify-content: space-between; padding: 20px 23px 15px; border-bottom: 1px solid rgba(36,65,52,.08); background: rgba(255,255,255,.96); backdrop-filter: blur(10px); }
+.dialog-heading .eyebrow { margin-bottom: 5px; }.dialog-heading h2 { margin: 0; color: #23392e; font-size: 19px; font-weight: 650; letter-spacing: -.55px; }
+.dialog-form { padding: 18px 23px 21px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 13px; }
+.form-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; color: #617168; font-size: 9px; font-weight: 600; }
+.form-field > span:first-child b { color: #c1745b; font-weight: 650; }
+.form-field--wide { grid-column: 1 / -1; }
+.form-field input, .form-field select, .form-field textarea { width: 100%; box-sizing: border-box; color: #384f41; font-size: 10px; }
+.form-field textarea { resize: vertical; line-height: 1.55; }
+.form-field input::placeholder, .form-field textarea::placeholder { color: #b1b9b3; }
+.money-input { display: flex; align-items: center; border: 1px solid rgba(36,65,52,.12); border-radius: 8px; }
+.money-input:focus-within { border-color: #86a78f; box-shadow: 0 0 0 3px rgba(39,102,80,.07); }
+.money-input > span { padding-left: 11px; color: #8a988e; font-size: 10px; }
+.money-input input { border: 0; box-shadow: none !important; }
+.form-hint, .stock-warning { display: flex; align-items: flex-start; gap: 8px; margin: 15px 0 0; padding: 10px 12px; border-radius: 8px; color: #78897e; background: #f4f7f1; font-size: 9px; line-height: 1.5; }
+.form-hint i, .stock-warning i { margin-top: 1px; color: #66886c; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 19px; padding-top: 15px; border-top: 1px solid rgba(36,65,52,.08); }
+.dialog-actions .button { min-height: 37px; }
+.form-field--spaced { margin-top: 15px; }

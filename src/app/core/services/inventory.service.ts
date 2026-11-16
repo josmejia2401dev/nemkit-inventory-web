@@ -1,7 +1,7 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
-import { EMPTY, Observable, Subject, expand, reduce, tap } from "rxjs";
-import { environment } from "../../../environments/environment";
+import { EMPTY, Observable, Subject, expand, map, reduce, tap } from "rxjs";
+import { BackendEndpointService } from "./backend-endpoint.service";
 import { DeliveryStatus, KitchenStatus, OrderStatus } from "../../modules/inventory/order-status.constants";
 
 export type { DeliveryStatus, KitchenStatus, OrderStatus } from "../../modules/inventory/order-status.constants";
@@ -409,14 +409,20 @@ export interface PageResult<T> {
 @Injectable({ providedIn: "root" })
 export class InventoryService {
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl;
+  private endpoint = inject(BackendEndpointService);
   private inventoryChanged = new Subject<void>();
+
+  /** Getter: cada request se construye contra el nodo activo del balanceador. */
+  private get baseUrl(): string {
+    return this.endpoint.apiUrl;
+  }
 
   readonly changes = this.inventoryChanged.asObservable();
 
   get<T>(
     path: string,
     params?: Record<string, string | number | undefined>,
+    context?: HttpContext,
   ): Observable<{ success: boolean; data: T }> {
     let httpParams = new HttpParams();
     for (const [key, value] of Object.entries(params ?? {})) {
@@ -427,7 +433,7 @@ export class InventoryService {
 
     return this.http.get<{ success: boolean; data: T }>(
       `${this.baseUrl}${path}`,
-      { params: httpParams },
+      { params: httpParams, context },
     );
   }
 
@@ -442,9 +448,20 @@ export class InventoryService {
       }
     }
 
-    return this.http.get<PageResult<T>>(`${this.baseUrl}${path}`, {
-      params: httpParams,
-    });
+    // La API expone la paginación en `metadata.pagination`; el resto de la app
+    // la consume en la raíz de la respuesta.
+    type RawPageResult = PageResult<T> & {
+      metadata?: { pagination?: PageResult<T>["pagination"] };
+    };
+
+    return this.http
+      .get<RawPageResult>(`${this.baseUrl}${path}`, { params: httpParams })
+      .pipe(
+        map((response) => ({
+          ...response,
+          pagination: response.pagination ?? response.metadata?.pagination,
+        })),
+      );
   }
 
   listAll<T>(

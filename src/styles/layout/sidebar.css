@@ -1,0 +1,110 @@
+/* ═══════════════════════════════════════════════════
+   Sidebar
+   ═══════════════════════════════════════════════════ */
+
+.deploy-sidebar {
+  background: var(--deploy-surface-0);
+  border-right: 1px solid var(--deploy-border);
+}
+
+.deploy-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.25rem;
+  border-bottom: 1px solid var(--deploy-border);
+}
+
+.deploy-sidebar-brand__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6366F1, #4F46E5);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  color: white;
+  font-size: 1rem;
+}
+
+.deploy-sidebar-brand__title {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--deploy-text);
+  letter-spacing: -0.01em;
+}
+
+.deploy-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--deploy-radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--deploy-text-secondary);
+  transition: all var(--deploy-transition);
+  position: relative;
+  text-decoration: none;
+}
+
+.deploy-nav-item:hover {
+  background: var(--deploy-primary-subtle);
+  color: var(--deploy-primary);
+}
+
+.deploy-nav-item--active {
+  background: var(--deploy-primary-subtle) !important;
+  color: var(--deploy-primary) !important;
+  font-weight: 600;
+}
+
+.deploy-nav-item--active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  border-radius: 0 4px 4px 0;
+  background: var(--deploy-primary);
+}
+
+.deploy-nav-item i {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* Machine selector in sidebar */
+.deploy-machine-selector {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--deploy-border);
+}
+
+.deploy-machine-selector__label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--deploy-text-muted);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Online pulse in machine selector */
+.deploy-online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  animation: online-pulse 2s infinite;
+}
+
+@keyframes online-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
+  50% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.05); }
+}

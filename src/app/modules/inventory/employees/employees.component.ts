@@ -9,7 +9,9 @@ import {
 } from "../../../core/services/inventory.service";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
+import { LimitsService, LimitStatus } from "../../../core/services/limits.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { PlanLimitBannerComponent } from "../../../shared/components/plan-limit-banner/plan-limit-banner.component";
 import { EmployeePaymentsComponent } from "./payments/employee-payments.component";
 import { EmployeeActivityComponent } from "./activity/employee-activity.component";
 
@@ -29,7 +31,7 @@ interface EmployeeForm {
 @Component({
   selector: "app-inventory-employees",
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent, EmployeePaymentsComponent, EmployeeActivityComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, PlanLimitBannerComponent, EmployeePaymentsComponent, EmployeeActivityComponent],
   templateUrl: "./employees.component.html",
   styleUrls: ["./employees.component.css"],
 })
@@ -38,6 +40,7 @@ export class EmployeesComponent implements OnInit {
   private inventory = inject(InventoryService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
+  readonly limits = inject(LimitsService);
 
   readonly roleOptions: Array<{ value: EmployeeRole; label: string }> = [
     { value: "admin", label: "Administrador" },
@@ -79,7 +82,16 @@ export class EmployeesComponent implements OnInit {
   form: EmployeeForm = this.emptyForm();
 
   ngOnInit(): void {
+    this.limits.load().subscribe({ error: () => undefined });
     this.load();
+  }
+
+  employeeLimit(): LimitStatus | null {
+    return this.limits.status("employees");
+  }
+
+  canCreateEmployee(): boolean {
+    return this.limits.canCreate("employees");
   }
 
   roleLabel(role?: EmployeeRole): string {
@@ -129,6 +141,10 @@ export class EmployeesComponent implements OnInit {
   }
 
   openCreate(): void {
+    if (!this.canCreateEmployee()) {
+      this.notifications.warn("Límite del plan alcanzado", "No puedes crear más empleados con tu plan actual.");
+      return;
+    }
     this.editingId = null;
     this.form = this.emptyForm();
     this.dialogOpen.set(true);
@@ -202,6 +218,7 @@ export class EmployeesComponent implements OnInit {
         this.dialogOpen.set(false);
         this.notifications.success(this.editingId ? "Empleado actualizado" : "Empleado creado");
         this.load();
+        if (isCreate) this.limits.load(true).subscribe({ error: () => undefined });
       },
       error: () => this.saving.set(false),
     });
@@ -231,6 +248,7 @@ export class EmployeesComponent implements OnInit {
           deactivating ? "El empleado ya no puede iniciar sesión." : "El empleado ya puede iniciar sesión.",
         );
         this.load();
+        this.limits.load(true).subscribe({ error: () => undefined });
       },
       error: () => this.statusUpdatingId.set(null),
     });

@@ -1,0 +1,16 @@
+.category-intro { display: flex; align-items: center; gap: 13px; margin-bottom: 18px; padding: 16px 19px; border: 1px solid rgba(36,65,52,.08); border-radius: 12px; background: #eff2e9; }
+.category-intro-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 11px; color: #4c7659; background: #dfe9db; }
+.category-intro strong { color: #3f5546; font-size: 11px; }
+.category-intro p { margin: 4px 0 0; color: #89978d; font-size: 9px; }
+.category-decoration { margin-left: auto; color: #99a795; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+.category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.category-card { position: relative; display: flex; min-height: 190px; flex-direction: column; padding: 17px; overflow: hidden; border: 1px solid rgba(36,65,52,.09); border-radius: 13px; background: #fff; box-shadow: 0 4px 15px rgba(31,57,45,.035); transition: transform .17s, box-shadow .17s; }
+.category-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(31,57,45,.08); }
+.category-card::after { position: absolute; top: -44px; right: -42px; width: 105px; height: 105px; border: 1px solid rgba(67,117,82,.08); border-radius: 50%; content: ''; }
+.category-card-top { display: flex; align-items: center; justify-content: space-between; }
+.category-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 12px; font-size: 14px; }
+.category-icon--0 { color: #568162; background: #edf4ec; }.category-icon--1 { color: #a18a56; background: #f4f1e8; }.category-icon--2 { color: #777b9d; background: #eff0f6; }.category-icon--3 { color: #aa7467; background: #f8efec; }
+.category-index { color: #b6beb7; font-size: 9px; font-weight: 700; }
+.category-card h2 { margin: 14px 0 5px; color: #364c3e; font-size: 14px; font-weight: 650; }
+.category-card > p { margin: 0 0 14px; color: #919d94; font-size: 9px; line-height: 1.55; }
+.category-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(36,65,52,.07); color: #a2aca4; font-size: 8px; }

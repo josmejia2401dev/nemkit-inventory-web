@@ -92,6 +92,82 @@
           />
         }
 
+        @if (showPlanSection) {
+          <section class="panel plan-card">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">SUSCRIPCIÓN</p>
+                <h3>Plan y límites</h3>
+                <p>Uso actual de tu empresa y planes disponibles.</p>
+              </div>
+              <span class="section-mark"><i class="pi pi-chart-pie"></i></span>
+            </div>
+
+            @if (limits.usage(); as usage) {
+              <div class="plan-summary">
+                <div class="plan-summary-item">
+                  <small>Plan actual</small>
+                  <strong>{{ usage.plan.name }}</strong>
+                </div>
+                <div class="plan-summary-item">
+                  <small>Precio</small>
+                  <strong>{{ usage.plan.price === 0 ? "Gratis" : (usage.plan.price | currency: usage.plan.currency) }}</strong>
+                </div>
+                <div class="plan-summary-item">
+                  <small>Periodo</small>
+                  <strong>{{ usage.period }}</strong>
+                </div>
+              </div>
+
+              <div class="plan-usage-list">
+                @for (key of limitKeys(usage); track key) {
+                  @let status = usage.limits[key];
+                  <div class="plan-usage-row">
+                    <div class="plan-usage-head">
+                      <span>{{ limitLabel(key) }}</span>
+                      <strong>{{ status.used }}/{{ status.max }}</strong>
+                    </div>
+                    <div class="plan-usage-bar">
+                      <span
+                        [style.width.%]="usagePercent(status)"
+                        [class.plan-usage-bar--full]="status.remaining === 0"
+                      ></span>
+                    </div>
+                    <small>{{ status.period === "month" ? "Se reinicia cada mes" : "Límite total de la cuenta" }}</small>
+                  </div>
+                }
+              </div>
+
+              @if (limits.plans().length) {
+                <div class="plan-catalog">
+                  <p class="eyebrow">PLANES DISPONIBLES</p>
+                  @for (plan of limits.plans(); track plan.code) {
+                    <div
+                      class="plan-catalog-row"
+                      [class.plan-catalog-row--current]="plan.code === usage.plan.code"
+                    >
+                      <div class="plan-catalog-info">
+                        <strong>{{ plan.name }}</strong>
+                        <small>{{ catalogSummary(plan) }}</small>
+                      </div>
+                      <span class="plan-catalog-price">{{ plan.price === 0 ? "Gratis" : (plan.price | currency: plan.currency) }}</span>
+                      @if (plan.code === usage.plan.code) {
+                        <span class="plan-current-pill">Actual</span>
+                      }
+                    </div>
+                  }
+                  <p class="plan-note">
+                    <i class="pi pi-info-circle"></i>
+                    El cambio de plan estará disponible al habilitar planes de pago.
+                  </p>
+                </div>
+              }
+            } @else {
+              <p class="plan-usage-empty">No pudimos cargar el uso de tu plan.</p>
+            }
+          </section>
+        }
+
         <section class="panel security-card">
           <div class="section-heading">
             <div>

@@ -4,6 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { finalize, timeout } from "rxjs";
 import { ApiService } from "../../core/services/api.service";
 import { NotificationService } from "../../core/services/notification.service";
+import { LimitStatus, LimitUsage, LimitsService, PlanCatalogEntry } from "../../core/services/limits.service";
 import { AuthStore } from "../../core/store/auth.store";
 import { BusinessProfileChanges, BusinessProfileSectionComponent } from "./components/business-profile-section/business-profile-section.component";
 
@@ -38,6 +39,13 @@ export class ProfileComponent implements OnInit {
   private api = inject(ApiService);
   private notifications = inject(NotificationService);
   private authStore = inject(AuthStore);
+  readonly limits = inject(LimitsService);
+
+  readonly limitLabels: Record<string, string> = {
+    employees: "Empleados",
+    products: "Productos",
+    contacts: "Contactos",
+  };
 
   profile = signal<UserProfile | null>(null);
   loading = signal(true);
@@ -62,8 +70,39 @@ export class ProfileComponent implements OnInit {
     return Boolean(profile?.companyName && profile.roles.includes("ADMIN"));
   }
 
+  /** El plan es del tenant: solo lo ve el titular, no empleados ni superadmin. */
+  get showPlanSection(): boolean {
+    const roles: string[] = this.authStore.user()?.roles ?? [];
+    return this.authStore.sessionType() !== "employee" && !roles.includes("SUPERADMIN");
+  }
+
+  limitKeys(usage: LimitUsage): string[] {
+    return Object.keys(usage.limits);
+  }
+
+  limitLabel(key: string): string {
+    return this.limitLabels[key] ?? key;
+  }
+
+  usagePercent(status: LimitStatus): number {
+    return status.max > 0 ? Math.min(100, Math.round((status.used / status.max) * 100)) : 0;
+  }
+
+  catalogSummary(plan: PlanCatalogEntry): string {
+    return Object.entries(plan.limits)
+      .map(([key, config]) => `${this.limitLabel(key)}: ${config.max}${config.period === "month" ? "/mes" : ""}`)
+      .join(" · ");
+  }
+
   ngOnInit(): void {
     this.loadProfile();
+    this.loadPlan();
+  }
+
+  private loadPlan(): void {
+    if (!this.showPlanSection) return;
+    this.limits.load().subscribe({ error: () => undefined });
+    this.limits.loadPlans().subscribe({ error: () => undefined });
   }
 
   loadProfile(): void {

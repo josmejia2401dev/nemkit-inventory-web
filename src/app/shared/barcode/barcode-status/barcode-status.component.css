@@ -1,0 +1,123 @@
+:host {
+  display: inline-flex;
+}
+
+.barcode-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.barcode-scanner-trigger {
+  position: relative;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(36, 65, 52, 0.1);
+  border-radius: 10px;
+  color: #4d6557;
+  background: #fff;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+
+.barcode-scanner-trigger:hover {
+  color: #2f6b4d;
+  border-color: rgba(47, 107, 77, 0.28);
+  background: #f3f8f2;
+}
+
+.barcode-scanner-trigger:focus-visible {
+  outline: 2px solid #c9a967;
+  outline-offset: 2px;
+}
+
+.barcode-scanner-trigger i {
+  font-size: 14px;
+}
+
+.barcode-scanner-trigger--active {
+  color: #2f7a4f;
+  border-color: rgba(47, 122, 79, 0.24);
+  background: #f0f8f1;
+}
+
+.barcode-scanner-trigger--configured {
+  color: #a8731f;
+  border-color: rgba(168, 115, 31, 0.24);
+  background: #fdf6e8;
+}
+
+.barcode-scanner-trigger--off {
+  color: #9aa49d;
+  background: #f7f8f5;
+}
+
+.barcode-scanner-dot {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b8c2bb;
+  box-shadow: 0 0 0 1.5px #fff;
+}
+
+.barcode-scanner-trigger--active .barcode-scanner-dot {
+  background: #3aa564;
+}
+
+.barcode-scanner-trigger--configured .barcode-scanner-dot {
+  background: #d19a3f;
+}
+
+.barcode-scanner-trigger--off .barcode-scanner-dot {
+  background: #aab3ac;
+}
+
+/* Mismo lenguaje visual que el botón de cámara reutilizable. */
+.barcode-camera-trigger {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(36, 65, 52, 0.1);
+  border-radius: 10px;
+  color: #4d6557;
+  background: #fff;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+
+.barcode-camera-trigger:hover:not(:disabled) {
+  color: #2f6b4d;
+  border-color: rgba(47, 107, 77, 0.28);
+  background: #f3f8f2;
+}
+
+.barcode-camera-trigger:focus-visible {
+  outline: 2px solid #c9a967;
+  outline-offset: 2px;
+}
+
+.barcode-camera-trigger--unsupported {
+  color: #aab3ac;
+  cursor: not-allowed;
+  background: #f7f8f5;
+}
+
+.barcode-camera-trigger i {
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .barcode-scanner-trigger,
+  .barcode-camera-trigger {
+    width: 44px;
+    height: 44px;
+  }
+}

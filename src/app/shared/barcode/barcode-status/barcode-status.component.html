@@ -1,0 +1,24 @@
+<div class="barcode-status">
+  <button
+    type="button"
+    class="barcode-scanner-trigger barcode-scanner-trigger--{{ state() }}"
+    [title]="scannerTitle()"
+    [attr.aria-label]="scannerTitle()"
+    (click)="openConfig()"
+  >
+    <i class="pi pi-barcode" aria-hidden="true"></i>
+    <span class="barcode-scanner-dot" aria-hidden="true"></span>
+  </button>
+
+  <button
+    type="button"
+    class="icon-button barcode-camera-trigger"
+    [class.barcode-camera-trigger--unsupported]="!cameraSupported()"
+    [disabled]="!cameraSupported()"
+    [title]="cameraSupported() ? 'Escanear con la cámara' : 'Cámara no disponible en este navegador'"
+    [attr.aria-label]="cameraSupported() ? 'Escanear con la cámara' : 'Cámara no disponible en este navegador'"
+    (click)="openCamera()"
+  >
+    <i class="pi pi-camera" aria-hidden="true"></i>
+  </button>
+</div>

@@ -14,6 +14,9 @@ import {
   InventoryProduct,
 } from "../../../../core/services/inventory.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
+import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
+import { BarcodeDispatcherService } from "../../../../core/barcode/barcode-dispatcher.service";
+import { BarcodeScan } from "../../../../core/barcode/barcode.types";
 import { ProductFilterBarComponent } from "../components/product-filter-bar/product-filter-bar.component";
 import { ProductTableComponent } from "../components/product-table/product-table.component";
 import { ProductCatalogService } from "../product-catalog.service";
@@ -21,7 +24,7 @@ import { ProductCatalogService } from "../product-catalog.service";
 @Component({
   selector: "app-product-catalog",
   standalone: true,
-  imports: [CommonModule, PaginationComponent, ProductFilterBarComponent, ProductTableComponent],
+  imports: [CommonModule, PaginationComponent, ProductFilterBarComponent, ProductTableComponent, BarcodeScanToolsComponent],
   templateUrl: "./product-catalog.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +34,7 @@ export class ProductCatalogComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly barcodeDispatcher = inject(BarcodeDispatcherService);
 
   readonly products = signal<InventoryProduct[]>([]);
   readonly categories = signal<InventoryCategory[]>([]);
@@ -46,6 +50,8 @@ export class ProductCatalogComponent implements OnInit {
   specificProductId: number | "" = "";
 
   ngOnInit(): void {
+    const unregister = this.barcodeDispatcher.register((scan) => this.onBarcodeScan(scan));
+    this.destroyRef.onDestroy(unregister);
     this.loadCategories();
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -118,6 +124,30 @@ export class ProductCatalogComponent implements OnInit {
       return;
     }
     this.loadProducts();
+  }
+
+  applyBarcode(code: string): void {
+    const value = code.trim();
+    if (!value) return;
+    const hadFocus = !!this.specificProductId;
+    this.search = value;
+    this.categoryFilter = "";
+    this.stockState = "";
+    this.specificProductId = "";
+    this.page.set(1);
+    if (hadFocus) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { productId: null },
+        queryParamsHandling: "merge",
+      });
+      return;
+    }
+    this.loadProducts();
+  }
+
+  private onBarcodeScan(scan: BarcodeScan): void {
+    this.applyBarcode(scan.code);
   }
 
   updateStockFilter(stockState: "" | "out_of_stock" | "low_stock"): void {

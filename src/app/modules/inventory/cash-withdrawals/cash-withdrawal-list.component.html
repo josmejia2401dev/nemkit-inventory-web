@@ -1,0 +1,176 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">CONTROL DE CAJA</p>
+    <h1>Retiros</h1>
+    <p class="heading-subtitle">
+      Registra el dinero que sale de la caja. No afecta ventas ni utilidad bruta.
+    </p>
+  </div>
+  <button class="button button-primary" (click)="openForm()">
+    <i class="pi pi-plus"></i> Registrar retiro
+  </button>
+</div>
+
+<section class="panel">
+  <div class="filter-bar">
+    <label class="form-field"><span>Desde</span><input type="date" [(ngModel)]="from" name="from" /></label>
+    <label class="form-field"><span>Hasta</span><input type="date" [(ngModel)]="to" name="to" /></label>
+    <label class="form-field">
+      <span>Motivo</span>
+      <select [(ngModel)]="reason" name="reason">
+        <option value="">Todos</option>
+        @for (item of reasons; track item.value) {
+          <option [value]="item.value">{{ item.label }}</option>
+        }
+      </select>
+    </label>
+    <button class="button button-primary" (click)="applyFilters()"><i class="pi pi-filter"></i> Aplicar</button>
+    <button class="icon-button" title="Actualizar" (click)="load()"><i class="pi pi-refresh"></i></button>
+  </div>
+
+  @if (dateError()) {
+    <p class="report-date-error">Selecciona un rango válido. La fecha inicial debe ser anterior o igual a la final.</p>
+  }
+
+  @if (summary(); as totals) {
+    <div class="report-summary">
+      <article><small>Total retirado</small><strong>{{ formatMoney(totals.totals.total) }}</strong></article>
+      <article><small>Retiros</small><strong>{{ totals.totals.count | number }}</strong></article>
+      <article><small>Promedio</small><strong>{{ formatMoney(totals.totals.average) }}</strong></article>
+      @for (reasonRow of totals.byReason; track reasonRow.reason) {
+        <article>
+          <small>{{ reasonRow.label }}</small>
+          <strong>{{ formatMoney(reasonRow.total) }}</strong>
+        </article>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-panel">
+      <i class="pi pi-spin pi-spinner"></i><span>Cargando retiros…</span>
+    </div>
+  } @else if (records().length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>FECHA</th>
+            <th>MONTO</th>
+            <th>MOTIVO</th>
+            <th>BENEFICIARIO</th>
+            <th>MÉTODO</th>
+            <th>REGISTRADO POR</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (withdrawal of records(); track withdrawal.id) {
+            <tr>
+              <td data-label="Fecha">
+                <strong>{{ withdrawal.date | date: "d MMM yyyy" : "" : "es-CO" }}</strong>
+              </td>
+              <td data-label="Monto"><strong>{{ formatMoney(withdrawal.amount) }}</strong></td>
+              <td data-label="Motivo">{{ reasonLabel(withdrawal.reason) }}</td>
+              <td data-label="Beneficiario">{{ withdrawal.beneficiary || "—" }}</td>
+              <td data-label="Método">{{ methodLabel(withdrawal.method) }}</td>
+              <td data-label="Registrado por">
+                {{ withdrawal.recordedBySnapshot?.name || "—" }}
+                @if (withdrawal.reference) {
+                  <small class="table-subtext">{{ withdrawal.reference }}</small>
+                }
+              </td>
+              <td class="row-actions">
+                <button class="icon-button" title="Anular retiro" aria-label="Anular retiro" (click)="cancel(withdrawal)">
+                  <i class="pi pi-ban"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="total()" itemLabel="retiros" (pageChange)="goToPage($event)" />
+    <p class="table-footer-note">Los retiros no modifican ventas, compras ni utilidad bruta.</p>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-wallet"></i></span>
+      <strong>Aún no hay retiros en este período</strong>
+      <p>Registra el dinero que sacas de la caja para llevarlo con trazabilidad.</p>
+      <button class="button button-primary button-small" (click)="openForm()">
+        <i class="pi pi-plus"></i> Registrar retiro
+      </button>
+    </div>
+  }
+</section>
+
+@if (dialogOpen()) {
+  <div class="dialog-backdrop" (click)="dialogOpen.set(false)">
+    <section
+      class="form-dialog form-dialog--narrow"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="withdrawal-dialog-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">SALIDA DE CAJA</p>
+          <h2 id="withdrawal-dialog-title">Registrar retiro</h2>
+        </div>
+        <button class="icon-button" aria-label="Cerrar" (click)="dialogOpen.set(false)">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <form class="dialog-form" [formGroup]="form" (ngSubmit)="save()">
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Monto <b>*</b></span>
+            <input type="number" min="0.01" step="0.01" formControlName="amount" />
+          </label>
+          <label class="form-field">
+            <span>Fecha <b>*</b></span>
+            <input type="date" formControlName="date" />
+          </label>
+          <label class="form-field">
+            <span>Motivo <b>*</b></span>
+            <select formControlName="reason">
+              @for (item of reasons; track item.value) {
+                <option [value]="item.value">{{ item.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Beneficiario</span>
+            <input formControlName="beneficiary" maxlength="120" placeholder="Quién retira" />
+          </label>
+          <label class="form-field">
+            <span>Método</span>
+            <select formControlName="method">
+              @for (item of methods; track item.value) {
+                <option [value]="item.value">{{ item.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Referencia</span>
+            <input formControlName="reference" maxlength="120" placeholder="Opcional" />
+          </label>
+          <label class="form-field form-field--wide">
+            <span>Notas</span>
+            <textarea formControlName="notes" rows="3" maxlength="1000" placeholder="Detalle opcional"></textarea>
+          </label>
+        </div>
+        <p class="table-footer-note">Este registro no afecta ventas, compras ni utilidad bruta.</p>
+        <div class="dialog-actions">
+          <button type="button" class="button button-secondary" (click)="dialogOpen.set(false)">Cancelar</button>
+          <button type="submit" class="button button-primary" [disabled]="saving()">
+            @if (saving()) { <i class="pi pi-spin pi-spinner"></i> } @else { <i class="pi pi-check"></i> }
+            Guardar retiro
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

@@ -4,8 +4,10 @@
     <h1>{{ title }}</h1>
     <p class="heading-subtitle">Mantén a mano los datos de las personas y negocios con los que trabajas.</p>
   </div>
-  <button class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo {{ singular }}</button>
+  <button class="button button-primary" [disabled]="!limits.canCreate('contacts')" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo {{ singular }}</button>
 </div>
+
+<app-plan-limit-banner label="contactos (clientes y proveedores)" [plan]="limits.usage()?.plan?.name ?? 'Gratuito'" [limit]="limits.status('contacts')" />
 
 @if (!isSupplier) {
   <section class="customer-lookup">
@@ -28,6 +30,7 @@
         <i [class]="lookupLoading() ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-right'"></i>
         <span>{{ lookupLoading() ? "Buscando…" : "Buscar" }}</span>
       </button>
+      <app-barcode-scan-tools cameraLabel="Escanear documento del cliente" (scanned)="applyScannedTerm($event)" />
     </form>
   </section>
 
@@ -45,6 +48,9 @@
       }
       <button type="button" class="contact-directory-search-button" aria-label="Buscar" (click)="applySearch()"><i class="pi pi-arrow-right"></i></button>
     </div>
+    @if (isSupplier) {
+      <app-barcode-scan-tools cameraLabel="Escanear documento del proveedor" (scanned)="applyScannedTerm($event)" />
+    }
   </div>
   @if (loading()) {
     <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando {{ title.toLowerCase() }}…</span></div>
@@ -81,7 +87,7 @@
     </div>
     <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="contactCount()" (pageChange)="goToPage($event)" />
   } @else {
-    <div class="empty-state"><span class="empty-icon"><i [class]="isSupplier ? 'pi pi-truck' : 'pi pi-users'"></i></span><strong>Aún no tienes {{ title.toLowerCase() }}</strong><p>Agrega tu primer {{ singular }} para usarlo en los documentos comerciales.</p><button class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Crear {{ singular }}</button></div>
+    <div class="empty-state"><span class="empty-icon"><i [class]="isSupplier ? 'pi pi-truck' : 'pi pi-users'"></i></span><strong>Aún no tienes {{ title.toLowerCase() }}</strong><p>Agrega tu primer {{ singular }} para usarlo en los documentos comerciales.</p><button class="button button-primary button-small" [disabled]="!limits.canCreate('contacts')" (click)="openCreate()"><i class="pi pi-plus"></i> Crear {{ singular }}</button></div>
   }
 </section>
 

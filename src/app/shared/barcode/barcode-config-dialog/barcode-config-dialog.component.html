@@ -1,0 +1,122 @@
+@if (visible) {
+  <div class="dialog-backdrop" (click)="close()">
+    <section
+      class="form-dialog barcode-config-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="barcode-config-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">LECTOR DE CÓDIGOS</p>
+          <h2 id="barcode-config-title">Pistola de códigos</h2>
+        </div>
+        <button type="button" class="icon-button" (click)="close()" aria-label="Cerrar configuración">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="barcode-config-body">
+        <div class="barcode-config-status barcode-config-status--{{ statusTone() }}">
+          <span class="barcode-config-dot" aria-hidden="true"></span>
+          <span>{{ statusLabel() }}</span>
+        </div>
+
+        <div class="barcode-config-test" [class.barcode-config-test--ok]="testCode()">
+          <i class="pi" [class.pi-check-circle]="testCode()" [class.pi-barcode]="!testCode()" aria-hidden="true"></i>
+          @if (testCode(); as code) {
+            <span>Código detectado: <strong>{{ code }}</strong></span>
+          } @else {
+            <span>Escanea un código aquí para probar la conexión.</span>
+          }
+        </div>
+
+        <ol class="barcode-config-steps">
+          <li>Conecta la pistola por USB o empareja el Bluetooth en el sistema.</li>
+          <li>Configúrala en <strong>modo teclado (HID)</strong>, no en modo serial/COM.</li>
+          <li>Escanea desde cualquier pantalla: no necesitas hacer clic en un campo.</li>
+        </ol>
+
+        <label class="barcode-config-toggle">
+          <input
+            type="checkbox"
+            [ngModel]="config().enabled"
+            (ngModelChange)="update({ enabled: $event })"
+          />
+          <span>
+            <strong>Captura global activa</strong>
+            <small>Detecta la pistola aunque el foco esté en otro campo.</small>
+          </span>
+        </label>
+
+        <div class="barcode-config-grid">
+          <label class="form-field">
+            <span>Sensibilidad</span>
+            <select [ngModel]="sensitivity()" (ngModelChange)="setSensitivity($event)">
+              @for (preset of sensitivities; track preset.value) {
+                <option [value]="preset.value">{{ preset.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="form-field">
+            <span>Terminador</span>
+            <select [ngModel]="config().terminator" (ngModelChange)="updateTerminator($event)">
+              <option value="any">Enter o Tab</option>
+              <option value="enter">Solo Enter</option>
+              <option value="tab">Solo Tab</option>
+            </select>
+          </label>
+
+          <label class="form-field">
+            <span>Prefijo (opcional)</span>
+            <input
+              [ngModel]="config().prefix"
+              (ngModelChange)="update({ prefix: $event })"
+              maxlength="16"
+              placeholder="Ej. ]C1"
+              data-barcode-ignore
+            />
+          </label>
+
+          <label class="form-field">
+            <span>Sufijo (opcional)</span>
+            <input
+              [ngModel]="config().suffix"
+              (ngModelChange)="update({ suffix: $event })"
+              maxlength="16"
+              placeholder="Ej. \r\n"
+              data-barcode-ignore
+            />
+          </label>
+        </div>
+
+        <div class="barcode-config-checks">
+          <label class="barcode-config-toggle barcode-config-toggle--compact">
+            <input type="checkbox" [ngModel]="config().beep" (ngModelChange)="update({ beep: $event })" />
+            <span><strong>Sonido al escanear</strong><small>Tono corto de confirmación.</small></span>
+          </label>
+          <label class="barcode-config-toggle barcode-config-toggle--compact">
+            <input type="checkbox" [ngModel]="config().vibrate" (ngModelChange)="update({ vibrate: $event })" />
+            <span><strong>Vibración</strong><small>En móviles compatibles.</small></span>
+          </label>
+        </div>
+
+        <p class="barcode-config-note">
+          <i class="pi pi-info-circle"></i>
+          El navegador no puede detectar si la pistola está encendida; el estado verde aparece al primer escaneo.
+        </p>
+
+        <div class="barcode-config-actions">
+          <button type="button" class="button button-secondary" (click)="reset()">
+            <i class="pi pi-refresh"></i> Restablecer
+          </button>
+          <button type="button" class="button button-primary" (click)="close()">
+            <i class="pi pi-check"></i> Listo
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+}

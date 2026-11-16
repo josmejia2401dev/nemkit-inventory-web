@@ -1,0 +1,210 @@
+.barcode-config-dialog {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.barcode-config-body {
+  display: grid;
+  gap: 13px;
+  padding: 0 21px 21px;
+}
+
+.barcode-config-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border: 1px solid rgba(36, 65, 52, 0.08);
+  border-radius: 9px;
+  color: #6d7d72;
+  background: #f8faf6;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.barcode-config-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b8c2bb;
+  box-shadow: 0 0 0 3px rgba(184, 194, 187, 0.16);
+}
+
+.barcode-config-status--active {
+  color: #2f7a4f;
+  background: #f0f8f1;
+  border-color: rgba(47, 122, 79, 0.16);
+}
+
+.barcode-config-status--active .barcode-config-dot {
+  background: #3aa564;
+  box-shadow: 0 0 0 3px rgba(58, 165, 100, 0.16);
+}
+
+.barcode-config-status--configured .barcode-config-dot {
+  background: #c08a4a;
+  box-shadow: 0 0 0 3px rgba(192, 138, 74, 0.16);
+}
+
+.barcode-config-status--off .barcode-config-dot {
+  background: #aab3ac;
+}
+
+.barcode-config-test {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 13px;
+  border: 1px dashed rgba(36, 65, 52, 0.18);
+  border-radius: 10px;
+  color: #7b8980;
+  background: #fbfcf9;
+  font-size: 9px;
+}
+
+.barcode-config-test i {
+  color: #8d9a91;
+  font-size: 13px;
+}
+
+.barcode-config-test--ok {
+  border-color: rgba(47, 122, 79, 0.26);
+  color: #32684f;
+  background: #f1f8f1;
+}
+
+.barcode-config-test--ok i {
+  color: #3aa564;
+}
+
+.barcode-config-test strong {
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.barcode-config-steps {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding-left: 18px;
+  color: #728176;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.barcode-config-steps strong {
+  color: #4c6053;
+  font-weight: 650;
+}
+
+.barcode-config-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 12px;
+  border: 1px solid rgba(36, 65, 52, 0.08);
+  border-radius: 10px;
+  background: #fafbf8;
+  cursor: pointer;
+}
+
+.barcode-config-toggle input {
+  width: 15px;
+  height: 15px;
+  margin-top: 1px;
+  accent-color: #397252;
+}
+
+.barcode-config-toggle span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.barcode-config-toggle strong {
+  color: #41564a;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.barcode-config-toggle small {
+  color: #94a097;
+  font-size: 8px;
+}
+
+.barcode-config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.barcode-config-grid .form-field {
+  gap: 5px;
+  font-size: 8px;
+}
+
+.barcode-config-grid .form-field input,
+.barcode-config-grid .form-field select {
+  min-height: 36px;
+  padding: 8px 9px;
+  font-size: 10px;
+}
+
+.barcode-config-checks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.barcode-config-toggle--compact {
+  padding: 9px 10px;
+}
+
+.barcode-config-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  color: #94a097;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.barcode-config-note i {
+  margin-top: 1px;
+  color: #6d8a74;
+  font-size: 9px;
+}
+
+.barcode-config-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 3px;
+}
+
+@media (max-width: 640px) {
+  .barcode-config-dialog {
+    width: 100%;
+  }
+
+  .barcode-config-body {
+    padding: 0 18px calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .barcode-config-grid,
+  .barcode-config-checks {
+    grid-template-columns: 1fr;
+  }
+
+  .barcode-config-grid .form-field input,
+  .barcode-config-grid .form-field select {
+    min-height: 46px;
+    font-size: 15px;
+  }
+
+  .barcode-config-actions .button {
+    min-height: 46px;
+    flex: 1;
+  }
+}

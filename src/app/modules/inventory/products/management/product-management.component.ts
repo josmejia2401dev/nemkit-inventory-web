@@ -17,15 +17,24 @@ import {
 } from "../../../../core/services/inventory.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { ConfirmService } from "../../../../core/services/confirm.service";
+import { LimitsService } from "../../../../core/services/limits.service";
+import { AuthStore } from "../../../../core/store/auth.store";
+import { BarcodeDispatcherService } from "../../../../core/barcode/barcode-dispatcher.service";
+import { BarcodeScan } from "../../../../core/barcode/barcode.types";
+import { BarcodeCameraBarComponent } from "../../../../shared/barcode/barcode-camera-bar/barcode-camera-bar.component";
+import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
+import { ProductBarcodeService } from "../product-barcode.service";
+import { ProductQuickCreateDialogComponent } from "../product-quick-create-dialog/product-quick-create-dialog.component";
 import { ProductCatalogService } from "../product-catalog.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
+import { PlanLimitBannerComponent } from "../../../../shared/components/plan-limit-banner/plan-limit-banner.component";
 import { ProductFilterBarComponent } from "../components/product-filter-bar/product-filter-bar.component";
 import { ProductTableComponent } from "../components/product-table/product-table.component";
 
 @Component({
   selector: "app-products",
   standalone: true,
-  imports: [FormsModule, PaginationComponent, ProductFilterBarComponent, ProductTableComponent],
+  imports: [FormsModule, PaginationComponent, PlanLimitBannerComponent, ProductFilterBarComponent, ProductTableComponent, BarcodeCameraBarComponent, BarcodeScanToolsComponent, ProductQuickCreateDialogComponent],
   templateUrl: "./product-management.component.html",
   styleUrls: ["./product-management.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +45,10 @@ export class ProductManagementComponent implements OnInit {
   private catalog = inject(ProductCatalogService);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
+  private barcodeDispatcher = inject(BarcodeDispatcherService);
+  private productBarcode = inject(ProductBarcodeService);
+  private store = inject(AuthStore);
+  readonly limits = inject(LimitsService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
@@ -70,9 +83,13 @@ export class ProductManagementComponent implements OnInit {
   statusFilter = "";
   stockState: "" | "out_of_stock" | "low_stock" = "";
   specificProductId: number | "" = "";
+  quickCreateBarcode = signal<string | null>(null);
   form = this.emptyForm();
 
   ngOnInit(): void {
+    this.limits.load().subscribe({ error: () => undefined });
+    const unregister = this.barcodeDispatcher.register((scan) => this.onBarcodeScan(scan));
+    this.destroyRef.onDestroy(unregister);
     this.loadCategories();
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -164,6 +181,75 @@ export class ProductManagementComponent implements OnInit {
     });
   }
 
+  private onBarcodeScan(scan: BarcodeScan): void {
+    this.applyBarcode(scan.code);
+  }
+
+  /**
+   * Con el formulario abierto el código llena el campo; en el listado dispara
+   * una búsqueda. En ambos casos se avisa si el código ya existe.
+   */
+  applyBarcode(code: string): void {
+    const value = code.trim();
+    if (!value) return;
+    if (this.quickCreateBarcode()) return;
+
+    if (this.dialogOpen()) {
+      this.form.barcode = value;
+      this.productBarcode.lookup(value).subscribe({
+        next: (product) => {
+          if (product) {
+            this.notifications.warn(
+              "Código ya registrado",
+              `"${value}" pertenece a ${product.name}.`,
+            );
+          }
+        },
+        error: () => undefined,
+      });
+      return;
+    }
+
+    this.specificProductId = "";
+    this.search = value;
+    this.page.set(1);
+    this.loadProducts();
+
+    // Si el código no existe, el listado ofrece crearlo sin salir de aquí.
+    this.productBarcode.lookup(value).subscribe({
+      next: (product) => {
+        if (!product) this.offerQuickCreate(value);
+      },
+      error: () => undefined,
+    });
+  }
+
+  private offerQuickCreate(barcode: string): void {
+    const roles = this.store.user()?.roles ?? [];
+    if (!this.productBarcode.canManageProducts(roles)) return;
+
+    if (!this.limits.canCreate("products")) {
+      this.notifications.warn(
+        "Límite del plan alcanzado",
+        "No puedes crear más productos con tu plan actual.",
+      );
+      return;
+    }
+
+    this.quickCreateBarcode.set(barcode);
+  }
+
+  onProductCreated(product: InventoryProduct): void {
+    this.quickCreateBarcode.set(null);
+    this.notifications.success(
+      "Producto creado",
+      `"${product.name}" ya está disponible en el catálogo.`,
+    );
+    this.search = product.barcode ?? this.search;
+    this.loadProducts();
+    this.limits.load(true).subscribe({ error: () => undefined });
+  }
+
   loadCategories(): void {
     this.catalog.listCategories().subscribe({
       next: (categories) => this.categories.set(categories),
@@ -207,6 +293,11 @@ export class ProductManagementComponent implements OnInit {
   }
 
   openCreate(): void {
+    if (!this.limits.canCreate("products")) {
+      this.notifications.warn("Límite del plan alcanzado", "No puedes crear más productos con tu plan actual.");
+      return;
+    }
+    this.quickCreateBarcode.set(null);
     this.editingId = null;
     this.form = this.emptyForm();
     this.loadIngredients();
@@ -281,6 +372,7 @@ export class ProductManagementComponent implements OnInit {
     if (isPrepared) body["recipe"] = recipe;
 
     this.saving.set(true);
+    const isCreate = !this.editingId;
     const request = this.editingId
       ? this.inventory.put<InventoryProduct>(
           `/products/${this.editingId}`,
@@ -296,6 +388,7 @@ export class ProductManagementComponent implements OnInit {
           this.editingId ? "Producto actualizado" : "Producto creado",
         );
         this.loadProducts();
+        if (isCreate) this.limits.load(true).subscribe({ error: () => undefined });
       },
       error: () => this.saving.set(false),
     });
@@ -320,6 +413,7 @@ export class ProductManagementComponent implements OnInit {
           "El producto se movió a eliminados.",
         );
         this.loadProducts();
+        this.limits.load(true).subscribe({ error: () => undefined });
       },
     });
   }

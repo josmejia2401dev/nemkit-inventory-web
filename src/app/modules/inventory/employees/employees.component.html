@@ -4,8 +4,10 @@
     <h1>Empleados</h1>
     <p class="heading-subtitle">Registra a tu equipo y asígnale un cargo para operar ventas, compras y domicilios.</p>
   </div>
-  <div class="heading-actions"><button class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo empleado</button></div>
+  <div class="heading-actions"><button class="button button-primary" [disabled]="!canCreateEmployee()" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo empleado</button></div>
 </div>
+
+<app-plan-limit-banner label="empleados" [plan]="limits.usage()?.plan?.name ?? 'Gratuito'" [limit]="employeeLimit()" />
 
 <section class="panel catalog-panel">
   <div class="filter-bar employee-filter-bar">

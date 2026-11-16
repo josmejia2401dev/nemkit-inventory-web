@@ -1,0 +1,65 @@
+@if (showTrigger()) {
+  <button
+    type="button"
+    class="icon-button barcode-camera-trigger"
+    [class.barcode-camera-trigger--labeled]="withLabel()"
+    [class.barcode-camera-trigger--unsupported]="!supported()"
+    [disabled]="!supported()"
+    [title]="supported() ? label() : 'Cámara no disponible en este navegador'"
+    [attr.aria-label]="supported() ? label() : 'Cámara no disponible en este navegador'"
+    (click)="start()"
+  >
+    <i class="pi pi-camera" aria-hidden="true"></i>
+    @if (withLabel()) {
+      <span>{{ text() }}</span>
+    }
+  </button>
+}
+
+@if (open()) {
+  <div class="dialog-backdrop barcode-camera-backdrop" (click)="close()">
+    <section
+      class="barcode-camera-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Escanear código con la cámara"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="barcode-camera-heading">
+        <div>
+          <p class="eyebrow">LECTOR DE CÓDIGOS</p>
+          <strong>Apunta al código de barras</strong>
+        </div>
+        <button type="button" class="icon-button" (click)="close()" aria-label="Cerrar cámara">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="barcode-camera-view">
+        <video #video playsinline muted></video>
+        <div class="barcode-camera-frame" aria-hidden="true"><span></span></div>
+        @if (starting()) {
+          <div class="barcode-camera-overlay">
+            <i class="pi pi-spin pi-spinner"></i><span>Abriendo cámara…</span>
+          </div>
+        }
+      </div>
+
+      @if (error(); as message) {
+        <p class="barcode-camera-message barcode-camera-message--error" role="alert">
+          <i class="pi pi-exclamation-circle"></i>{{ message }}
+        </p>
+      } @else {
+        <p class="barcode-camera-message">
+          <i class="pi pi-info-circle"></i> La cámara se apaga al detectar el código.
+        </p>
+      }
+
+      <div class="barcode-camera-actions">
+        <button type="button" class="button button-secondary" (click)="close()">
+          Escribir el código a mano
+        </button>
+      </div>
+    </section>
+  </div>
+}

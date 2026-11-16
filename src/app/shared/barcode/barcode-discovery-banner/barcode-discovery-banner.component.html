@@ -1,0 +1,25 @@
+@if (visible()) {
+  <section class="barcode-discovery" role="region" aria-label="Escaneo con pistola o cámara">
+    <span class="barcode-discovery__icon" aria-hidden="true"><i class="pi pi-barcode"></i></span>
+    <div class="barcode-discovery__copy">
+      <strong>Escanea con pistola o cámara</strong>
+      <span>Funciona en Ventas, Compras, Productos y Movimientos.</span>
+    </div>
+    <div class="barcode-discovery__actions">
+      <button type="button" class="button button-primary button-small" (click)="testCamera()">
+        <i class="pi pi-camera"></i> Probar cámara
+      </button>
+      <button type="button" class="button button-secondary button-small" (click)="openConfig()">
+        <i class="pi pi-sliders-h"></i> Configurar pistola
+      </button>
+      <button
+        type="button"
+        class="button button-secondary button-small barcode-discovery__dismiss"
+        (click)="dismiss()"
+        aria-label="Cerrar aviso de escaneo"
+      >
+        Entendido
+      </button>
+    </div>
+  </section>
+}

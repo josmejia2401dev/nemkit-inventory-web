@@ -8,5 +8,5 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   styleUrl: "./content-loader.component.css",
 })
 export class ContentLoaderComponent {
-  message = input('Loading...');
+  message = input('Cargando…');
 }

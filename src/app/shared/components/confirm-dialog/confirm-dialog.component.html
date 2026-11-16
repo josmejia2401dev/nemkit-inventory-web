@@ -6,8 +6,8 @@
   <p class="text-sm" style="color: var(--deploy-text-muted)">{{ confirmService.options().message }}</p>
   <ng-template #footer>
     <div class="flex justify-end gap-2 mt-4">
-      <p-button [label]="confirmService.options().cancelLabel ?? 'Cancel'" [text]="true" (onClick)="confirmService.reject()" />
-      <p-button [label]="confirmService.options().confirmLabel ?? 'Confirm'"
+      <p-button [label]="confirmService.options().cancelLabel ?? 'Cancelar'" [text]="true" (onClick)="confirmService.reject()" />
+      <p-button [label]="confirmService.options().confirmLabel ?? 'Confirmar'"
                 [severity]="confirmService.options().severity === 'danger' ? 'danger' : 'primary'"
                 (onClick)="confirmService.accept()" />
     </div>

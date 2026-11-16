@@ -7,7 +7,11 @@ import {
   RouterOutlet,
 } from "@angular/router";
 import { AuthStore } from "../../core/store/auth.store";
+import { LimitsService } from "../../core/services/limits.service";
 import { BackendStatusTagComponent } from "../../shared/components/backend-status-tag/backend-status-tag.component";
+import { BarcodeStatusComponent } from "../../shared/barcode/barcode-status/barcode-status.component";
+import { BarcodeOverlaysComponent } from "../../shared/barcode/barcode-overlays/barcode-overlays.component";
+import { BarcodeDiscoveryBannerComponent } from "../../shared/barcode/barcode-discovery-banner/barcode-discovery-banner.component";
 
 export interface AppNavItem {
   path: string;
@@ -24,12 +28,16 @@ export interface AppNavItem {
     RouterLink,
     RouterLinkActive,
     BackendStatusTagComponent,
+    BarcodeStatusComponent,
+    BarcodeOverlaysComponent,
+    BarcodeDiscoveryBannerComponent,
   ],
   templateUrl: "./application-shell.component.html",
 })
 export class ApplicationShellComponent {
   private readonly store = inject(AuthStore);
   private readonly router = inject(Router);
+  private readonly limits = inject(LimitsService);
 
   @Input({ required: true }) navItems: AppNavItem[] = [];
   @Input() mobilePaths: string[] = [];
@@ -39,6 +47,7 @@ export class ApplicationShellComponent {
   @Input() alertsPath = "/alerts";
   @Input() profilePath = "/profile";
   @Input() reportPath = "";
+  @Input() showBarcodeTools = true;
   @Input() workspaceLabel = "PLATAFORMA";
 
   sidebarOpen = signal(false);
@@ -99,6 +108,7 @@ export class ApplicationShellComponent {
 
   logout(): void {
     const loginPath = this.store.loginPath();
+    this.limits.clear();
     this.store.clear();
     this.router.navigateByUrl(loginPath);
   }

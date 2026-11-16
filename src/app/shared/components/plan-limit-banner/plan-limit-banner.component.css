@@ -1,0 +1,32 @@
+.plan-limit-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--deploy-surface-3);
+  border-radius: 0.75rem;
+  background: var(--deploy-surface-1);
+  color: var(--deploy-text-muted);
+  font-size: 0.8125rem;
+}
+
+.plan-limit-banner i {
+  color: var(--deploy-primary);
+  font-size: 0.9375rem;
+}
+
+.plan-limit-banner strong {
+  color: var(--deploy-text);
+  text-transform: capitalize;
+}
+
+.plan-limit-banner--reached {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--deploy-text);
+}
+
+.plan-limit-banner--reached i {
+  color: var(--deploy-warning);
+}

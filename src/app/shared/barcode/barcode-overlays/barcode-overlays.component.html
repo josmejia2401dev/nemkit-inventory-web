@@ -1,0 +1,11 @@
+<app-barcode-camera-bar
+  [showTrigger]="false"
+  [openToken]="tools.cameraToken()"
+  label="Escanear con la cámara"
+  (scanned)="onCameraScanned($event)"
+/>
+
+<app-barcode-config-dialog
+  [visible]="tools.configOpen()"
+  (visibleChange)="tools.setConfigOpen($event)"
+/>

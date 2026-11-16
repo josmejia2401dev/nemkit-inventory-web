@@ -1,0 +1,11 @@
+@if (limit(); as usage) {
+  <div class="plan-limit-banner" [class.plan-limit-banner--reached]="atLimit()">
+    <i class="pi" [class.pi-info-circle]="!atLimit()" [class.pi-exclamation-circle]="atLimit()" aria-hidden="true"></i>
+    <span>
+      Plan <strong>{{ plan() }}</strong>: {{ usage.used }}/{{ usage.max }} {{ label() }}
+      @if (atLimit()) {
+        — alcanzaste el límite. Desactiva o elimina registros para crear nuevos.
+      }
+    </span>
+  </div>
+}

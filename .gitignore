@@ -7,3 +7,4 @@ out-tsc/
 .env.*
 !.env.example
 npm-debug.log*
+opencode.json

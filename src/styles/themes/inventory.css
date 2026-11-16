@@ -1,0 +1,20 @@
+/* Nemkit Inventory visual layer */
+:root {
+  --deploy-primary: #276650;
+  --deploy-primary-hover: #1c5140;
+  --deploy-primary-50: #e9f2ed;
+  --deploy-primary-subtle: rgba(39, 102, 80, 0.07);
+  --deploy-accent: #d8aa62;
+  --deploy-bg: #f7f7f2;
+  --deploy-bg-card: #ffffff;
+  --deploy-text: #1b3028;
+  --deploy-text-secondary: #68756e;
+  --deploy-text-muted: #929c96;
+  --deploy-border: rgba(36, 65, 52, 0.11);
+  --deploy-border-hover: rgba(36, 65, 52, 0.22);
+  --deploy-shadow-sm: 0 4px 18px rgba(31, 57, 45, 0.045);
+  --deploy-shadow-md: 0 12px 28px rgba(31, 57, 45, 0.08);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1b3028;
+  background: #f7f7f2;
+}

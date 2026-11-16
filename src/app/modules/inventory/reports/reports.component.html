@@ -9,6 +9,7 @@
   <button [class.report-tab--active]="kind === 'sales'" (click)="selectReport('sales')"><i class="pi pi-chart-line"></i> Ventas</button>
   <button [class.report-tab--active]="kind === 'employees'" (click)="selectReport('employees')"><i class="pi pi-users"></i> Por empleado</button>
   <button [class.report-tab--active]="kind === 'cancellations'" (click)="selectReport('cancellations')"><i class="pi pi-ban"></i> Cancelaciones</button>
+  <button [class.report-tab--active]="kind === 'cashflow'" (click)="selectReport('cashflow')"><i class="pi pi-wallet"></i> Flujo de caja</button>
 </div>
 
 <section class="panel report-panel">
@@ -75,6 +76,35 @@
         } @else { <div class="empty-state"><strong>No hay ventas canceladas en este período</strong><p>Prueba con otro rango de fechas.</p></div> }
       } @else {
         <div class="empty-state"><strong>No pudimos cargar este reporte</strong><p>Comprueba el rango seleccionado y la conexión con el servidor.</p><button class="button button-primary button-small" (click)="load()">Intentar de nuevo</button></div>
+      }
+    } @else if (kind === "cashflow") {
+      @if (cashFlowReport(); as report) {
+        <div class="report-title-row">
+          <div>
+            <p class="eyebrow">ENTRADAS Y SALIDAS DEL PERÍODO</p>
+            <h2>Flujo de caja</h2>
+            <small>Las compras se asumen pagadas al contado. Los retiros no afectan ventas ni utilidad bruta.</small>
+          </div>
+          <a class="button button-secondary" routerLink="/admin/cash-withdrawals"><i class="pi pi-wallet"></i> Ver retiros</a>
+        </div>
+        <div class="report-summary">
+          <article><small>Entradas por ventas</small><strong>{{ formatMoney(report.inflows.sales) }}</strong></article>
+          <article><small>Ventas cobradas</small><strong>{{ report.inflows.salesCount | number }}</strong></article>
+          <article><small>Compras registradas</small><strong>{{ formatMoney(report.outflows.purchases) }}</strong></article>
+          <article><small>Pagos a empleados</small><strong>{{ formatMoney(report.outflows.employeePayments) }}</strong></article>
+          <article><small>Retiros de caja</small><strong>{{ formatMoney(report.outflows.withdrawals) }}</strong></article>
+          <article><small>Salidas totales</small><strong>{{ formatMoney(report.outflows.total) }}</strong></article>
+          <article><small>Neto del período</small><strong>{{ formatMoney(report.net) }}</strong></article>
+        </div>
+        @if (cashFlowError()) {
+          <div class="empty-state"><strong>No pudimos cargar el flujo de caja</strong><p>Comprueba tu conexión y el rango seleccionado antes de intentarlo de nuevo.</p><button class="button button-primary button-small" (click)="load()">Intentar de nuevo</button></div>
+        } @else if (report.withdrawalsByReason.length) {
+          <div class="table-scroll"><table class="inventory-table"><thead><tr><th>MOTIVO DEL RETIRO</th><th>RETIROS</th><th>TOTAL</th></tr></thead><tbody>@for (row of report.withdrawalsByReason; track row.reason) { <tr><td data-label="Motivo">{{ row.label }}</td><td data-label="Retiros">{{ row.count }}</td><td data-label="Total"><strong>{{ formatMoney(row.total) }}</strong></td></tr> }</tbody></table></div>
+        } @else {
+          <div class="empty-state"><strong>Sin retiros en este período</strong><p>El flujo de caja muestra solo ventas cobradas, compras, pagos y retiros registrados.</p></div>
+        }
+      } @else if (!cashFlowError()) {
+        <div class="empty-state"><strong>Sin datos para el rango</strong><p>Cambia las fechas y vuelve a aplicar el filtro.</p></div>
       }
     } @else {
       @if (employeesReport(); as report) {

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject, Input, OnInit, signal } from "@angular/core";
+import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import {
   CustomerProfile,
@@ -12,6 +12,12 @@ import {
 import { NotificationService } from "../../../../core/services/notification.service";
 import { ConfirmService } from "../../../../core/services/confirm.service";
 import { AuthStore } from "../../../../core/store/auth.store";
+import { LimitsService } from "../../../../core/services/limits.service";
+import { BarcodeDispatcherService } from "../../../../core/barcode/barcode-dispatcher.service";
+import { BarcodeScan } from "../../../../core/barcode/barcode.types";
+import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
+import { ProductBarcodeService } from "../../products/product-barcode.service";
+import { ProductQuickCreateDialogComponent } from "../../products/product-quick-create-dialog/product-quick-create-dialog.component";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
 import {
@@ -33,7 +39,7 @@ interface DraftItem {
 @Component({
   selector: "app-inventory-documents",
   standalone: true,
-  imports: [CommonModule, FormsModule, CancelOrderDialogComponent, CustomerSaleSummaryComponent, DocumentReceiptComponent, PaginationComponent],
+  imports: [CommonModule, FormsModule, CancelOrderDialogComponent, CustomerSaleSummaryComponent, DocumentReceiptComponent, PaginationComponent, BarcodeScanToolsComponent, ProductQuickCreateDialogComponent],
   templateUrl: "./document-workbench.component.html",
   styleUrls: ["./document-workbench.component.css"],
 })
@@ -43,6 +49,10 @@ export class DocumentWorkbenchComponent implements OnInit {
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
   private store = inject(AuthStore);
+  private limits = inject(LimitsService);
+  private barcodeDispatcher = inject(BarcodeDispatcherService);
+  private productBarcode = inject(ProductBarcodeService);
+  private destroyRef = inject(DestroyRef);
 
   /** Modo restaurante: habilita el campo de mesa en la venta. */
   get isRestaurant(): boolean {
@@ -83,6 +93,7 @@ export class DocumentWorkbenchComponent implements OnInit {
   customerForm = this.emptyCustomerForm();
   productSearch = "";
   contactSearch = "";
+  quickCreateBarcode = signal<string | null>(null);
 
   get isSale(): boolean {
     return this.kind === "sales";
@@ -161,6 +172,9 @@ export class DocumentWorkbenchComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.limits.load().subscribe({ error: () => undefined });
+    const unregister = this.barcodeDispatcher.register((scan) => this.onBarcodeScan(scan));
+    this.destroyRef.onDestroy(unregister);
     this.loadProducts();
     this.selectedContactId = "";
     this.dialogOpen.set(false);
@@ -235,6 +249,130 @@ export class DocumentWorkbenchComponent implements OnInit {
     this.loadProducts(this.productSearch);
   }
 
+  private onBarcodeScan(scan: BarcodeScan): void {
+    this.applyBarcode(scan.code);
+  }
+
+  /**
+   * Resuelve el código exacto y agrega la línea. Si no existe ofrece crearlo
+   * dentro del mismo diálogo para no perder el documento en curso.
+   */
+  applyBarcode(code: string): void {
+    const value = code.trim();
+    if (!value) return;
+    if (this.quickCreateBarcode()) return;
+
+    if (!this.dialogOpen()) this.openCreate();
+
+    this.productBarcode.lookup(value).subscribe({
+      next: (product) => {
+        if (!product) {
+          this.offerQuickCreate(value);
+          return;
+        }
+
+        if (!this.productBarcode.isActive(product)) {
+          this.notifications.warn(
+            "Producto inactivo",
+            `"${product.name}" está inactivo. Actívalo en el catálogo para usarlo.`,
+          );
+          return;
+        }
+
+        const allowed = this.isSale
+          ? this.productBarcode.isSellable(product)
+          : this.productBarcode.isPurchasable(product);
+        if (!allowed) {
+          this.notifications.warn(
+            "Producto no disponible",
+            this.isSale
+              ? `"${product.name}" es un insumo y no se vende suelto.`
+              : `"${product.name}" es un plato y no se compra.`,
+          );
+          return;
+        }
+
+        this.addScannedProduct(product);
+      },
+      error: () => {
+        this.notifications.error(
+          "No se pudo buscar el código",
+          "Revisa tu conexión e intenta de nuevo.",
+        );
+      },
+    });
+  }
+
+  private offerQuickCreate(barcode: string): void {
+    const roles = this.store.user()?.roles ?? [];
+    if (!this.productBarcode.canManageProducts(roles)) {
+      this.notifications.warn(
+        "Código no registrado",
+        `"${barcode}" no está registrado. Pide a un administrador o bodeguero que cree el producto.`,
+      );
+      return;
+    }
+
+    if (!this.limits.canCreate("products")) {
+      this.notifications.warn(
+        "Límite del plan alcanzado",
+        "No puedes crear más productos con tu plan actual.",
+      );
+      return;
+    }
+
+    this.quickCreateBarcode.set(barcode);
+  }
+
+  onProductCreated(product: InventoryProduct): void {
+    this.quickCreateBarcode.set(null);
+    this.addScannedProduct(product);
+  }
+
+  private addScannedProduct(product: InventoryProduct): void {
+    const id = product.id ?? product._id;
+    if (!id) return;
+
+    this.products.update((list) =>
+      list.some((candidate) => (candidate.id ?? candidate._id) === id)
+        ? list
+        : [...list, product],
+    );
+
+    const price = this.isSale ? product.salePrice : product.purchasePrice;
+    const existingIndex = this.items.findIndex(
+      (item) => Number(item.productId) === id,
+    );
+
+    if (existingIndex >= 0) {
+      this.items = this.items.map((item, index) =>
+        index === existingIndex
+          ? {
+              ...item,
+              quantity: Number(item.quantity) + 1,
+              amount: Number(item.amount) || price,
+            }
+          : item,
+      );
+    } else {
+      const emptyIndex = this.items.findIndex((item) => !item.productId);
+      const nextItem: DraftItem = { productId: id, quantity: 1, amount: price };
+      this.items = emptyIndex >= 0
+        ? this.items.map((item, index) => (index === emptyIndex ? nextItem : item))
+        : [...this.items, nextItem];
+    }
+
+    if (this.isSale && product.type !== "prepared" && product.stock < 1) {
+      this.notifications.warn(
+        "Producto sin stock",
+        `${product.name} se agregó con 0 unidades. Registra una entrada antes de cobrar.`,
+      );
+      return;
+    }
+
+    this.notifications.success("Producto agregado", `${product.name} · ${product.sku}`);
+  }
+
   loadContacts(search = ""): void {
     const endpoint = this.isSale ? "/customers" : "/suppliers";
     this.contactSearch = search;
@@ -296,6 +434,7 @@ export class DocumentWorkbenchComponent implements OnInit {
   }
 
   openCreate(): void {
+    this.quickCreateBarcode.set(null);
     this.customerFormOpen.set(false);
     this.customerForm = this.emptyCustomerForm();
     this.selectedContactId = "";
