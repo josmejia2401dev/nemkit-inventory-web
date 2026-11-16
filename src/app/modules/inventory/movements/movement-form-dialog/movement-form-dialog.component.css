@@ -1,0 +1,120 @@
+:host {
+  display: contents;
+}
+
+.movement-dialog {
+  width: min(100%, 820px);
+}
+
+.movement-dialog .dialog-actions {
+  position: sticky;
+  bottom: -21px;
+  z-index: 1;
+  margin: 18px -23px -21px;
+  padding: 14px 23px 21px;
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.label-short {
+  display: none;
+}
+
+.sheet-grip {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .movement-dialog {
+    max-height: calc(100dvh - env(safe-area-inset-top));
+    animation: movement-sheet-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Asa visual: refuerza la lectura de "hoja inferior" en celular. */
+  .sheet-grip {
+    display: block;
+    width: 42px;
+    height: 4px;
+    margin: 9px auto 0;
+    border-radius: 99px;
+    background: rgba(36, 65, 52, 0.18);
+  }
+
+  .movement-dialog .dialog-form {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .movement-dialog .items-heading {
+    align-items: flex-start;
+  }
+
+  .movement-dialog .items-heading > .button {
+    min-height: 44px;
+  }
+
+  /* Buscador: input y botón en la misma línea; lector a lo ancho. */
+  .movement-dialog .product-picker-search {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .movement-dialog .product-picker-search input {
+    flex: 1 1 160px;
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .movement-dialog .product-picker-search .button {
+    min-height: 48px;
+    flex: 0 0 auto;
+  }
+
+  .movement-dialog .product-picker-search .label-full {
+    display: none;
+  }
+
+  .movement-dialog .product-picker-search .label-short {
+    display: inline;
+  }
+
+  .movement-dialog .movement-item-row {
+    align-items: flex-start;
+    padding: 12px;
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(31, 57, 45, 0.04);
+  }
+
+  .movement-dialog .item-product select,
+  .movement-dialog .item-quantity input,
+  .movement-dialog .item-direction select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .movement-dialog .dialog-actions {
+    bottom: calc(-20px - env(safe-area-inset-bottom));
+    margin-right: -17px;
+    margin-left: -17px;
+    padding: 12px 17px calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 420px) {
+  .movement-dialog .dialog-actions .button {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
+
+@keyframes movement-sheet-up {
+  from {
+    transform: translateY(18px);
+    opacity: 0.65;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

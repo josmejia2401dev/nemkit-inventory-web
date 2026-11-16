@@ -1,0 +1,176 @@
+<div class="dialog-backdrop" (click)="closed.emit()">
+  <section
+    class="form-dialog movement-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="movement-dialog-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="dialog-heading">
+      <div>
+        <p class="eyebrow">ACTUALIZA LAS EXISTENCIAS</p>
+        <h2 id="movement-dialog-title">Registrar movimiento</h2>
+      </div>
+      <button type="button" class="icon-button" aria-label="Cerrar" (click)="closed.emit()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+    <form (ngSubmit)="save()" class="dialog-form">
+      <div class="form-grid">
+        <label class="form-field"
+          ><span>Tipo de movimiento <b>*</b></span
+          ><select [ngModel]="type()" (ngModelChange)="type.set($event)" name="type">
+            <option value="damage">Daño · salida</option>
+            <option value="loss">Pérdida · salida</option>
+            <option value="internal_use">Consumo interno · salida</option>
+            <option value="manual_adjustment">Ajuste manual · entrada o salida</option>
+          </select></label
+        ><label class="form-field"
+          ><span>Fecha <b>*</b></span
+          ><input type="date" [ngModel]="date()" (ngModelChange)="date.set($event)" name="date" required
+        /></label>
+        <label class="form-field"
+          ><span>Responsable</span
+          ><select
+            [ngModel]="selectedEmployeeId()"
+            (ngModelChange)="selectedEmployeeId.set($event)"
+            name="employeeId"
+          >
+            <option value="">Sin asignar</option>
+            @for (employee of employees(); track employee.id || employee._id) {
+              <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option>
+            }
+          </select></label
+        >
+      </div>
+      <div class="items-heading">
+        <div>
+          <span class="eyebrow">DETALLE</span><strong>Productos del movimiento</strong>
+        </div>
+        <button type="button" class="button button-secondary button-small" (click)="addItem()">
+          <i class="pi pi-plus"></i> Agregar producto
+        </button>
+      </div>
+      <div class="product-picker-search">
+        <input
+          [ngModel]="productSearch()"
+          (ngModelChange)="productSearch.set($event)"
+          name="productSearch"
+          (keyup.enter)="loadProducts()"
+          maxlength="100"
+          placeholder="Nombre, SKU o código"
+          aria-label="Buscar productos"
+        /><button type="button" class="button button-secondary button-small" (click)="loadProducts()">
+          <i class="pi pi-search"></i>
+          <span class="label-full">Buscar producto</span>
+          <span class="label-short">Buscar</span></button
+        ><app-barcode-scan-tools
+          cameraLabel="Escanear producto con la cámara"
+          (scanned)="applyBarcode($event)"
+        />
+      </div>
+      <div class="movement-item-list">
+        @for (item of items(); track $index) {
+          <div class="movement-item-row">
+            <span class="item-index">{{ ($index + 1).toString().padStart(2, "0") }}</span
+            ><label class="form-field item-product"
+              ><span>Producto</span
+              ><select
+                [ngModel]="item.productId"
+                (ngModelChange)="updateItem($index, { productId: $event })"
+                [name]="'product-' + $index"
+                required
+              >
+                <option value="">Selecciona un producto</option>
+                @for (product of products(); track product.id || product._id) {
+                  <option [ngValue]="product.id || product._id">
+                    {{ product.name }} · {{ product.sku }} ({{ product.stock }}
+                    disp.)
+                  </option>
+                }
+              </select></label
+            ><label class="form-field item-quantity"
+              ><span>Cantidad</span
+              ><input
+                type="number"
+                min="1"
+                step="1"
+                [ngModel]="item.quantity"
+                (ngModelChange)="updateItem($index, { quantity: +$event })"
+                [name]="'quantity-' + $index"
+                required /></label
+            ><label class="form-field item-direction"
+              ><span>Dirección</span>
+              @if (type() === "manual_adjustment") {
+                <select
+                  [ngModel]="item.direction"
+                  (ngModelChange)="updateItem($index, { direction: $event })"
+                  [name]="'direction-' + $index"
+                >
+                  <option value="in">Entrada +</option>
+                  <option value="out">Salida −</option>
+                </select>
+              } @else {
+                <span
+                  class="direction-readonly"
+                  [class.direction-readonly--out]="itemDirection(item) === 'out'"
+                  ><i
+                    [class]="
+                      itemDirection(item) === 'in' ? 'pi pi-arrow-down-left' : 'pi pi-arrow-up-right'
+                    "
+                  ></i
+                  >{{ itemDirection(item) === "in" ? "Entrada" : "Salida" }}</span
+                >
+              }
+            </label>
+            @if (items().length > 1) {
+              <button
+                type="button"
+                class="icon-button icon-button--danger item-remove"
+                title="Quitar artículo"
+                (click)="removeItem($index)"
+              >
+                <i class="pi pi-times"></i>
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <label class="form-field form-field--spaced"
+        ><span>Observaciones</span
+        ><textarea
+          [ngModel]="notes()"
+          (ngModelChange)="notes.set($event)"
+          name="notes"
+          rows="3"
+          maxlength="1000"
+          placeholder="Proveedor, motivo del ajuste u otro detalle"
+        ></textarea>
+      </label>
+      <div class="stock-warning">
+        <i class="pi pi-info-circle"></i
+        ><span
+          >El cambio de stock se aplica al confirmar y queda registrado en el
+          historial.</span
+        >
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" (click)="closed.emit()">Cancelar</button
+        ><button class="button button-primary" [disabled]="saving() || !products().length">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i
+          >{{ saving() ? "Registrando…" : "Confirmar movimiento" }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
+
+@if (quickCreateBarcode(); as barcode) {
+  <app-product-quick-create-dialog
+    [barcode]="barcode"
+    contextLabel="movimiento"
+    (created)="onProductCreated($event)"
+    (cancelled)="quickCreateBarcode.set(null)"
+  />
+}
