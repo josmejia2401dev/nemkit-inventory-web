@@ -1,0 +1,58 @@
+@if (loading()) {
+  <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Preparando reporte…</span></div>
+} @else if (failed()) {
+  <div class="empty-state">
+    <strong>No pudimos cargar el inventario</strong>
+    <p>Comprueba la conexión con el servidor e inténtalo de nuevo.</p>
+    <button class="button button-primary button-small" (click)="load()">Intentar de nuevo</button>
+  </div>
+} @else {
+  @if (report(); as data) {
+  <div class="report-title-row">
+    <div>
+      <p class="eyebrow">VALORACIÓN A PRECIO ACTUAL</p>
+      <h2>Inventario actual</h2>
+      <small>Generado {{ data.generatedAt | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</small>
+    </div>
+    <div class="report-actions">
+      <button class="button button-secondary" (click)="exportExcel()"><i class="pi pi-file-excel"></i> Excel</button>
+      <button class="button button-primary" (click)="exportPdf()"><i class="pi pi-file-pdf"></i> Descargar PDF</button>
+    </div>
+  </div>
+
+  <div class="report-summary">
+    <article><small>Productos</small><strong>{{ data.totals.productCount | number }}</strong></article>
+    <article><small>Unidades</small><strong>{{ data.totals.units | number }}</strong></article>
+    <article><small>Valor al costo</small><strong>{{ formatMoney(data.totals.inventoryCost) }}</strong></article>
+    <article><small>Venta potencial</small><strong>{{ formatMoney(data.totals.potentialSales) }}</strong></article>
+  </div>
+
+  @if (data.items.length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr><th>PRODUCTO</th><th>CATEGORÍA</th><th>STOCK / MÍN.</th><th>COSTO UNIT.</th><th>PRECIO VENTA</th><th>VALOR AL COSTO</th></tr>
+        </thead>
+        <tbody>
+          @for (item of visibleItems(); track item.id) {
+            <tr>
+              <td data-label="Producto"><strong>{{ item.name }}</strong><small class="table-subtext">{{ item.sku }} · {{ item.status === "active" ? "Activo" : "Inactivo" }}</small></td>
+              <td data-label="Categoría">{{ item.categoryName }}</td>
+              <td data-label="Stock / mínimo">{{ item.stock }} / {{ item.minimumStock }}</td>
+              <td data-label="Costo unitario">{{ formatMoney(item.purchasePrice) }}</td>
+              <td data-label="Precio venta">{{ formatMoney(item.salePrice) }}</td>
+              <td data-label="Valor al costo"><strong>{{ formatMoney(item.inventoryCost) }}</strong></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="data.items.length" itemLabel="productos" (pageChange)="goToPage($event)" />
+  } @else {
+    <div class="empty-state">
+      <strong>No hay productos para reportar</strong>
+      <p>Agrega productos para generar el inventario.</p>
+    </div>
+  }
+}
+}

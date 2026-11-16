@@ -1,0 +1,60 @@
+@if (loading()) {
+  <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Preparando reporte…</span></div>
+} @else if (failed()) {
+  <div class="empty-state">
+    <strong>No pudimos cargar este reporte</strong>
+    <p>Comprueba el rango seleccionado y la conexión con el servidor.</p>
+    <button class="button button-primary button-small" (click)="load()">Intentar de nuevo</button>
+  </div>
+} @else {
+  @if (report(); as data) {
+  <div class="report-title-row">
+    <div>
+      <p class="eyebrow">RESULTADOS DEL PERÍODO</p>
+      <h2>Ventas por {{ groupLabel() }}</h2>
+    </div>
+    <label class="form-field form-field--compact">
+      <span>Agrupar por</span>
+      <select [ngModel]="groupBy()" (ngModelChange)="groupBy.set($event)" name="groupBy">
+        <option value="day">Día</option>
+        <option value="week">Semana</option>
+        <option value="month">Mes</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="report-summary">
+    <article><small>Ventas</small><strong>{{ data.totals.salesCount | number }}</strong></article>
+    <article><small>Unidades vendidas</small><strong>{{ data.totals.unitsSold | number }}</strong></article>
+    <article><small>Ingresos</small><strong>{{ formatMoney(data.totals.revenue) }}</strong></article>
+    <article><small>Utilidad bruta estimada</small><strong>{{ formatMoney(data.totals.grossProfit) }}</strong></article>
+  </div>
+
+  @if (data.periods.length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr><th>PERÍODO</th><th>VENTAS</th><th>UNIDADES</th><th>INGRESOS</th><th>UTILIDAD BRUTA</th></tr>
+        </thead>
+        <tbody>
+          @for (period of visiblePeriods(); track period.periodStart) {
+            <tr>
+              <td data-label="Período"><strong>{{ period.periodStart | date: periodFormat() : "" : "es-CO" }}</strong></td>
+              <td data-label="Ventas">{{ period.salesCount }}</td>
+              <td data-label="Unidades">{{ period.unitsSold }}</td>
+              <td data-label="Ingresos"><strong>{{ formatMoney(period.revenue) }}</strong></td>
+              <td data-label="Utilidad bruta">{{ formatMoney(period.grossProfit) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="data.periods.length" itemLabel="períodos" (pageChange)="goToPage($event)" />
+  } @else {
+    <div class="empty-state">
+      <strong>No hay ventas en este período</strong>
+      <p>Cuando registres ventas, aparecerán aquí agrupadas.</p>
+    </div>
+  }
+}
+}

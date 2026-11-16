@@ -1,0 +1,59 @@
+@if (loading()) {
+  <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Preparando reporte…</span></div>
+} @else if (failed()) {
+  <div class="empty-state">
+    <strong>No pudimos cargar el flujo de caja</strong>
+    <p>Comprueba tu conexión y el rango seleccionado antes de intentarlo de nuevo.</p>
+    <button class="button button-primary button-small" (click)="load()">Intentar de nuevo</button>
+  </div>
+} @else {
+  @if (report(); as data) {
+  <div class="report-title-row">
+    <div>
+      <p class="eyebrow">ENTRADAS Y SALIDAS DEL PERÍODO</p>
+      <h2>Flujo de caja</h2>
+      <small>Las compras se asumen pagadas al contado. Los retiros no afectan ventas ni utilidad bruta.</small>
+    </div>
+    <a class="button button-secondary" routerLink="/admin/cash-withdrawals"><i class="pi pi-wallet"></i> Ver retiros</a>
+  </div>
+
+  <div class="report-summary">
+    <article><small>Entradas por ventas</small><strong>{{ formatMoney(data.inflows.sales) }}</strong></article>
+    <article><small>Ventas cobradas</small><strong>{{ data.inflows.salesCount | number }}</strong></article>
+    <article><small>Compras registradas</small><strong>{{ formatMoney(data.outflows.purchases) }}</strong></article>
+    <article><small>Pagos a empleados</small><strong>{{ formatMoney(data.outflows.employeePayments) }}</strong></article>
+    <article><small>Retiros de caja</small><strong>{{ formatMoney(data.outflows.withdrawals) }}</strong></article>
+    <article><small>Salidas totales</small><strong>{{ formatMoney(data.outflows.total) }}</strong></article>
+    <article><small>Neto del período</small><strong>{{ formatMoney(data.net) }}</strong></article>
+  </div>
+
+  @if (data.withdrawalsByReason.length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr><th>MOTIVO DEL RETIRO</th><th>RETIROS</th><th>TOTAL</th></tr>
+        </thead>
+        <tbody>
+          @for (row of data.withdrawalsByReason; track row.reason) {
+            <tr>
+              <td data-label="Motivo">{{ row.label }}</td>
+              <td data-label="Retiros">{{ row.count }}</td>
+              <td data-label="Total"><strong>{{ formatMoney(row.total) }}</strong></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <strong>Sin retiros en este período</strong>
+      <p>El flujo de caja muestra solo ventas cobradas, compras, pagos y retiros registrados.</p>
+    </div>
+  }
+} @else {
+  <div class="empty-state">
+    <strong>Sin datos para el rango</strong>
+    <p>Cambia las fechas y vuelve a aplicar el filtro.</p>
+  </div>
+}
+}

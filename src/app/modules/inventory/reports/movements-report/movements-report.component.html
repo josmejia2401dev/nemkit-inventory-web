@@ -1,0 +1,82 @@
+<div class="report-filters report-filters--inline">
+  <label class="form-field">
+    <span>Tipo de movimiento</span>
+    <select [ngModel]="movementType()" (ngModelChange)="movementType.set($event)">
+      <option value="">Todos</option>
+      <option value="purchase">Compra</option>
+      <option value="manual_adjustment">Ajuste manual</option>
+      <option value="sale">Venta</option>
+      <option value="sale_void">Anulación de venta</option>
+      <option value="damage">Daño</option>
+      <option value="loss">Pérdida</option>
+      <option value="internal_use">Consumo interno</option>
+    </select>
+  </label>
+  <div class="form-field">
+    <label for="report-product-search">Buscar producto</label>
+    <div class="product-picker-search">
+      <input id="report-product-search" [ngModel]="productSearch()" (ngModelChange)="productSearch.set($event)" name="productSearch" (keyup.enter)="searchProducts()" maxlength="100" placeholder="Nombre, SKU o código" />
+      <button type="button" class="button button-secondary button-small" (click)="searchProducts()">Buscar</button>
+    </div>
+  </div>
+  <label class="form-field">
+    <span>Producto</span>
+    <select [ngModel]="productId()" (ngModelChange)="productId.set($event)">
+      <option value="">Todos los productos</option>
+      @for (product of products(); track product.id || product._id) {
+        <option [value]="product.id || product._id">{{ product.name }} · {{ product.sku }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+@if (loading()) {
+  <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Preparando reporte…</span></div>
+} @else {
+  <div class="report-title-row">
+    <div>
+      <p class="eyebrow">TRAZABILIDAD</p>
+      <h2>Movimientos del período</h2>
+      <small>{{ total() | number }} registros</small>
+    </div>
+  </div>
+
+  @if (failed()) {
+    <div class="empty-state">
+      <strong>No pudimos cargar los movimientos</strong>
+      <p>Comprueba tu conexión y el rango seleccionado antes de intentarlo de nuevo.</p>
+      <button class="button button-primary button-small" (click)="load()">Intentar de nuevo</button>
+    </div>
+  } @else if (rows().length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead>
+          <tr><th>FECHA</th><th>TIPO</th><th>PRODUCTOS</th><th>UNIDADES</th><th>OBSERVACIONES</th></tr>
+        </thead>
+        <tbody>
+          @for (movement of rows(); track movement.id || movement._id) {
+            <tr>
+              <td data-label="Fecha">{{ movement.date | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</td>
+              <td data-label="Tipo">{{ label(movement.type) }}</td>
+              <td data-label="Productos">
+                <div class="movement-products">
+                  @for (item of movement.items; track $index) {
+                    <span>{{ item.name }} <b>{{ item.direction === "in" ? "+" : "−" }}{{ item.quantity }}</b></span>
+                  }
+                </div>
+              </td>
+              <td data-label="Unidades">{{ quantity(movement) }}</td>
+              <td data-label="Observaciones">{{ movement.notes || "—" }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="total()" (pageChange)="goToPage($event)" />
+  } @else {
+    <div class="empty-state">
+      <strong>No hay movimientos en este período</strong>
+      <p>Cambia las fechas o los filtros para consultar otros registros.</p>
+    </div>
+  }
+}

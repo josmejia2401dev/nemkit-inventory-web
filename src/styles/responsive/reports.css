@@ -24,3 +24,47 @@
   .report-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .report-title-row { align-items: flex-start; }
 }
+
+/* Navegación por pestañas tipo app: desplazamiento horizontal con snap. */
+@media (max-width: 900px) {
+  .report-tabs {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .report-tabs::-webkit-scrollbar { display: none; }
+  .report-tabs button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    scroll-snap-align: start;
+  }
+  .report-title-row { flex-wrap: wrap; }
+  .report-title-row .form-field--compact { width: 100%; }
+  .report-actions { width: 100%; }
+  .report-actions .button { flex: 1; justify-content: center; }
+}
+
+@media (max-width: 900px) {
+  .report-filters--inline {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .report-filters--inline .form-field,
+  .report-filters--inline .product-picker-search,
+  .report-filters--inline select,
+  .report-filters--inline input {
+    width: 100%;
+  }
+  .report-filters--inline .product-picker-search {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .report-filters--inline .product-picker-search input { flex: 1; min-width: 0; }
+  .report-filters--inline .product-picker-search .button { flex: 0 0 auto; min-height: 48px; }
+}
