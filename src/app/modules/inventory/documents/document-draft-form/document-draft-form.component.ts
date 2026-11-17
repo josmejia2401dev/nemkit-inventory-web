@@ -6,7 +6,6 @@ import {
   InventoryContact,
   InventoryEmployee,
   InventoryProduct,
-  InventoryService,
   InventoryTable,
 } from "../../../../core/services/inventory.service";
 import { NotificationService } from "../../../../core/services/notification.service";
@@ -16,6 +15,8 @@ import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-sc
 import { EMPTY_SCAN, ScanRequest } from "../../../../shared/barcode/scan-request";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
 import { CustomerSaleSummaryComponent } from "../customer-sale-summary/customer-sale-summary.component";
+import { CustomerCreateFormComponent, CustomerDraft } from "../customer-create-form/customer-create-form.component";
+import { DocumentsApi } from "../documents.api";
 import { ProductBarcodeService } from "../../products/product-barcode.service";
 import { ProductQuickCreateDialogComponent } from "../../products/product-quick-create-dialog/product-quick-create-dialog.component";
 import type { DocumentKind } from "../document.types";
@@ -34,6 +35,7 @@ interface DraftItem {
     FormsModule,
     BarcodeScanToolsComponent,
     CustomerSaleSummaryComponent,
+    CustomerCreateFormComponent,
     ProductQuickCreateDialogComponent,
   ],
   templateUrl: "./document-draft-form.component.html",
@@ -41,7 +43,7 @@ interface DraftItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DocumentDraftFormComponent implements OnInit {
-  private readonly inventory = inject(InventoryService);
+  private readonly api = inject(DocumentsApi);
   private readonly notifications = inject(NotificationService);
   private readonly limits = inject(LimitsService);
   private readonly barcode = inject(ProductBarcodeService);
@@ -76,7 +78,6 @@ export class DocumentDraftFormComponent implements OnInit {
   date = new Date().toISOString().slice(0, 10);
   notes = "";
   items: DraftItem[] = [this.emptyItem()];
-  customerForm = this.emptyCustomerForm();
   productSearch = "";
   contactSearch = "";
 
@@ -117,20 +118,13 @@ export class DocumentDraftFormComponent implements OnInit {
   }
 
   loadTables(): void {
-    this.inventory.get<InventoryTable[]>("/tables/occupancy")
+    this.api.tablesOccupancy()
       .subscribe({ next: (response) => this.tables.set(response.data ?? []) });
   }
 
   loadProducts(search = ""): void {
     this.productSearch = search;
-    // Ventas: vendibles (simple + plato). Compras: comprables (simple + insumo).
-    const types = this.isSale ? "simple,prepared" : "simple,ingredient";
-    this.inventory.list<InventoryProduct>("/products", {
-      limit: 100,
-      status: "active",
-      types,
-      search: search.trim() || undefined,
-    }).subscribe({
+    this.api.products(this.kind(), search).subscribe({
       next: (response) => {
         const selectedIds = new Set(this.items.map((item) => Number(item.productId)).filter(Boolean));
         const selectedProducts = this.products().filter((product) => selectedIds.has(product.id ?? product._id ?? 0));
@@ -267,12 +261,8 @@ export class DocumentDraftFormComponent implements OnInit {
   }
 
   loadContacts(search = ""): void {
-    const endpoint = this.isSale ? "/customers" : "/suppliers";
     this.contactSearch = search;
-    this.inventory.list<InventoryContact>(endpoint, {
-      limit: 100,
-      search: search.trim() || undefined,
-    }).subscribe({
+    this.api.contacts(this.kind(), search).subscribe({
       next: (response) => {
         const selectedContact = this.contacts().find((contact) => (contact.id ?? contact._id) === Number(this.selectedContactId));
         const contactsById = new Map<number, InventoryContact>();
@@ -289,13 +279,13 @@ export class DocumentDraftFormComponent implements OnInit {
   }
 
   loadEmployees(): void {
-    this.inventory.get<InventoryEmployee[]>("/employee-options").subscribe({
+    this.api.employees().subscribe({
       next: (response) => this.employees.set(response.data ?? []),
     });
   }
 
   loadCouriers(): void {
-    this.inventory.get<InventoryEmployee[]>("/employee-options", { role: "courier" }).subscribe({
+    this.api.employees("courier").subscribe({
       next: (response) => this.couriers.set(response.data ?? []),
     });
   }
@@ -310,7 +300,7 @@ export class DocumentDraftFormComponent implements OnInit {
       const customerId = customer.id ?? customer._id;
       if (customerId) {
         this.customerProfileLoading.set(true);
-        this.inventory.get<CustomerProfile>(`/statistics/customers/${customerId}/profile`, { limit: 1 }).subscribe({
+        this.api.customerProfile(customerId).subscribe({
           next: (response) => {
             if (Number(this.selectedContactId) === customerId) {
               this.customerProfile.set(response.data);
@@ -347,28 +337,14 @@ export class DocumentDraftFormComponent implements OnInit {
     this.customerFormOpen.update((isOpen) => !isOpen);
   }
 
-  createCustomer(): void {
-    if (this.customerForm.name.trim().length < 2) {
-      this.notifications.warn(
-        "Falta el nombre",
-        "Escribe al menos dos caracteres para el cliente.",
-      );
-      return;
-    }
-
+  createCustomer(draft: CustomerDraft): void {
     this.customerSaving.set(true);
-    this.inventory.post<InventoryContact>("/customers", {
-      name: this.customerForm.name.trim(),
-      document: this.customerForm.document.trim(),
-      phone: this.customerForm.phone.trim(),
-      email: this.customerForm.email.trim(),
-    }).subscribe({
+    this.api.createCustomer(draft).subscribe({
       next: (response) => {
         this.customerSaving.set(false);
         this.contacts.update((contacts) => [...contacts, response.data]);
         this.selectedContactId = response.data.id ?? response.data._id ?? "";
         this.contactChanged();
-        this.customerForm = this.emptyCustomerForm();
         this.customerFormOpen.set(false);
         this.notifications.success(
           "Cliente creado",
@@ -479,9 +455,5 @@ export class DocumentDraftFormComponent implements OnInit {
 
   private emptyItem(): DraftItem {
     return { productId: "", quantity: 1, amount: 0 };
-  }
-
-  private emptyCustomerForm() {
-    return { name: "", document: "", phone: "", email: "" };
   }
 }

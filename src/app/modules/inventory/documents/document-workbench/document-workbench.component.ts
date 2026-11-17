@@ -1,5 +1,5 @@
 import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
-import { InventoryDocument, InventoryService } from "../../../../core/services/inventory.service";
+import { InventoryDocument } from "../../../../core/services/inventory.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { ConfirmService } from "../../../../core/services/confirm.service";
 import { AuthStore } from "../../../../core/store/auth.store";
@@ -13,6 +13,7 @@ import {
 } from "../../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
 import { ORDER_STATUS_LABELS } from "../../order-status.constants";
+import { DocumentsApi } from "../documents.api";
 import { DocumentAdvanceEvent, DocumentListComponent } from "../document-list/document-list.component";
 import { DocumentDraftFormComponent } from "../document-draft-form/document-draft-form.component";
 import { DocumentReceiptComponent } from "../document-receipt/document-receipt.component";
@@ -32,7 +33,7 @@ import type { DocumentKind } from "../document.types";
 })
 export class DocumentWorkbenchComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private readonly inventory = inject(InventoryService);
+  private readonly api = inject(DocumentsApi);
   private readonly notifications = inject(NotificationService);
   private readonly confirm = inject(ConfirmService);
   private readonly store = inject(AuthStore);
@@ -95,10 +96,7 @@ export class DocumentWorkbenchComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this.inventory.list<InventoryDocument>(`/${this.kind}`, {
-      page: this.page(),
-      limit: this.pageSize,
-    }).subscribe({
+    this.api.list(this.kind, this.page(), this.pageSize).subscribe({
       next: (response) => {
         const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
         if (this.page() > totalPages) {
@@ -146,7 +144,7 @@ export class DocumentWorkbenchComponent implements OnInit {
   }
 
   advanceOnSiteOrder({ document, orderStatus }: DocumentAdvanceEvent): void {
-    this.inventory.put(`/sales/${document.id || document._id}/status`, { orderStatus }).subscribe({
+    this.api.advanceSale(document.id || document._id!, orderStatus).subscribe({
       next: () => {
         this.notifications.success(`Pedido #${document.id || document._id}`, `Estado actualizado: ${ORDER_STATUS_LABELS[orderStatus]}.`);
         this.load();
@@ -174,7 +172,7 @@ export class DocumentWorkbenchComponent implements OnInit {
       severity: "info",
     });
     if (!ok) return;
-    this.inventory.put<InventoryDocument>(`/sales/${document.id || document._id}/pay`, {}).subscribe({
+    this.api.paySale(document.id || document._id!).subscribe({
       next: () => {
         this.notifications.success("Venta cobrada", "El pago quedó registrado.");
         this.load();
@@ -189,7 +187,7 @@ export class DocumentWorkbenchComponent implements OnInit {
   confirmCancel(result: CancelOrderResult): void {
     const document = this.cancellingDocument();
     if (!document) return;
-    this.inventory.put<InventoryDocument>(`/sales/${document.id || document._id}/cancel`, result).subscribe({
+    this.api.cancelSale(document.id || document._id!, result).subscribe({
       next: () => {
         this.notifications.success("Pedido cancelado", "El pedido quedó cancelado y el stock se repuso.");
         this.cancellingDocument.set(null);
@@ -204,7 +202,7 @@ export class DocumentWorkbenchComponent implements OnInit {
 
   save(body: Record<string, unknown>): void {
     this.saving.set(true);
-    this.inventory.post<InventoryDocument>(`/${this.kind}`, body).subscribe({
+    this.api.create(this.kind, body).subscribe({
       next: (response) => {
         this.saving.set(false);
         this.dialogOpen.set(false);

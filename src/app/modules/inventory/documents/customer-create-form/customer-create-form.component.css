@@ -1,0 +1,15 @@
+:host {
+  display: contents;
+}
+
+@media (max-width: 480px) {
+  /* En celular los cuatro campos van uno por línea: 16 px y una sola columna. */
+  .customer-quick-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .customer-quick-form > .button {
+    width: 100%;
+    justify-self: stretch;
+  }
+}

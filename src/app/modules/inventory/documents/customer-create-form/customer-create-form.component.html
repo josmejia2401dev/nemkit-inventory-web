@@ -1,0 +1,10 @@
+<div class="customer-quick-form">
+  <div><strong>Nuevo cliente</strong><small>Se guardará y quedará seleccionado en esta venta.</small></div>
+  <div class="customer-quick-fields">
+    <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="form.name" name="newCustomerName" required minlength="2" maxlength="100" /></label>
+    <label class="form-field"><span>Documento</span><input [(ngModel)]="form.document" name="newCustomerDocument" maxlength="40" /></label>
+    <label class="form-field"><span>Teléfono</span><input [(ngModel)]="form.phone" name="newCustomerPhone" type="tel" maxlength="40" /></label>
+    <label class="form-field"><span>Correo</span><input [(ngModel)]="form.email" name="newCustomerEmail" type="email" maxlength="254" /></label>
+  </div>
+  <button type="button" class="button button-secondary button-small" [disabled]="saving()" (click)="submit()"><i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ saving() ? "Creando…" : "Crear y seleccionar" }}</button>
+</div>

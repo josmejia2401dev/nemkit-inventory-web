@@ -85,16 +85,7 @@
         }
       }
       @if (isSale && customerFormOpen()) {
-        <div class="customer-quick-form">
-          <div><strong>Nuevo cliente</strong><small>Se guardará y quedará seleccionado en esta venta.</small></div>
-          <div class="customer-quick-fields">
-            <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="customerForm.name" name="newCustomerName" required minlength="2" maxlength="100" /></label>
-            <label class="form-field"><span>Documento</span><input [(ngModel)]="customerForm.document" name="newCustomerDocument" maxlength="40" /></label>
-            <label class="form-field"><span>Teléfono</span><input [(ngModel)]="customerForm.phone" name="newCustomerPhone" type="tel" maxlength="40" /></label>
-            <label class="form-field"><span>Correo</span><input [(ngModel)]="customerForm.email" name="newCustomerEmail" type="email" maxlength="254" /></label>
-          </div>
-          <button type="button" class="button button-secondary button-small" [disabled]="customerSaving()" (click)="createCustomer()"><i [class]="customerSaving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>{{ customerSaving() ? "Creando…" : "Crear y seleccionar" }}</button>
-        </div>
+        <app-customer-create-form [saving]="customerSaving()" (submitted)="createCustomer($event)" />
       }
       <div class="items-heading">
         <div>
