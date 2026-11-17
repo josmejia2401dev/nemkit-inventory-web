@@ -19,13 +19,13 @@ import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-sc
 import { ProductBarcodeService } from "../../products/product-barcode.service";
 import { ProductQuickCreateDialogComponent } from "../../products/product-quick-create-dialog/product-quick-create-dialog.component";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
+import { DEFAULT_PAGE_SIZE } from "../../../../shared/components/pagination/pagination.component";
 import {
   CancelOrderDialogComponent,
   CancelOrderResult,
 } from "../../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
-import { cancelReasonLabel } from "../../../../shared/cancel-reasons";
-import { ORDER_STATUS_LABELS, OrderStatus } from "../../order-status.constants";
+import { ORDER_STATUS_LABELS } from "../../order-status.constants";
+import { DocumentListComponent, DocumentAdvanceEvent } from "../document-list/document-list.component";
 import { CustomerSaleSummaryComponent } from "../customer-sale-summary/customer-sale-summary.component";
 import { DocumentReceiptComponent } from "../document-receipt/document-receipt.component";
 import type { DocumentKind } from "../document.types";
@@ -39,7 +39,7 @@ interface DraftItem {
 @Component({
   selector: "app-inventory-documents",
   standalone: true,
-  imports: [CommonModule, FormsModule, CancelOrderDialogComponent, CustomerSaleSummaryComponent, DocumentReceiptComponent, PaginationComponent, BarcodeScanToolsComponent, ProductQuickCreateDialogComponent],
+  imports: [CommonModule, FormsModule, CancelOrderDialogComponent, CustomerSaleSummaryComponent, DocumentReceiptComponent, DocumentListComponent, BarcodeScanToolsComponent, ProductQuickCreateDialogComponent],
   templateUrl: "./document-workbench.component.html",
   styleUrls: ["./document-workbench.component.css"],
 })
@@ -116,48 +116,13 @@ export class DocumentWorkbenchComponent implements OnInit {
     return this.isSale ? "Cliente" : "Proveedor";
   }
 
-  currentOrderStatus(document: InventoryDocument): OrderStatus | null {
-    if (document.status === "void") return "cancelled";
-    const rawStatus = document.deliveryStatus ?? document.orderStatus ?? document.kitchenStatus;
-    if (rawStatus === "served") return "delivered";
-    if (rawStatus === "picked_up") return "on_route";
-    return rawStatus && rawStatus in ORDER_STATUS_LABELS ? rawStatus as OrderStatus : null;
-  }
-
-  orderStages(document: InventoryDocument): OrderStatus[] {
-    return document.orderChannel === "delivery"
-      ? ["pending", "preparing", "ready", "on_route", "delivered"]
-      : ["pending", "preparing", "ready", "delivered"];
-  }
-
-  orderProgressIndex(document: InventoryDocument): number {
-    const status = this.currentOrderStatus(document);
-    return status ? this.orderStages(document).indexOf(status) : 0;
-  }
-
-  orderProgressLabel(document: InventoryDocument): string {
-    const status = this.currentOrderStatus(document);
-    return status ? ORDER_STATUS_LABELS[status] : "Pendiente";
-  }
-
-  nextOnSiteOrderStatus(document: InventoryDocument): OrderStatus | null {
-    if (!this.isSale || this.isRestaurant || document.orderChannel === "delivery" || document.status === "void") return null;
-    const currentStatus = document.orderStatus ?? document.kitchenStatus ?? "pending";
-    if (currentStatus === "pending") return "preparing";
-    if (currentStatus === "preparing") return "ready";
-    if (currentStatus === "ready") return "delivered";
-    return null;
-  }
-
   get canAdvanceOnSiteOrders(): boolean {
     if (this.isRestaurant || !this.isSale) return false;
     const roles = this.store.user()?.roles ?? [];
     return roles.includes("ADMIN") || roles.includes("SELLER");
   }
 
-  advanceOnSiteOrder(document: InventoryDocument): void {
-    const orderStatus = this.nextOnSiteOrderStatus(document);
-    if (!orderStatus || !this.canAdvanceOnSiteOrders) return;
+  advanceOnSiteOrder({ document, orderStatus }: DocumentAdvanceEvent): void {
     this.inventory.put(`/sales/${document.id || document._id}/status`, { orderStatus }).subscribe({
       next: () => {
         this.notifications.success(`Pedido #${document.id || document._id}`, `Estado actualizado: ${ORDER_STATUS_LABELS[orderStatus]}.`);
@@ -475,22 +440,8 @@ export class DocumentWorkbenchComponent implements OnInit {
     return this.products().find((product) => (product.id ?? product._id) === id)?.name ?? `Producto #${id}`;
   }
 
-  documentContact(document: InventoryDocument): string {
-    return this.isSale
-      ? document.customerSnapshot?.name || "Cliente"
-      : document.supplierSnapshot?.name || "Proveedor";
-  }
-
   openDocument(document: InventoryDocument): void {
     this.previewDocument.set(document);
-  }
-
-  /** Venta pendiente que administración o ventas puede cobrar al recibir el dinero. */
-  isPending(document: InventoryDocument): boolean {
-    return this.isSale
-      && this.canRegisterPayment
-      && document.status !== "void"
-      && document.paymentStatus === "pending";
   }
 
   /** Registra el cobro de una venta pendiente. */
@@ -510,15 +461,6 @@ export class DocumentWorkbenchComponent implements OnInit {
         this.load();
       },
     });
-  }
-
-  /** ¿Se puede cancelar? Ventas no anuladas (restaurante: típicamente pendientes). */
-  canCancel(document: InventoryDocument): boolean {
-    return this.isSale && document.status !== "void";
-  }
-
-  cancelReasonLabel(value: string | undefined | null): string {
-    return cancelReasonLabel(value);
   }
 
   openCancel(document: InventoryDocument): void {

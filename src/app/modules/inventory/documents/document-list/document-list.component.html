@@ -1,0 +1,78 @@
+<section class="panel catalog-panel">
+  <div class="filter-bar"><div class="filter-title"><span class="panel-icon"><i [class]="isSale() ? 'pi pi-chart-line' : 'pi pi-box'"></i></span><strong>Historial de {{ title().toLowerCase() }}</strong><span class="filter-count">{{ documents().length }}</span></div><app-barcode-scan-tools [cameraLabel]="'Escanear producto para una nueva ' + singular()" cameraText="Cámara" (scanned)="scanned.emit($event)" /><button class="icon-button filter-refresh" title="Actualizar" (click)="refreshed.emit()"><i class="pi pi-refresh"></i></button></div>
+  @if (loading()) {
+    <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando {{ title().toLowerCase() }}…</span></div>
+  } @else if (documents().length) {
+    <div class="table-scroll"><table class="inventory-table">
+      <thead><tr><th>DOCUMENTO</th><th>FECHA</th><th>{{ contactLabel().toUpperCase() }}</th><th>ARTÍCULOS</th><th>TOTAL</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
+      <tbody>@for (document of documents(); track document.id || document._id) {
+        <tr>
+          <td data-label="Documento"><strong>#{{ document.id || document._id }}</strong><small class="table-subtext">{{ document.items.length }} {{ document.items.length === 1 ? "producto" : "productos" }}</small></td>
+          <td data-label="Fecha">{{ document.date | date: "d MMM yyyy, HH:mm" : "" : "es-CO" }}</td>
+          <td [attr.data-label]="contactLabel()">{{ documentContact(document) }}</td>
+          <td data-label="Artículos"><div class="document-lines-preview">@for (item of document.items.slice(0, 2); track $index) { <span>{{ item.quantity }} × {{ item.name }}</span> } @if (document.items.length > 2) { <small>+{{ document.items.length - 2 }} más</small> }</div></td>
+          <td data-label="Total"><strong>{{ formatMoney(document.total) }}</strong></td>
+          <td data-label="Estado" class="document-state-cell">
+            <div class="document-state-stack">
+            @if (isSale() && document.status === "void") {
+              <span class="document-status document-status--void"><i class="pi pi-ban"></i> Cancelada</span>
+              @if (document.voidReason || document.voidNote) {
+                <small class="table-subtext">{{ cancelReasonLabel(document.voidReason) }}{{ document.voidNote ? (document.voidReason ? " · " : "") + document.voidNote : "" }}</small>
+              }
+            } @else if (isSale() && document.paymentStatus === "pending") {
+              <span class="document-status document-status--pending"><i class="pi pi-clock"></i> Por cobrar</span>
+            } @else {
+              <span class="document-status"><i class="pi pi-check-circle"></i> {{ isSale() ? "Pagada" : "Registrada" }}</span>
+            }
+            @if (isSale() && document.status !== "void") {
+              <div class="document-order-state" [class.document-order-state--delivery]="document.orderChannel === 'delivery'">
+                <i [class]="document.orderChannel === 'delivery' ? 'pi pi-send' : 'pi pi-shopping-bag'"></i>
+                <span>
+                  <small>{{ document.orderChannel === "delivery" ? "Domicilio" : "En sitio" }}</small>
+                  <strong>{{ orderProgressLabel(document) }}</strong>
+                </span>
+              </div>
+              <div class="document-order-progress" [attr.aria-label]="'Progreso: ' + orderProgressLabel(document)">
+                @for (stage of orderStages(document); track stage; let index = $index) {
+                  <span
+                    [class.document-order-progress-step--done]="index < orderProgressIndex(document)"
+                    [class.document-order-progress-step--current]="index === orderProgressIndex(document)"
+                  ></span>
+                }
+              </div>
+            }
+            @if (isSale() && (document.orderChannel === "delivery" || document.deliveryStatus)) {
+              @if (document.deliveryCourierName) {
+                <small class="document-status-courier"><i class="pi pi-user"></i> {{ document.deliveryCourierName }}</small>
+              }
+            }
+            </div>
+          </td>
+          <td data-label="Acciones" class="document-actions-cell">
+            <div class="document-actions">
+            @if (canAdvanceOnSiteOrders()) {
+              @if (nextOnSiteOrderStatus(document); as nextStatus) {
+                <button class="button button-secondary button-small document-advance-button" title="Avanzar estado del pedido" (click)="advance(document)">
+                  <i class="pi pi-arrow-right"></i>
+                  <span>{{ nextStatus === "preparing" ? "Preparar" : nextStatus === "ready" ? "Marcar listo" : "Entregar" }}</span>
+                </button>
+              }
+            }
+            @if (isPending(document)) {
+              <button class="button button-primary button-small" title="Registrar cobro" (click)="paid.emit(document)"><i class="pi pi-dollar"></i> Cobrar</button>
+            }
+            @if (canCancel(document)) {
+              <button class="button-link-danger" title="Cancelar pedido" (click)="cancelled.emit(document)"><i class="pi pi-ban"></i> Cancelar</button>
+            }
+            <button class="icon-button" title="Ver detalle e imprimir" aria-label="Ver detalle e imprimir" (click)="opened.emit(document)"><i class="pi pi-eye"></i></button>
+            </div>
+          </td>
+        </tr>
+      }</tbody>
+    </table></div>
+    <app-pagination [page]="page()" [pageSize]="pageSize()" [totalItems]="totalItems()" (pageChange)="pageChange.emit($event)" />
+    <p class="table-footer-note">El stock refleja estos registros</p>
+  } @else {
+    <div class="empty-state"><span class="empty-icon"><i [class]="isSale() ? 'pi pi-receipt' : 'pi pi-truck'"></i></span><strong>Aún no hay {{ title().toLowerCase() }}</strong><p>{{ isSale() ? "Registra tu primera venta y genera un comprobante listo para imprimir." : "Registra una compra para recibir productos y actualizar las existencias." }}</p><button class="button button-primary button-small" (click)="create.emit()"><i class="pi pi-plus"></i> Registrar {{ singular() }}</button></div>
+  }
+</section>

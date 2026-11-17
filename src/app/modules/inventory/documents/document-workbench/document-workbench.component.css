@@ -103,102 +103,6 @@
   font-size: 9px;
 }
 
-.document-state-stack {
-  display: grid;
-  justify-items: start;
-  gap: 7px;
-  min-width: 128px;
-  white-space: normal;
-}
-
-.document-order-state {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #4d7157;
-}
-
-.document-order-state > i {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 9px;
-  color: inherit;
-  background: #edf4ec;
-  font-size: 12px;
-}
-
-.document-order-state--delivery {
-  color: #426b84;
-}
-
-.document-order-state--delivery > i {
-  background: #eaf2f7;
-}
-
-.document-order-state > span {
-  display: grid;
-  gap: 2px;
-}
-
-.document-order-state small {
-  color: #89968d;
-  font-size: 8px;
-}
-
-.document-order-state strong {
-  color: #385543;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.document-order-state--delivery strong {
-  color: #3f6177;
-}
-
-.document-order-progress {
-  display: flex;
-  width: 100%;
-  max-width: 150px;
-  gap: 3px;
-}
-
-.document-order-progress span {
-  height: 4px;
-  flex: 1 1 0;
-  border-radius: 99px;
-  background: #e7ece7;
-}
-
-.document-order-progress .document-order-progress-step--done {
-  background: #85aa8a;
-}
-
-.document-order-progress .document-order-progress-step--current {
-  background: #276650;
-  box-shadow: 0 0 0 2px rgba(39, 102, 80, 0.12);
-}
-
-.document-actions-cell {
-  white-space: normal;
-}
-
-.document-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  min-width: 126px;
-}
-
-.document-advance-button {
-  min-height: 36px;
-  padding-inline: 10px;
-  white-space: nowrap;
-}
-
 .transaction-dialog {
   width: min(100%, 940px);
 }
@@ -498,65 +402,6 @@
     display: none;
   }
 
-  .document-state-cell {
-    display: block !important;
-    padding: 10px 0 !important;
-    text-align: left !important;
-  }
-
-  .document-state-cell::before {
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  .document-state-stack {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: stretch;
-    gap: 9px;
-    min-width: 0;
-  }
-
-  .document-order-state {
-    width: fit-content;
-  }
-
-  .document-order-progress {
-    max-width: 100%;
-  }
-
-  .document-order-progress span {
-    height: 5px;
-  }
-
-  .document-actions-cell {
-    display: block !important;
-    padding-top: 10px !important;
-    text-align: left !important;
-  }
-
-  .document-actions-cell::before {
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  .document-actions {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 8px;
-    min-width: 0;
-  }
-
-  .document-actions .button {
-    min-height: 44px;
-  }
-
-  .document-actions .icon-button {
-    width: 44px;
-    height: 44px;
-    border: 1px solid rgba(36, 65, 52, 0.11);
-    background: #fafbf8;
-  }
-
   .transaction-dialog--sale {
     max-height: calc(100dvh - env(safe-area-inset-top));
     border-radius: 20px 20px 0 0;
@@ -775,9 +620,23 @@
   }
 }
 
+@media (max-width: 420px) {
+  /* En pantallas muy angostas el botón queda icono + aria-label, como el resto
+     de cabeceras, para no desbordar el título. */
+  .page-heading > .sales-create-button {
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .page-heading > .sales-create-button i {
+    font-size: 15px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sales-create-button,
-  .document-order-progress span {
+  .sales-create-button {
     transition: none;
   }
 }
