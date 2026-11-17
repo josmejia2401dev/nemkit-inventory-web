@@ -18,6 +18,7 @@ import { LimitsService } from "../../../../core/services/limits.service";
 import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
 import { ProductBarcodeService } from "../../products/product-barcode.service";
 import { ProductQuickCreateDialogComponent } from "../../products/product-quick-create-dialog/product-quick-create-dialog.component";
+import { ScanRequest } from "../../../../shared/barcode/scan-request";
 
 export type MovementDirection = "in" | "out";
 
@@ -28,12 +29,6 @@ export interface MovementDraft {
   notes: string;
   employeeId?: number;
   items: Array<{ productId: number; quantity: number; direction?: MovementDirection }>;
-}
-
-/** Pedido de escaneo emitido por la pantalla (el lector es global). */
-export interface MovementScanRequest {
-  code: string;
-  seq: number;
 }
 
 @Component({
@@ -52,7 +47,7 @@ export class MovementFormDialogComponent implements OnInit {
   private readonly productBarcode = inject(ProductBarcodeService);
 
   readonly saving = input(false);
-  readonly scan = input<MovementScanRequest>({ code: "", seq: 0 });
+  readonly scan = input<ScanRequest>({ code: "", seq: 0 });
   readonly submitted = output<MovementDraft>();
   readonly closed = output<void>();
 

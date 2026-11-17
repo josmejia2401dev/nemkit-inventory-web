@@ -1,0 +1,66 @@
+:host {
+  display: contents;
+}
+
+.barcode-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.barcode-input-row input {
+  min-width: 0;
+  flex: 1;
+}
+
+.sheet-grip {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .product-form-dialog {
+    animation: product-sheet-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Asa visual: refuerza la lectura de "hoja inferior" en celular. */
+  .sheet-grip {
+    display: block;
+    width: 42px;
+    height: 4px;
+    margin: 9px auto 0;
+    border-radius: 99px;
+    background: rgba(36, 65, 52, 0.18);
+  }
+
+  /* Receta: insumo a lo ancho y cantidad + quitar en una fila táctil. */
+  .product-form-dialog .recipe-row {
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .product-form-dialog .recipe-row .recipe-ingredient {
+    flex: 1 1 100%;
+  }
+
+  .product-form-dialog .recipe-row .recipe-qty {
+    flex: 1 1 auto;
+  }
+
+  .product-form-dialog .recipe-row .recipe-remove {
+    align-self: flex-end;
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
+@keyframes product-sheet-up {
+  from {
+    transform: translateY(18px);
+    opacity: 0.65;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

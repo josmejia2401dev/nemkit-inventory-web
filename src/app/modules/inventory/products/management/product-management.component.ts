@@ -9,20 +9,15 @@ import {
 import { FormsModule } from "@angular/forms";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
-import {
-  InventoryCategory,
-  InventoryProduct,
-  InventoryService,
-  ProductType,
-} from "../../../../core/services/inventory.service";
+import { InventoryCategory, InventoryProduct, InventoryService } from "../../../../core/services/inventory.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { ConfirmService } from "../../../../core/services/confirm.service";
 import { LimitsService } from "../../../../core/services/limits.service";
 import { AuthStore } from "../../../../core/store/auth.store";
 import { BarcodeDispatcherService } from "../../../../core/barcode/barcode-dispatcher.service";
 import { BarcodeScan } from "../../../../core/barcode/barcode.types";
-import { BarcodeCameraBarComponent } from "../../../../shared/barcode/barcode-camera-bar/barcode-camera-bar.component";
 import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
+import { EMPTY_SCAN, ScanRequest, nextScan } from "../../../../shared/barcode/scan-request";
 import { ProductBarcodeService } from "../product-barcode.service";
 import { ProductQuickCreateDialogComponent } from "../product-quick-create-dialog/product-quick-create-dialog.component";
 import { ProductCatalogService } from "../product-catalog.service";
@@ -30,41 +25,57 @@ import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/compo
 import { PlanLimitBannerComponent } from "../../../../shared/components/plan-limit-banner/plan-limit-banner.component";
 import { ProductFilterBarComponent } from "../components/product-filter-bar/product-filter-bar.component";
 import { ProductTableComponent } from "../components/product-table/product-table.component";
+import { ProductDraft, ProductFormDialogComponent } from "./product-form-dialog/product-form-dialog.component";
 
 @Component({
   selector: "app-products",
   standalone: true,
-  imports: [FormsModule, PaginationComponent, PlanLimitBannerComponent, ProductFilterBarComponent, ProductTableComponent, BarcodeCameraBarComponent, BarcodeScanToolsComponent, ProductQuickCreateDialogComponent],
+  imports: [
+    FormsModule,
+    PaginationComponent,
+    PlanLimitBannerComponent,
+    ProductFilterBarComponent,
+    ProductTableComponent,
+    BarcodeScanToolsComponent,
+    ProductQuickCreateDialogComponent,
+    ProductFormDialogComponent,
+  ],
   templateUrl: "./product-management.component.html",
   styleUrls: ["./product-management.component.css"],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductManagementComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private inventory = inject(InventoryService);
-  private catalog = inject(ProductCatalogService);
-  private notifications = inject(NotificationService);
-  private confirm = inject(ConfirmService);
-  private barcodeDispatcher = inject(BarcodeDispatcherService);
-  private productBarcode = inject(ProductBarcodeService);
-  private store = inject(AuthStore);
+  private readonly inventory = inject(InventoryService);
+  private readonly catalog = inject(ProductCatalogService);
+  private readonly notifications = inject(NotificationService);
+  private readonly confirm = inject(ConfirmService);
+  private readonly barcodeDispatcher = inject(BarcodeDispatcherService);
+  private readonly productBarcode = inject(ProductBarcodeService);
+  private readonly store = inject(AuthStore);
   readonly limits = inject(LimitsService);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  products = signal<InventoryProduct[]>([]);
-  categories = signal<InventoryCategory[]>([]);
-  loading = signal(true);
-  page = signal(1);
-  pageCount = signal(1);
-  productCount = signal(0);
-  dialogOpen = signal(false);
-  saving = signal(false);
-  editingId: number | null = null;
+  readonly products = signal<InventoryProduct[]>([]);
+  readonly categories = signal<InventoryCategory[]>([]);
+  readonly loading = signal(true);
+  readonly page = signal(1);
+  readonly pageCount = signal(1);
+  readonly productCount = signal(0);
+  readonly dialogOpen = signal(false);
+  readonly saving = signal(false);
+  readonly editingProduct = signal<InventoryProduct | null>(null);
+  readonly scanRequest = signal<ScanRequest>(EMPTY_SCAN);
+  readonly quickCreateBarcode = signal<string | null>(null);
+
   search = "";
   categoryFilter: number | "" = "";
   typeFilter: "" | "simple" | "ingredient" | "prepared" = "";
+  statusFilter = "";
+  stockState: "" | "out_of_stock" | "low_stock" = "";
+  specificProductId: number | "" = "";
 
   readonly typeFilters: Array<{ value: "" | "simple" | "ingredient" | "prepared"; label: string }> = [
     { value: "", label: "Todos" },
@@ -72,19 +83,6 @@ export class ProductManagementComponent implements OnInit {
     { value: "ingredient", label: "Insumos" },
     { value: "prepared", label: "Platos" },
   ];
-
-  // Insumos disponibles para armar recetas (productos ingredient o simple).
-  ingredients = signal<InventoryProduct[]>([]);
-  readonly typeOptions: Array<{ value: ProductType; label: string; hint: string }> = [
-    { value: "simple", label: "Simple", hint: "Se compra y se vende (tiendas)" },
-    { value: "ingredient", label: "Insumo", hint: "Se compra, no se vende suelto" },
-    { value: "prepared", label: "Plato / preparado", hint: "Se vende con receta de insumos" },
-  ];
-  statusFilter = "";
-  stockState: "" | "out_of_stock" | "low_stock" = "";
-  specificProductId: number | "" = "";
-  quickCreateBarcode = signal<string | null>(null);
-  form = this.emptyForm();
 
   ngOnInit(): void {
     this.limits.load().subscribe({ error: () => undefined });
@@ -99,9 +97,7 @@ export class ProductManagementComponent implements OnInit {
           ? (stockState as "out_of_stock" | "low_stock")
           : "";
         const productId = Number(params.get("productId"));
-        this.specificProductId = Number.isSafeInteger(productId) && productId > 0
-          ? productId
-          : "";
+        this.specificProductId = Number.isSafeInteger(productId) && productId > 0 ? productId : "";
         this.page.set(1);
         if (this.stockState) {
           this.search = "";
@@ -195,17 +191,7 @@ export class ProductManagementComponent implements OnInit {
     if (this.quickCreateBarcode()) return;
 
     if (this.dialogOpen()) {
-      this.form.barcode = value;
-      this.productBarcode.resolveForScan(value, "catalog").subscribe({
-        next: (outcome) => {
-          if (outcome.status !== "found") return;
-          this.notifications.warn(
-            "Código ya registrado",
-            `"${value}" pertenece a ${outcome.product.name}.`,
-          );
-        },
-        error: () => undefined,
-      });
+      this.scanRequest.update((current) => nextScan(current, value));
       return;
     }
 
@@ -255,33 +241,10 @@ export class ProductManagementComponent implements OnInit {
     });
   }
 
-  loadIngredients(): void {
-    // Insumos y simples activos, aptos para formar parte de una receta.
-    this.inventory.listAll<InventoryProduct>("/products", {
-      status: "active",
-      types: "ingredient,simple",
-    }).subscribe({
-      next: (products) => this.ingredients.set(products),
-    });
-  }
-
-  ingredientName(id: number): string {
-    const p = this.ingredients().find((item) => (item.id ?? item._id) === id);
-    return p ? p.name : `Insumo #${id}`;
-  }
-
-  addRecipeItem(): void {
-    this.form.recipe = [...this.form.recipe, { ingredientId: "" as number | "", quantity: 1 }];
-  }
-
-  removeRecipeItem(index: number): void {
-    this.form.recipe = this.form.recipe.filter((_item, i) => i !== index);
-  }
-
   categoryName(id: number): string {
     return (
-      this.categories().find((category) => (category.id ?? category._id) === id)
-        ?.name ?? "Sin categoría"
+      this.categories().find((category) => (category.id ?? category._id) === id)?.name ??
+      "Sin categoría"
     );
   }
 
@@ -296,33 +259,14 @@ export class ProductManagementComponent implements OnInit {
       this.notifications.warn("Límite del plan alcanzado", "No puedes crear más productos con tu plan actual.");
       return;
     }
-    this.quickCreateBarcode.set(null);
-    this.editingId = null;
-    this.form = this.emptyForm();
-    this.loadIngredients();
+    this.editingProduct.set(null);
+    this.scanRequest.set(EMPTY_SCAN);
     this.dialogOpen.set(true);
   }
 
   openEdit(product: InventoryProduct): void {
-    this.editingId = product.id ?? product._id ?? null;
-    this.form = {
-      categoryId: product.categoryId,
-      type: product.type ?? "simple",
-      sku: product.sku,
-      barcode: product.barcode ?? "",
-      name: product.name,
-      description: product.description ?? "",
-      purchasePrice: product.purchasePrice,
-      salePrice: product.salePrice,
-      minimumStock: product.minimumStock ?? 0,
-      status: product.status,
-      image: product.image?.url ?? "",
-      recipe: (product.recipe ?? []).map((ri) => ({
-        ingredientId: ri.ingredientId as number | "",
-        quantity: ri.quantity,
-      })),
-    };
-    this.loadIngredients();
+    this.editingProduct.set(product);
+    this.scanRequest.set(EMPTY_SCAN);
     this.dialogOpen.set(true);
   }
 
@@ -330,64 +274,20 @@ export class ProductManagementComponent implements OnInit {
     this.dialogOpen.set(false);
   }
 
-  save(): void {
-    if (
-      !this.form.categoryId ||
-      !this.form.sku.trim() ||
-      !this.form.name.trim()
-    ) {
-      this.notifications.warn(
-        "Faltan datos",
-        "Completa el nombre, SKU y categoría.",
-      );
-      return;
-    }
-
-    const isPrepared = this.form.type === "prepared";
-    let recipe: Array<{ ingredientId: number; quantity: number }> | undefined;
-    if (isPrepared) {
-      // La receta es opcional: si el restaurante no define insumos, el plato se
-      // guarda igual (la venta no descontará insumos). Solo enviamos los válidos.
-      const valid = this.form.recipe.filter((ri) => ri.ingredientId && Number(ri.quantity) > 0);
-      recipe = valid.map((ri) => ({ ingredientId: Number(ri.ingredientId), quantity: Number(ri.quantity) }));
-    }
-
-    const body: Record<string, unknown> = {
-      categoryId: Number(this.form.categoryId),
-      type: this.form.type,
-      sku: this.form.sku.trim(),
-      barcode: this.form.barcode.trim(),
-      name: this.form.name.trim(),
-      description: this.form.description.trim(),
-      // Precio de compra opcional: si queda vacío, se envía 0.
-      purchasePrice: Number(this.form.purchasePrice) || 0,
-      salePrice: Number(this.form.salePrice),
-      minimumStock: Number(this.form.minimumStock),
-      status: this.form.status,
-      image: this.form.image.trim()
-        ? { url: this.form.image.trim() }
-        : undefined,
-    };
-    if (isPrepared) body["recipe"] = recipe;
-
+  save(draft: ProductDraft): void {
+    const editing = this.editingProduct();
     this.saving.set(true);
-    const isCreate = !this.editingId;
-    const request = this.editingId
-      ? this.inventory.put<InventoryProduct>(
-          `/products/${this.editingId}`,
-          body,
-        )
-      : this.inventory.post<InventoryProduct>("/products", body);
+    const request = editing
+      ? this.inventory.put<InventoryProduct>(`/products/${editing.id ?? editing._id}`, draft.body)
+      : this.inventory.post<InventoryProduct>("/products", draft.body);
 
     request.subscribe({
       next: () => {
         this.saving.set(false);
         this.closeDialog();
-        this.notifications.success(
-          this.editingId ? "Producto actualizado" : "Producto creado",
-        );
+        this.notifications.success(draft.isCreate ? "Producto creado" : "Producto actualizado");
         this.loadProducts();
-        if (isCreate) this.limits.load(true).subscribe({ error: () => undefined });
+        if (draft.isCreate) this.limits.load(true).subscribe({ error: () => undefined });
       },
       error: () => this.saving.set(false),
     });
@@ -415,22 +315,5 @@ export class ProductManagementComponent implements OnInit {
         this.limits.load(true).subscribe({ error: () => undefined });
       },
     });
-  }
-
-  private emptyForm() {
-    return {
-      categoryId: "" as number | "",
-      type: "simple" as ProductType,
-      sku: "",
-      barcode: "",
-      name: "",
-      description: "",
-      purchasePrice: 0,
-      salePrice: 0,
-      minimumStock: 0,
-      status: "active" as "active" | "inactive",
-      image: "",
-      recipe: [] as Array<{ ingredientId: number | ""; quantity: number }>,
-    };
   }
 }

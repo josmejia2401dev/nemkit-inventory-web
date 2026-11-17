@@ -6,10 +6,10 @@ import { NotificationService } from "../../../core/services/notification.service
 import { BarcodeDispatcherService } from "../../../core/barcode/barcode-dispatcher.service";
 import { BarcodeScan } from "../../../core/barcode/barcode.types";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { EMPTY_SCAN, ScanRequest, nextScan } from "../../../shared/barcode/scan-request";
 import {
   MovementDraft,
   MovementFormDialogComponent,
-  MovementScanRequest,
 } from "./movement-form-dialog/movement-form-dialog.component";
 
 const MOVEMENT_LABELS: Record<string, string> = {
@@ -43,7 +43,7 @@ export class MovementsComponent implements OnInit {
   readonly movementCount = signal(0);
   readonly dialogOpen = signal(false);
   readonly saving = signal(false);
-  readonly scanRequest = signal<MovementScanRequest>({ code: "", seq: 0 });
+  readonly scanRequest = signal<ScanRequest>(EMPTY_SCAN);
   readonly filterType = signal("");
   readonly labels = MOVEMENT_LABELS;
 
@@ -63,7 +63,7 @@ export class MovementsComponent implements OnInit {
   /** El lector es global: abre la hoja y le pasa el código al formulario. */
   private onBarcodeScan(scan: BarcodeScan): void {
     this.dialogOpen.set(true);
-    this.scanRequest.update((current) => ({ code: scan.code, seq: current.seq + 1 }));
+    this.scanRequest.update((current) => nextScan(current, scan.code));
   }
 
   onFilterChange(value: string): void {
@@ -108,7 +108,7 @@ export class MovementsComponent implements OnInit {
   }
 
   openCreate(): void {
-    this.scanRequest.set({ code: "", seq: 0 });
+    this.scanRequest.set(EMPTY_SCAN);
     this.dialogOpen.set(true);
   }
 
