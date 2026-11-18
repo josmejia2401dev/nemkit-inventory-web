@@ -177,3 +177,13 @@
     height: 42px;
   }
 }
+
+/* En pantallas muy estrechas el alta pasa a icono para no desbordar el título. */
+@media (max-width: 420px) {
+  .page-heading > .button {
+    width: 44px;
+    min-width: 44px;
+    padding: 0;
+    font-size: 0;
+  }
+}

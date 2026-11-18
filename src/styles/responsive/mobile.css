@@ -131,6 +131,8 @@
     text-align: left;
   }
   .inventory-table td:last-child { border-bottom: 0; }
+  /* En modo tarjeta las acciones ocupan todo el ancho y se alinean a la derecha. */
+  .inventory-table td.row-actions-cell { width: auto; justify-content: flex-end; }
   .inventory-table td[data-label="Producto"],
   .inventory-table td[data-label="Productos"] {
     display: block;
