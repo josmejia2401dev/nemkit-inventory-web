@@ -5,8 +5,8 @@ import {
   DocumentType,
   EmployeeRole,
   InventoryEmployee,
-  InventoryService,
 } from "../../../core/services/inventory.service";
+import { EmployeeInput, EmployeesApi } from "./employees.api";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { LimitsService, LimitStatus } from "../../../core/services/limits.service";
@@ -37,7 +37,7 @@ interface EmployeeForm {
 })
 export class EmployeesComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private inventory = inject(InventoryService);
+  private employeesApi = inject(EmployeesApi);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
   readonly limits = inject(LimitsService);
@@ -104,8 +104,8 @@ export class EmployeesComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this.inventory
-      .list<InventoryEmployee>("/users/employees", {
+    this.employeesApi
+      .list({
         page: this.page(),
         limit: this.pageSize,
         search: this.search.trim(),
@@ -194,7 +194,7 @@ export class EmployeesComponent implements OnInit {
       }
     }
 
-    const body: Record<string, unknown> = {
+    const body: EmployeeInput = {
       name: this.form.name.trim(),
       documentType: this.form.documentType,
       documentNumber: this.form.documentNumber.trim(),
@@ -202,16 +202,16 @@ export class EmployeesComponent implements OnInit {
       role: this.form.role,
       status: this.form.status,
     };
-    if (this.form.hireDate) body["hireDate"] = this.form.hireDate;
+    if (this.form.hireDate) body.hireDate = this.form.hireDate;
     if (isCreate) {
-      body["email"] = this.form.email.trim();
-      body["password"] = this.form.password;
+      body.email = this.form.email.trim();
+      body.password = this.form.password;
     }
 
     this.saving.set(true);
-    const request = isCreate
-      ? this.inventory.post<InventoryEmployee>("/users/employees", body)
-      : this.inventory.put<InventoryEmployee>(`/users/employees/${this.editingId}`, body);
+    const request = this.editingId
+      ? this.employeesApi.update(this.editingId, body)
+      : this.employeesApi.create(body);
     request.subscribe({
       next: () => {
         this.saving.set(false);
@@ -240,7 +240,7 @@ export class EmployeesComponent implements OnInit {
     });
     if (!ok) return;
     this.statusUpdatingId.set(id);
-    this.inventory.put(`/users/employees/${id}`, { status: nextStatus }).subscribe({
+    this.employeesApi.changeStatus(id, nextStatus).subscribe({
       next: () => {
         this.statusUpdatingId.set(null);
         this.notifications.success(
@@ -283,7 +283,7 @@ export class EmployeesComponent implements OnInit {
     }
 
     this.resettingPassword.set(true);
-    this.inventory.put(`/users/employees/${id}/password`, { newPassword: this.newPassword }).subscribe({
+    this.employeesApi.resetPassword(id, this.newPassword).subscribe({
       next: () => {
         this.resettingPassword.set(false);
         this.passwordDialogOpen.set(false);

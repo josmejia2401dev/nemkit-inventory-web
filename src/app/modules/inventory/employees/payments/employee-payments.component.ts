@@ -4,9 +4,9 @@ import { FormsModule } from "@angular/forms";
 import {
   InventoryEmployeePayment,
   InventoryEmployeePaymentSummary,
-  InventoryService,
   PageResult,
 } from "../../../../core/services/inventory.service";
+import { EmployeePaymentInput, EmployeesApi } from "../employees.api";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
@@ -35,7 +35,7 @@ export class EmployeePaymentsComponent {
   @Output() closed = new EventEmitter<void>();
 
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private inventory = inject(InventoryService);
+  private employeesApi = inject(EmployeesApi);
   private notifications = inject(NotificationService);
 
   records = signal<InventoryEmployeePayment[]>([]);
@@ -53,17 +53,11 @@ export class EmployeePaymentsComponent {
 
   load(): void {
     this.loading.set(true);
-    this.inventory.list<InventoryEmployeePayment>("/employee-payments", {
-      employeeId: this.employeeId,
-      page: this.page(),
-      limit: this.pageSize,
-    }).subscribe({
+    this.employeesApi.payments(this.employeeId, this.page(), this.pageSize).subscribe({
       next: (response: PageResult<InventoryEmployeePayment>) => {
         this.records.set(response.data ?? []);
         this.total.set(response.pagination?.total ?? response.data.length);
-        this.inventory.get<InventoryEmployeePaymentSummary>("/statistics/employees/payments", {
-          employeeId: this.employeeId,
-        }).subscribe({
+        this.employeesApi.paymentSummary(this.employeeId).subscribe({
           next: (summary) => {
             this.summary.set(summary.data);
             this.loading.set(false);
@@ -95,17 +89,19 @@ export class EmployeePaymentsComponent {
     }
 
     this.saving.set(true);
-    this.inventory.post<InventoryEmployeePayment>("/employee-payments", {
+    const amount = this.form.amount;
+    const body: EmployeePaymentInput = {
       employeeId: this.employeeId,
       paymentDate: this.form.paymentDate,
       periodStart: this.form.periodStart || undefined,
       periodEnd: this.form.periodEnd || undefined,
       type: this.form.type,
-      amount: this.form.amount,
+      amount,
       method: this.form.method,
       reference: this.form.reference.trim(),
       notes: this.form.notes.trim(),
-    }).subscribe({
+    };
+    this.employeesApi.createPayment(body).subscribe({
       next: () => {
         this.saving.set(false);
         this.formOpen.set(false);

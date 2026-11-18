@@ -1,10 +1,8 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import {
-  InventoryCategory,
-  InventoryService,
-} from "../../../core/services/inventory.service";
+import { InventoryCategory } from "../../../core/services/inventory.service";
+import { CategoriesApi } from "./categories.api";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
@@ -18,7 +16,7 @@ import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/componen
 })
 export class CategoriesComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private inventory = inject(InventoryService);
+  private categoriesApi = inject(CategoriesApi);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
 
@@ -39,8 +37,8 @@ export class CategoriesComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this.inventory
-      .list<InventoryCategory>("/categories", { page: this.page(), limit: this.pageSize })
+    this.categoriesApi
+      .list(this.page(), this.pageSize)
       .subscribe({
         next: (response) => {
           const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
@@ -93,11 +91,8 @@ export class CategoriesComponent implements OnInit {
       description: this.description.trim(),
     };
     const request = this.editingId
-      ? this.inventory.put<InventoryCategory>(
-          `/categories/${this.editingId}`,
-          body,
-        )
-      : this.inventory.post<InventoryCategory>("/categories", body);
+      ? this.categoriesApi.update(this.editingId, body)
+      : this.categoriesApi.create(body);
 
     request.subscribe({
       next: () => {
@@ -124,7 +119,7 @@ export class CategoriesComponent implements OnInit {
     });
     if (!ok) return;
 
-    this.inventory.delete(`/categories/${id}`).subscribe({
+    this.categoriesApi.remove(id).subscribe({
       next: () => {
         this.notifications.success("Categoría eliminada");
         this.load();

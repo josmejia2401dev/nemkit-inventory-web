@@ -6,8 +6,8 @@ import {
   InventoryContact,
   InventoryLoyaltyRule,
   LoyaltyTier,
-  InventoryService,
 } from "../../../core/services/inventory.service";
+import { ContactInput, ContactKind, ContactsApi } from "./contacts.api";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { LimitsService } from "../../../core/services/limits.service";
@@ -19,7 +19,7 @@ import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/componen
 import { PlanLimitBannerComponent } from "../../../shared/components/plan-limit-banner/plan-limit-banner.component";
 import { CustomerLoyaltyGuideComponent } from "./loyalty-guide/customer-loyalty-guide.component";
 
-export type ContactKind = "suppliers" | "customers";
+export type { ContactKind } from "./contacts.api";
 
 @Component({
   selector: "app-inventory-contacts",
@@ -30,7 +30,7 @@ export type ContactKind = "suppliers" | "customers";
 })
 export class ContactDirectoryComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private inventory = inject(InventoryService);
+  private contactsApi = inject(ContactsApi);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
   private barcodeDispatcher = inject(BarcodeDispatcherService);
@@ -109,7 +109,7 @@ export class ContactDirectoryComponent implements OnInit {
   }
 
   private loadLoyaltyRules(): void {
-    this.inventory.get<InventoryLoyaltyRule[]>("/statistics/customers/loyalty-rules").subscribe({
+    this.contactsApi.loyaltyRules().subscribe({
       next: (response) => this.loyaltyRules.set(response.data ?? []),
     });
   }
@@ -117,7 +117,7 @@ export class ContactDirectoryComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.loadFailed.set(false);
-    this.inventory.list<InventoryContact>(`/${this.kind}`, {
+    this.contactsApi.list(this.kind, {
       page: this.page(),
       limit: this.pageSize,
       search: this.search.trim(),
@@ -179,7 +179,7 @@ export class ContactDirectoryComponent implements OnInit {
       this.notifications.warn("Revisa el nombre", "Escribe al menos dos caracteres.");
       return;
     }
-    const body: Record<string, string> = {
+    const body: ContactInput = {
       name: this.form.name.trim(),
       document: this.form.document.trim(),
       phone: this.form.phone.trim(),
@@ -189,8 +189,8 @@ export class ContactDirectoryComponent implements OnInit {
     this.saving.set(true);
     const isCreate = !this.editingId;
     const request = this.editingId
-      ? this.inventory.put<InventoryContact>(`/${this.kind}/${this.editingId}`, body)
-      : this.inventory.post<InventoryContact>(`/${this.kind}`, body);
+      ? this.contactsApi.update(this.kind, this.editingId, body)
+      : this.contactsApi.create(this.kind, body);
     request.subscribe({
       next: () => {
         this.saving.set(false);
@@ -214,7 +214,7 @@ export class ContactDirectoryComponent implements OnInit {
       severity: "danger",
     });
     if (!ok) return;
-    this.inventory.delete(`/${this.kind}/${id}`).subscribe({
+    this.contactsApi.remove(this.kind, id).subscribe({
       next: () => {
         this.notifications.success("Registro eliminado");
         this.load();
@@ -230,7 +230,7 @@ export class ContactDirectoryComponent implements OnInit {
       return;
     }
     this.lookupLoading.set(true);
-    this.inventory.get<InventoryContact | null>("/customers/lookup", { term }).subscribe({
+    this.contactsApi.lookup(term).subscribe({
       next: (response) => {
         this.lookupLoading.set(false);
         if (!response.data) {
@@ -259,10 +259,7 @@ export class ContactDirectoryComponent implements OnInit {
   }
 
   private loadCustomerProfile(customerId: number, page: number): void {
-    this.inventory.get<CustomerProfile>(`/statistics/customers/${customerId}/profile`, {
-      page,
-      limit: this.profilePageSize,
-    }).subscribe({
+    this.contactsApi.profile(customerId, page, this.profilePageSize).subscribe({
       next: (response) => {
         this.profile.set(response.data);
         this.profileOpen.set(true);

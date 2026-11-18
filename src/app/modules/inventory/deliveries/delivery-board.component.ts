@@ -6,8 +6,9 @@ import {
   DeliveryStatus,
   InventoryDelivery,
   InventoryEmployee,
-  InventoryService,
 } from "../../../core/services/inventory.service";
+import { DeliveriesApi, DeliveryProof } from "./deliveries.api";
+import { EmployeesApi } from "../employees/employees.api";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 import { AuthStore } from "../../../core/store/auth.store";
@@ -43,7 +44,8 @@ export type DeliveryBoardMode = "operations" | "courier";
 })
 export class DeliveryBoardComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private inventory = inject(InventoryService);
+  private deliveriesApi = inject(DeliveriesApi);
+  private employeesApi = inject(EmployeesApi);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
   private store = inject(AuthStore);
@@ -127,7 +129,7 @@ export class DeliveryBoardComponent implements OnInit {
 
   load(): void {
     this.loading.set(true);
-    this.inventory.list<InventoryDelivery>("/deliveries", {
+    this.deliveriesApi.list({
       page: this.page(),
       limit: this.pageSize,
       status: this.statusFilter || undefined,
@@ -161,15 +163,13 @@ export class DeliveryBoardComponent implements OnInit {
   }
 
   loadCouriers(): void {
-    this.inventory.get<InventoryEmployee[]>("/employee-options", { role: "courier" })
+    this.employeesApi.couriers()
       .subscribe({ next: (response) => this.couriers.set(response.data ?? []) });
   }
 
   assignCourier(delivery: InventoryDelivery, courierId: string): void {
     if (!courierId) return;
-    this.inventory.put<InventoryDelivery>(`/deliveries/${delivery.id}/courier`, {
-      courierId: Number(courierId),
-    }).subscribe({
+    this.deliveriesApi.assignCourier(delivery.id, Number(courierId)).subscribe({
       next: () => {
         this.notifications.success("Domiciliario asignado");
         this.load();
@@ -200,7 +200,7 @@ export class DeliveryBoardComponent implements OnInit {
   }
 
   private changeStatus(delivery: InventoryDelivery, status: DeliveryStatus): void {
-    this.inventory.put<InventoryDelivery>(`/deliveries/${delivery.id}/status`, { status }).subscribe({
+    this.deliveriesApi.changeStatus(delivery.id, status).subscribe({
       next: () => {
         this.notifications.success("Estado actualizado", `Ahora: ${STATUS_LABELS[status]}.`);
         this.load();
@@ -217,7 +217,7 @@ export class DeliveryBoardComponent implements OnInit {
       severity: "danger",
     });
     if (!ok) return;
-    this.inventory.put<InventoryDelivery>(`/deliveries/${delivery.id}/void`, {}).subscribe({
+    this.deliveriesApi.void(delivery.id).subscribe({
       next: () => {
         this.notifications.success("Entrega anulada", "La venta fue revertida y el stock repuesto.");
         this.load();
@@ -235,9 +235,9 @@ export class DeliveryBoardComponent implements OnInit {
   saveProof(): void {
     const delivery = this.proofDelivery();
     if (!delivery) return;
-    const proof: Record<string, unknown> = { observation: this.proofObservation.trim() };
-    if (this.proofPhotoUrl.trim()) proof["photo"] = { url: this.proofPhotoUrl.trim() };
-    this.inventory.put<InventoryDelivery>(`/deliveries/${delivery.id}/proof`, { proof }).subscribe({
+    const proof: DeliveryProof = { observation: this.proofObservation.trim() };
+    if (this.proofPhotoUrl.trim()) proof.photo = { url: this.proofPhotoUrl.trim() };
+    this.deliveriesApi.saveProof(delivery.id, proof).subscribe({
       next: () => {
         this.proofOpen.set(false);
         this.notifications.success("Evidencia guardada");

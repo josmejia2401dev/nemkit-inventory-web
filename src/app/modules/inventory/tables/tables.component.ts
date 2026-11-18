@@ -1,10 +1,8 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import {
-  InventoryTable,
-  InventoryService,
-} from "../../../core/services/inventory.service";
+import { InventoryTable } from "../../../core/services/inventory.service";
+import { TablesApi } from "./tables.api";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
 
@@ -15,7 +13,7 @@ import { ConfirmService } from "../../../core/services/confirm.service";
   templateUrl: "./tables.component.html",
 })
 export class TablesComponent implements OnInit {
-  private inventory = inject(InventoryService);
+  private tablesApi = inject(TablesApi);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
 
@@ -33,7 +31,7 @@ export class TablesComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     // Trae las mesas con su estado de ocupación.
-    this.inventory.get<InventoryTable[]>("/tables/occupancy").subscribe({
+    this.tablesApi.occupancy().subscribe({
       next: (response) => {
         this.tables.set(response.data ?? []);
         this.loading.set(false);
@@ -62,8 +60,8 @@ export class TablesComponent implements OnInit {
     const body = { name: this.form.name.trim(), description: this.form.description.trim() };
     this.saving.set(true);
     const request = this.editingId
-      ? this.inventory.put<InventoryTable>(`/tables/${this.editingId}`, body)
-      : this.inventory.post<InventoryTable>("/tables", body);
+      ? this.tablesApi.update(this.editingId, body)
+      : this.tablesApi.create(body);
     request.subscribe({
       next: () => {
         this.saving.set(false);
@@ -86,7 +84,7 @@ export class TablesComponent implements OnInit {
       severity: "danger",
     });
     if (!ok) return;
-    this.inventory.delete(`/tables/${id}`).subscribe({
+    this.tablesApi.remove(id).subscribe({
       next: () => {
         this.notifications.success("Mesa eliminada");
         this.load();

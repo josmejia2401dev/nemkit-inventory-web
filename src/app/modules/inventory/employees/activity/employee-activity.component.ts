@@ -1,11 +1,8 @@
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import {
-  InventorySalesByEmployeeReport,
-  InventorySalesByEmployeeRow,
-  InventoryService,
-} from "../../../../core/services/inventory.service";
+import { InventorySalesByEmployeeRow } from "../../../../core/services/inventory.service";
+import { ReportsApi } from "../../reports/reports.api";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
 
 @Component({
@@ -20,7 +17,7 @@ export class EmployeeActivityComponent implements OnInit {
   @Input({ required: true }) employeeName = "";
   @Output() closed = new EventEmitter<void>();
 
-  private inventory = inject(InventoryService);
+  private reports = inject(ReportsApi);
   metrics = signal<InventorySalesByEmployeeRow | null>(null);
   loading = signal(true);
   failed = signal(false);
@@ -40,10 +37,7 @@ export class EmployeeActivityComponent implements OnInit {
 
     this.loading.set(true);
     this.failed.set(false);
-    this.inventory.get<InventorySalesByEmployeeReport>("/statistics/employees/sales", {
-      from: this.from,
-      to: this.to,
-    }).subscribe({
+    this.reports.employees(this.from, this.to).subscribe({
       next: (response) => {
         this.metrics.set(response.data.employees.find((employee) => employee.employeeId === this.employeeId) ?? null);
         this.loading.set(false);
