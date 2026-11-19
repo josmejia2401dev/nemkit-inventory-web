@@ -1,10 +1,8 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import {
-  InventoryService,
-  InventoryDashboardSummary,
-} from "../../../core/services/inventory.service";
+import { InventoryDashboardSummary } from "../../../core/services/inventory.service";
+import { DashboardApi } from "./dashboard.api";
 
 @Component({
   selector: "app-dashboard",
@@ -13,7 +11,7 @@ import {
   templateUrl: "./dashboard.component.html",
 })
 export class DashboardComponent implements OnInit {
-  private inventory = inject(InventoryService);
+  private dashboard = inject(DashboardApi);
 
   summary = signal<InventoryDashboardSummary | null>(null);
   loading = signal(true);
@@ -30,7 +28,7 @@ export class DashboardComponent implements OnInit {
 
   refresh(): void {
     this.loading.set(true);
-    this.inventory.get<InventoryDashboardSummary>("/statistics/dashboard/summary").subscribe({
+    this.dashboard.summary().subscribe({
       next: (response) => {
         this.summary.set(response.data);
         this.loading.set(false);

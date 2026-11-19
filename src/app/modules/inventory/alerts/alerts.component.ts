@@ -1,7 +1,8 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
-import { InventoryService, InventoryStockAlerts } from "../../../core/services/inventory.service";
+import { InventoryStockAlerts } from "../../../core/services/inventory.service";
+import { DashboardApi } from "../dashboard/dashboard.api";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 
 @Component({
@@ -12,7 +13,7 @@ import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/componen
 })
 export class AlertsComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private inventory = inject(InventoryService);
+  private dashboard = inject(DashboardApi);
   private router = inject(Router);
 
   alerts = signal<InventoryStockAlerts | null>(null);
@@ -45,7 +46,7 @@ export class AlertsComponent implements OnInit {
   refresh(): void {
     this.loading.set(true);
     this.page.set(1);
-    this.inventory.get<InventoryStockAlerts>("/statistics/dashboard/alerts").subscribe({
+    this.dashboard.alerts().subscribe({
       next: (response) => {
         this.alerts.set(response.data);
         this.loading.set(false);

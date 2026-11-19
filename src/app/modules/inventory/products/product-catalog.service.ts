@@ -31,4 +31,19 @@ export class ProductCatalogService {
   listCategories(): Observable<InventoryCategory[]> {
     return this.categoriesApi.listAll();
   }
+
+  create(body: Record<string, unknown>): Observable<{ success: boolean; data: InventoryProduct }> {
+    return this.inventory.post<InventoryProduct>("/products", body);
+  }
+
+  update(
+    id: number,
+    body: Record<string, unknown>,
+  ): Observable<{ success: boolean; data: InventoryProduct }> {
+    return this.inventory.put<InventoryProduct>(`/products/${id}`, body);
+  }
+
+  remove(id: number): Observable<{ success: boolean; data: unknown }> {
+    return this.inventory.delete(`/products/${id}`);
+  }
 }

@@ -9,7 +9,7 @@ import {
 import { FormsModule } from "@angular/forms";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ActivatedRoute, Router } from "@angular/router";
-import { InventoryCategory, InventoryProduct, InventoryService } from "../../../../core/services/inventory.service";
+import { InventoryCategory, InventoryProduct } from "../../../../core/services/inventory.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { ConfirmService } from "../../../../core/services/confirm.service";
 import { LimitsService } from "../../../../core/services/limits.service";
@@ -46,7 +46,6 @@ import { ProductDraft, ProductFormDialogComponent } from "./product-form-dialog/
 })
 export class ProductManagementComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private readonly inventory = inject(InventoryService);
   private readonly catalog = inject(ProductCatalogService);
   private readonly notifications = inject(NotificationService);
   private readonly confirm = inject(ConfirmService);
@@ -278,8 +277,8 @@ export class ProductManagementComponent implements OnInit {
     const editing = this.editingProduct();
     this.saving.set(true);
     const request = editing
-      ? this.inventory.put<InventoryProduct>(`/products/${editing.id ?? editing._id}`, draft.body)
-      : this.inventory.post<InventoryProduct>("/products", draft.body);
+      ? this.catalog.update(Number(editing.id ?? editing._id), draft.body)
+      : this.catalog.create(draft.body);
 
     request.subscribe({
       next: () => {
@@ -305,7 +304,7 @@ export class ProductManagementComponent implements OnInit {
     });
     if (!ok) return;
 
-    this.inventory.delete(`/products/${id}`).subscribe({
+    this.catalog.remove(id).subscribe({
       next: () => {
         this.notifications.success(
           "Producto eliminado",

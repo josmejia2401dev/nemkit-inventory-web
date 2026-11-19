@@ -3,7 +3,6 @@ import { FormsModule } from "@angular/forms";
 import {
   InventoryCategory,
   InventoryProduct,
-  InventoryService,
 } from "../../../../core/services/inventory.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { ProductCatalogService } from "../product-catalog.service";
@@ -29,7 +28,6 @@ interface QuickProductForm {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductQuickCreateDialogComponent implements OnInit {
-  private readonly inventory = inject(InventoryService);
   private readonly catalog = inject(ProductCatalogService);
   private readonly notifications = inject(NotificationService);
 
@@ -78,8 +76,8 @@ export class ProductQuickCreateDialogComponent implements OnInit {
     this.saving.set(true);
     this.error.set(null);
 
-    this.inventory
-      .post<InventoryProduct>("/products", {
+    this.catalog
+      .create({
         categoryId: Number(this.form.categoryId),
         type: "simple",
         sku,

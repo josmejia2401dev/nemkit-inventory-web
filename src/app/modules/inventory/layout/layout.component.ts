@@ -7,10 +7,8 @@ import {
   AppNavItem,
   ApplicationShellComponent,
 } from "../../../foundation/layout/application-shell.component";
-import {
-  InventoryService,
-  InventoryStockAlerts,
-} from "../../../core/services/inventory.service";
+import { InventoryService } from "../../../core/services/inventory.service";
+import { DashboardApi } from "../dashboard/dashboard.api";
 
 export type NavItem = AppNavItem;
 
@@ -22,6 +20,7 @@ export type NavItem = AppNavItem;
 })
 export class LayoutComponent implements OnInit {
   private readonly inventory = inject(InventoryService);
+  private readonly dashboard = inject(DashboardApi);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
@@ -52,7 +51,7 @@ export class LayoutComponent implements OnInit {
   }
 
   private refreshAlertCount(): void {
-    this.inventory.get<InventoryStockAlerts>("/statistics/dashboard/alerts").subscribe({
+    this.dashboard.alerts().subscribe({
       next: (response) => this.alertCount.set(response.data.outOfStock + response.data.lowStock),
       error: () => this.alertCount.set(0),
     });

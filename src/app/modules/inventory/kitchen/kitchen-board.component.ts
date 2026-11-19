@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { interval } from "rxjs";
-import { InventoryService, KitchenStatus, OrderStatus } from "../../../core/services/inventory.service";
+import { KitchenStatus, OrderStatus } from "../../../core/services/inventory.service";
 import { ORDER_STATUS_LABELS } from "../order-status.constants";
 import { NotificationService } from "../../../core/services/notification.service";
 import { ConfirmService } from "../../../core/services/confirm.service";
@@ -11,21 +11,7 @@ import {
   CancelOrderDialogComponent,
   CancelOrderResult,
 } from "../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
-
-interface KitchenOrder {
-  id: number;
-  date: string;
-  createdAt?: string;
-  tableNumber?: string;
-  orderStatus: KitchenStatus;
-  orderChannel?: "delivery" | "on_site";
-  paymentStatus?: "paid" | "pending";
-  total?: number;
-  notes?: string;
-  customerSnapshot?: { name?: string };
-  employeeSnapshot?: { name?: string };
-  items: Array<{ name: string; quantity: number }>;
-}
+import { KitchenApi, KitchenOrder } from "./kitchen.api";
 
 export type KitchenBoardMode = "service" | "preparation";
 
@@ -49,7 +35,7 @@ const NEXT: Record<KitchenStatus, { status: OrderStatus; label: string; icon: st
   styleUrls: ["./kitchen-board.component.css"],
 })
 export class KitchenBoardComponent implements OnInit {
-  private inventory = inject(InventoryService);
+  private kitchen = inject(KitchenApi);
   private notifications = inject(NotificationService);
   private confirm = inject(ConfirmService);
   private destroyRef = inject(DestroyRef);
@@ -74,7 +60,7 @@ export class KitchenBoardComponent implements OnInit {
 
   load(silent = false): void {
     if (!silent) this.loading.set(true);
-    this.inventory.get<KitchenOrder[]>("/kitchen").subscribe({
+    this.kitchen.list().subscribe({
       next: (response) => {
         this.orders.set(response.data ?? []);
         this.loading.set(false);
@@ -103,7 +89,7 @@ export class KitchenBoardComponent implements OnInit {
   }
 
   private setStatus(order: KitchenOrder, status: OrderStatus, label: string): void {
-    this.inventory.put(`/kitchen/${order.id}`, { orderStatus: status }).subscribe({
+    this.kitchen.setStatus(order.id, status).subscribe({
       next: () => {
         this.notifications.success(`Pedido #${order.id}`, `Ahora: ${label}.`);
         this.load(true);
@@ -138,7 +124,7 @@ export class KitchenBoardComponent implements OnInit {
       severity: "info",
     });
     if (!ok) return;
-    this.inventory.put(`/sales/${order.id}/pay`, {}).subscribe({
+    this.kitchen.pay(order.id).subscribe({
       next: () => {
         this.notifications.success(`Pedido #${order.id}`, "Cobro registrado.");
         this.load(true);
@@ -154,7 +140,7 @@ export class KitchenBoardComponent implements OnInit {
   confirmCancel(result: CancelOrderResult): void {
     const order = this.cancelling();
     if (!order) return;
-    this.inventory.put(`/kitchen/${order.id}/cancel`, result).subscribe({
+    this.kitchen.cancel(order.id, result).subscribe({
       next: () => {
         this.notifications.success(`Pedido #${order.id}`, "Pedido cancelado.");
         this.cancelling.set(null);

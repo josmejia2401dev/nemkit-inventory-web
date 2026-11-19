@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { RouterLink } from "@angular/router";
 import { debounceTime, interval, merge, timeout } from "rxjs";
 import { InventoryService } from "../../../../core/services/inventory.service";
+import { DashboardApi } from "../../dashboard/dashboard.api";
 
 type InventoryNotice =
   | { type: "loading" }
@@ -20,6 +21,7 @@ type InventoryNotice =
 })
 export class InventoryStatusMessageComponent implements OnInit {
   private inventory = inject(InventoryService);
+  private dashboard = inject(DashboardApi);
   private destroyRef = inject(DestroyRef);
 
   notice = signal<InventoryNotice>({ type: "loading" });
@@ -36,8 +38,8 @@ export class InventoryStatusMessageComponent implements OnInit {
   }
 
   refresh(): void {
-    this.inventory
-      .get<{ outOfStock: number; lowStock: number }>("/statistics/dashboard/alerts")
+    this.dashboard
+      .alerts()
       .pipe(timeout(15_000))
       .subscribe({
         next: ({ data }) => {

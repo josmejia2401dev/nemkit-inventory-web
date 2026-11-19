@@ -1,7 +1,9 @@
 import { CommonModule } from "@angular/common";
 import { Component, DestroyRef, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { InventoryMovement, InventoryProduct, InventoryService } from "../../../core/services/inventory.service";
+import { InventoryMovement, InventoryProduct } from "../../../core/services/inventory.service";
+import { ProductCatalogService } from "../products/product-catalog.service";
+import { MovementsApi } from "./movements.api";
 import { NotificationService } from "../../../core/services/notification.service";
 import { BarcodeDispatcherService } from "../../../core/barcode/barcode-dispatcher.service";
 import { BarcodeScan } from "../../../core/barcode/barcode.types";
@@ -30,7 +32,8 @@ const MOVEMENT_LABELS: Record<string, string> = {
 })
 export class MovementsComponent implements OnInit {
   readonly pageSize = DEFAULT_PAGE_SIZE;
-  private readonly inventory = inject(InventoryService);
+  private readonly movementsApi = inject(MovementsApi);
+  private readonly catalog = inject(ProductCatalogService);
   private readonly notifications = inject(NotificationService);
   private readonly barcodeDispatcher = inject(BarcodeDispatcherService);
   private readonly destroyRef = inject(DestroyRef);
@@ -55,8 +58,8 @@ export class MovementsComponent implements OnInit {
   }
 
   loadProducts(): void {
-    this.inventory
-      .list<InventoryProduct>("/products", { limit: 100, status: "active" })
+    this.catalog
+      .list({ limit: 100, status: "active" })
       .subscribe({ next: (response) => this.products.set(response.data ?? []) });
   }
 
@@ -78,12 +81,8 @@ export class MovementsComponent implements OnInit {
 
   private fetchMovements(): void {
     this.loading.set(true);
-    this.inventory
-      .list<InventoryMovement>("/movements", {
-        page: this.page(),
-        limit: this.pageSize,
-        type: this.filterType() || undefined,
-      })
+    this.movementsApi
+      .list(this.page(), this.pageSize, this.filterType())
       .subscribe({
         next: (response) => {
           const totalPages = Math.max(1, response.pagination?.totalPages ?? 1);
@@ -118,7 +117,7 @@ export class MovementsComponent implements OnInit {
 
   save(draft: MovementDraft): void {
     this.saving.set(true);
-    this.inventory.post<InventoryMovement>("/movements", draft).subscribe({
+    this.movementsApi.create(draft).subscribe({
       next: () => {
         this.saving.set(false);
         this.dialogOpen.set(false);
