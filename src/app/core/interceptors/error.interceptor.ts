@@ -43,7 +43,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         } else if (err.status === 404) {
           notifications.warn("No encontrado", message);
         } else if (err.status === 409) {
-          notifications.warn("No se pudo completar", message);
+          // El backend marca los 409 de cuota con `PLAN_LIMIT_REACHED`: mostrar
+          // el título correcto sin depender del texto del mensaje.
+          const title =
+            err.error?.code === "PLAN_LIMIT_REACHED"
+              ? "Límite del plan alcanzado"
+              : "No se pudo completar";
+          notifications.warn(title, message);
         } else if (err.status === 429) {
           notifications.warn("Demasiadas solicitudes", message);
         } else if (err.status >= 500) {

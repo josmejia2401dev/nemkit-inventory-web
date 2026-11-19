@@ -36,7 +36,7 @@
             <article class="kitchen-card">
               <div class="kitchen-card-head">
                 <strong>@if (order.tableNumber) { Mesa {{ order.tableNumber }} } @else { Pedido #{{ order.id }} }</strong>
-                <span class="kitchen-time" [class.kitchen-time--late]="minutesAgo(order.date) >= 15">{{ minutesAgo(order.date) }} min</span>
+                <span class="kitchen-time" [class.kitchen-time--late]="minutesAgo(order.date, order.createdAt) >= 15">{{ minutesAgo(order.date, order.createdAt) }} min</span>
               </div>
               @if (order.tableNumber) { <small class="kitchen-card-ref">Pedido #{{ order.id }}</small> }
               <ul class="kitchen-items">

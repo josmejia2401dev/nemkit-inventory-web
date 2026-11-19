@@ -317,6 +317,9 @@ export class DocumentDraftFormComponent implements OnInit {
   }
 
   addItem(): void {
+    // La hoja ya nace con una línea vacía; agregar otra deja filas que invalidan
+    // la venta y obligan a borrarlas a mano.
+    if (this.items.some((item) => !item.productId)) return;
     this.items = [...this.items, this.emptyItem()];
   }
 
@@ -399,7 +402,13 @@ export class DocumentDraftFormComponent implements OnInit {
     }
 
     if (!this.items.length || this.items.some((item) => !item.productId || !Number.isInteger(Number(item.quantity)) || item.quantity < 1 || !Number.isFinite(Number(item.amount)) || item.amount < 0)) {
-      this.notifications.warn("Revisa los productos", "Selecciona productos y cantidades válidas para continuar.");
+      const emptyRow = this.items.some((item) => !item.productId);
+      this.notifications.warn(
+        "Revisa los productos",
+        emptyRow
+          ? "Hay una línea sin producto: elígela o quítala con el ícono de papelera."
+          : "Selecciona productos y cantidades válidas para continuar.",
+      );
       return;
     }
     const itemExceedingStock = this.isSale && this.items.find((item) => {

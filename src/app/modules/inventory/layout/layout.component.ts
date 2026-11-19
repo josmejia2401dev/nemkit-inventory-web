@@ -32,6 +32,7 @@ export class LayoutComponent implements OnInit {
   @Input() alertsPath = "/alerts";
   @Input() profilePath = "/profile";
   @Input() reportPath = "";
+  @Input() showBarcodeTools = true;
 
   readonly alertCount = signal(0);
 

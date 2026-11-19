@@ -15,6 +15,7 @@ import {
 interface KitchenOrder {
   id: number;
   date: string;
+  createdAt?: string;
   tableNumber?: string;
   orderStatus: KitchenStatus;
   orderChannel?: "delivery" | "on_site";
@@ -114,8 +115,13 @@ export class KitchenBoardComponent implements OnInit {
     });
   }
 
-  minutesAgo(date: string): number {
-    return Math.max(0, Math.round((Date.now() - new Date(date).getTime()) / 60000));
+  /**
+   * Minutos desde que se creó la comanda. `date` es la fecha del documento
+   * (00:00), así que usarla daba esperas falsas de ~1200 min en pedidos nuevos.
+   */
+  minutesAgo(date: string, createdAt?: string): number {
+    const from = createdAt ?? date;
+    return Math.max(0, Math.round((Date.now() - new Date(from).getTime()) / 60000));
   }
 
   formatMoney(value: number | undefined): string {
