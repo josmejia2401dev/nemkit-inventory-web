@@ -44,11 +44,4 @@ export const environment = {
   primaryRecheckMs: 30_000,
   appName: "Nemkit Inventory",
   tokenRefreshThresholdMs: 2 * 60 * 1000,
-
-  /** @deprecated usar `apiEndpoints`. */
-  get apiUrl(): string {
-    return apiEndpoints[0].baseUrl;
-  },
-  /** @deprecated usar `apiEndpoints`. */
-  healthUrl: `${RENDER_ORIGIN}/health`,
 };
