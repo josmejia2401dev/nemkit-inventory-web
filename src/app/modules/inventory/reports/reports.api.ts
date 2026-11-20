@@ -9,14 +9,15 @@ import {
   InventoryService,
   PageResult,
 } from "../../../core/services/inventory.service";
-import { CashFlowReport, CashWithdrawalsService } from "../../../core/services/cash-withdrawals.service";
+import { CashFlowReport } from "../../../core/services/cash-withdrawals.service";
+import { ProductCatalogService } from "../products/product-catalog.service";
 import type { InventoryReport } from "./report.types";
 
 /** Rutas HTTP de la feature de reportes; las pantallas no conocen endpoints. */
 @Injectable({ providedIn: "root" })
 export class ReportsApi {
   private readonly inventory = inject(InventoryService);
-  private readonly withdrawals = inject(CashWithdrawalsService);
+  private readonly catalog = inject(ProductCatalogService);
 
   inventoryReport(): Observable<{ success: boolean; data: InventoryReport }> {
     return this.inventory.get<InventoryReport>("/statistics/reports/inventory");
@@ -64,14 +65,10 @@ export class ReportsApi {
   }
 
   cashFlow(from: string, to: string): Observable<{ success: boolean; data: CashFlowReport }> {
-    return this.withdrawals.cashFlow(from, to);
+    return this.inventory.get<CashFlowReport>("/statistics/reports/cash-flow", { from, to });
   }
 
   activeProducts(search?: string): Observable<PageResult<InventoryProduct>> {
-    return this.inventory.list<InventoryProduct>("/products", {
-      limit: 100,
-      status: "active",
-      search: search?.trim() || undefined,
-    });
+    return this.catalog.lookup({ search });
   }
 }

@@ -121,8 +121,4 @@ export class CashWithdrawalsService {
   remove(id: number): Observable<{ success: boolean; data: unknown }> {
     return this.inventory.delete(`/cash-withdrawals/${id}`);
   }
-
-  cashFlow(from: string, to: string): Observable<{ success: boolean; data: CashFlowReport }> {
-    return this.inventory.get<CashFlowReport>("/statistics/reports/cash-flow", { from, to });
-  }
 }

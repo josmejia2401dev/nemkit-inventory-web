@@ -13,9 +13,9 @@ import { FormsModule } from "@angular/forms";
 import {
   InventoryCategory,
   InventoryProduct,
-  InventoryService,
   ProductType,
 } from "../../../../../core/services/inventory.service";
+import { ProductCatalogService } from "../../product-catalog.service";
 import { NotificationService } from "../../../../../core/services/notification.service";
 import { BarcodeCameraBarComponent } from "../../../../../shared/barcode/barcode-camera-bar/barcode-camera-bar.component";
 import { ProductBarcodeService } from "../../product-barcode.service";
@@ -36,7 +36,7 @@ export interface ProductDraft {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductFormDialogComponent implements OnInit {
-  private readonly inventory = inject(InventoryService);
+  private readonly catalog = inject(ProductCatalogService);
   private readonly notifications = inject(NotificationService);
   private readonly productBarcode = inject(ProductBarcodeService);
 
@@ -81,8 +81,8 @@ export class ProductFormDialogComponent implements OnInit {
 
   private loadIngredients(): void {
     // Insumos y simples activos, aptos para formar parte de una receta.
-    this.inventory
-      .listAll<InventoryProduct>("/products", { status: "active", types: "ingredient,simple" })
+    this.catalog
+      .lookupAll({ types: "ingredient,simple" })
       .subscribe({ next: (products) => this.ingredients.set(products) });
   }
 

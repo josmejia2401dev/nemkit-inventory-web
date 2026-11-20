@@ -11,7 +11,9 @@ import {
   untracked,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { InventoryEmployee, InventoryProduct, InventoryService } from "../../../../core/services/inventory.service";
+import { InventoryEmployee, InventoryProduct } from "../../../../core/services/inventory.service";
+import { EmployeesApi } from "../../employees/employees.api";
+import { ProductCatalogService } from "../../products/product-catalog.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { AuthStore } from "../../../../core/store/auth.store";
 import { LimitsService } from "../../../../core/services/limits.service";
@@ -40,7 +42,8 @@ export interface MovementDraft {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MovementFormDialogComponent implements OnInit {
-  private readonly inventory = inject(InventoryService);
+  private readonly catalog = inject(ProductCatalogService);
+  private readonly employeesApi = inject(EmployeesApi);
   private readonly notifications = inject(NotificationService);
   private readonly store = inject(AuthStore);
   private readonly limits = inject(LimitsService);
@@ -80,19 +83,14 @@ export class MovementFormDialogComponent implements OnInit {
   }
 
   private loadEmployees(): void {
-    this.inventory
-      .get<InventoryEmployee[]>("/employee-options")
+    this.employeesApi
+      .options()
       .subscribe({ next: (response) => this.employees.set(response.data ?? []) });
   }
 
   loadProducts(): void {
-    this.inventory
-      .list<InventoryProduct>("/products", {
-        limit: 100,
-        status: "active",
-        types: "simple,ingredient",
-        search: this.productSearch().trim() || undefined,
-      })
+    this.catalog
+      .lookup({ types: "simple,ingredient", search: this.productSearch() })
       .subscribe({
         next: (response) => {
           const selectedIds = new Set(this.items().map((item) => Number(item.productId)).filter(Boolean));

@@ -14,9 +14,18 @@ export interface ProductCatalogQuery {
   status?: string;
   type?: string;
   stockState?: string;
+  /** Tipos del catálogo aceptados por la API, separados por coma. */
+  types?: string;
   productId?: number;
   page?: number;
   limit?: number;
+}
+
+/** Filtros de los selectores de producto (movimientos, recetas, reportes). */
+export interface ProductLookupQuery {
+  search?: string;
+  /** Tipos del catálogo aceptados por la API, separados por coma. */
+  types?: string;
 }
 
 @Injectable({ providedIn: "root" })
@@ -26,6 +35,24 @@ export class ProductCatalogService {
 
   list(query: ProductCatalogQuery = {}): Observable<PageResult<InventoryProduct>> {
     return this.inventory.list<InventoryProduct>("/products", { ...query });
+  }
+
+  /** Productos activos para un selector; una sola página de 100. */
+  lookup(query: ProductLookupQuery = {}): Observable<PageResult<InventoryProduct>> {
+    return this.list({
+      status: "active",
+      types: query.types,
+      search: query.search?.trim() || undefined,
+      limit: 100,
+    });
+  }
+
+  /** Catálogo completo de productos activos (recorre todas las páginas). */
+  lookupAll(query: Omit<ProductLookupQuery, "search"> = {}): Observable<InventoryProduct[]> {
+    return this.inventory.listAll<InventoryProduct>("/products", {
+      status: "active",
+      types: query.types,
+    });
   }
 
   listCategories(): Observable<InventoryCategory[]> {
