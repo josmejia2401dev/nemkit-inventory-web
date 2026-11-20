@@ -10,6 +10,8 @@ import {
   InventoryTable,
   PageResult,
 } from "../../../core/services/inventory.service";
+import { EmployeesApi } from "../employees/employees.api";
+import { ProductCatalogService } from "../products/product-catalog.service";
 import type { CancelOrderResult } from "../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
 import type { OrderStatus } from "../order-status.constants";
 import type { CustomerDraft } from "./customer-create-form/customer-create-form.component";
@@ -19,6 +21,8 @@ import type { DocumentKind } from "./document.types";
 @Injectable({ providedIn: "root" })
 export class DocumentsApi {
   private readonly inventory = inject(InventoryService);
+  private readonly catalog = inject(ProductCatalogService);
+  private readonly employeesApi = inject(EmployeesApi);
 
   list(kind: DocumentKind, page: number, limit: number): Observable<PageResult<InventoryDocument>> {
     return this.inventory.list<InventoryDocument>(`/${kind}`, { page, limit });
@@ -42,11 +46,9 @@ export class DocumentsApi {
 
   /** Ventas: vendibles (simples + platos). Compras: comprables (simples + insumos). */
   products(kind: DocumentKind, search = ""): Observable<PageResult<InventoryProduct>> {
-    return this.inventory.list<InventoryProduct>("/products", {
-      limit: 100,
-      status: "active",
+    return this.catalog.lookup({
       types: kind === "sales" ? "simple,prepared" : "simple,ingredient",
-      search: search.trim() || undefined,
+      search,
     });
   }
 
@@ -62,7 +64,7 @@ export class DocumentsApi {
   }
 
   employees(role?: "courier"): Observable<{ success: boolean; data: InventoryEmployee[] }> {
-    return this.inventory.get<InventoryEmployee[]>("/employee-options", role ? { role } : undefined);
+    return this.employeesApi.options(role);
   }
 
   tablesOccupancy(): Observable<{ success: boolean; data: InventoryTable[] }> {
