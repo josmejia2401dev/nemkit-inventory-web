@@ -2,12 +2,26 @@ import { ApiEndpointConfig } from "../app/core/http/backend-endpoint.policy";
 
 const LOCAL_ORIGIN = "http://localhost:4000";
 
+/**
+ * Prueba local del failover: los dos nodos apuntan al mismo proceso.
+ * Ejercita selección, probes y estado sin depender de Render/Tailscale.
+ * Para probar el cambio real de nodo, levanta el respaldo en otro puerto y
+ * cambia `FALLBACK_ORIGIN`.
+ */
+const FALLBACK_ORIGIN = LOCAL_ORIGIN;
+
 const apiEndpoints: ApiEndpointConfig[] = [
   {
-    name: "local",
+    name: "casa",
     baseUrl: `${LOCAL_ORIGIN}/api/v1`,
     readyUrl: `${LOCAL_ORIGIN}/ready`,
     priority: 1,
+  },
+  {
+    name: "render",
+    baseUrl: `${FALLBACK_ORIGIN}/api/v1`,
+    readyUrl: `${FALLBACK_ORIGIN}/ready`,
+    priority: 2,
   },
 ];
 
