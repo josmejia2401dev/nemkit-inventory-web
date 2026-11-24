@@ -7,7 +7,7 @@ import { ApiEndpointConfig } from "../app/core/http/backend-endpoint.policy";
  * despliegue con el dominio real, por ejemplo:
  *   "https://nemkit-casa.tailXXXX.ts.net"
  */
-const HOME_API_ORIGIN = "";
+const HOME_API_ORIGIN = "https://gateway.tail224652.ts.net";
 
 const RENDER_ORIGIN = "https://nemkit-inventory-api.onrender.com";
 
