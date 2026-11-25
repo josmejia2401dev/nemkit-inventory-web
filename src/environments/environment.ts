@@ -2,6 +2,9 @@ import { ApiEndpointConfig } from "../app/core/http/backend-endpoint.policy";
 
 const LOCAL_ORIGIN = "http://localhost:4000";
 
+/** Prefijo propio del MS de inventario detrás del gateway Tailscale. */
+const API_PREFIX = "/api/v1/inventory";
+
 /**
  * Prueba local del failover: los dos nodos apuntan al mismo proceso.
  * Ejercita selección, probes y estado sin depender de Render/Tailscale.
@@ -13,14 +16,14 @@ const FALLBACK_ORIGIN = LOCAL_ORIGIN;
 const apiEndpoints: ApiEndpointConfig[] = [
   {
     name: "casa",
-    baseUrl: `${LOCAL_ORIGIN}/api/v1`,
-    readyUrl: `${LOCAL_ORIGIN}/ready`,
+    baseUrl: `${LOCAL_ORIGIN}${API_PREFIX}`,
+    readyUrl: `${LOCAL_ORIGIN}${API_PREFIX}/ready`,
     priority: 1,
   },
   {
     name: "render",
-    baseUrl: `${FALLBACK_ORIGIN}/api/v1`,
-    readyUrl: `${FALLBACK_ORIGIN}/ready`,
+    baseUrl: `${FALLBACK_ORIGIN}${API_PREFIX}`,
+    readyUrl: `${FALLBACK_ORIGIN}${API_PREFIX}/ready`,
     priority: 2,
   },
 ];

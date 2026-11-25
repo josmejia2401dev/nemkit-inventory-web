@@ -9,7 +9,7 @@ npm ci
 npm start
 ```
 
-La aplicación abre en `http://localhost:4200`. En desarrollo usa `http://localhost:4000/api/v1`; puedes ajustar `src/environments/environment.ts` si el backend escucha en otra dirección.
+La aplicación abre en `http://localhost:4200`. En desarrollo usa `http://localhost:4000/api/v1/inventory`; puedes ajustar `src/environments/environment.ts` si el backend escucha en otra dirección.
 
 ## Producción
 

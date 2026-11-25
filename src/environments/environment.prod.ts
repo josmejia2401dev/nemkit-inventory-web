@@ -11,12 +11,15 @@ const HOME_API_ORIGIN = "https://gateway.tail224652.ts.net";
 
 const RENDER_ORIGIN = "https://nemkit-inventory-api.onrender.com";
 
+/** Prefijo propio del MS de inventario detrás del gateway Tailscale. */
+const API_PREFIX = "/api/v1/inventory";
+
 const homeEndpoints: ApiEndpointConfig[] = HOME_API_ORIGIN
   ? [
       {
         name: "casa",
-        baseUrl: `${HOME_API_ORIGIN}/api/v1`,
-        readyUrl: `${HOME_API_ORIGIN}/ready`,
+        baseUrl: `${HOME_API_ORIGIN}${API_PREFIX}`,
+        readyUrl: `${HOME_API_ORIGIN}${API_PREFIX}/ready`,
         priority: 1,
       },
     ]
@@ -26,8 +29,8 @@ const apiEndpoints: ApiEndpointConfig[] = [
   ...homeEndpoints,
   {
     name: "render",
-    baseUrl: `${RENDER_ORIGIN}/api/v1`,
-    readyUrl: `${RENDER_ORIGIN}/ready`,
+    baseUrl: `${RENDER_ORIGIN}${API_PREFIX}`,
+    readyUrl: `${RENDER_ORIGIN}${API_PREFIX}/ready`,
     // Si hay servidor de casa es el respaldo; si no, es el único nodo.
     priority: homeEndpoints.length ? 2 : 1,
   },

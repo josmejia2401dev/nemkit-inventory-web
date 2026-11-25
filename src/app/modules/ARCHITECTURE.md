@@ -131,9 +131,10 @@ admin shell adds "Cocina" and "Mesas" only when `company.businessType` is
 ## Backend failover
 
 - `environments/environment*.ts` declares `apiEndpoints` (`baseUrl` + `readyUrl`
-  + `priority`). In development both nodes point to `localhost:4000` to exercise
-  the selection logic; in production `HOME_API_ORIGIN` stays empty until the home
-  node exists, so Render is the only endpoint and no failover runs.
+  + `priority`) con el prefijo propio del MS (`/api/v1/inventory`), también en
+  `readyUrl`. En desarrollo ambos nodos apuntan a `localhost:4000` para ejercitar
+  la selección; en producción el nodo de casa es el gateway Tailscale y Render
+  queda como respaldo.
 - At bootstrap, `BackendEndpointService.initialize()` probes the primary with the
   short timeout. If it fails, the app starts on the fallback and wakes the
   primary in the background.

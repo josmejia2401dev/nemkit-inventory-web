@@ -8,7 +8,7 @@
 
 export interface ApiEndpointConfig {
   name: string;
-  /** Base de la API, incluyendo el prefijo (`.../api/v1`). */
+  /** Base de la API, incluyendo el prefijo (`.../api/v1/inventory`). */
   baseUrl: string;
   /** Endpoint de disponibilidad real; en la API es `/ready`, no `/health`. */
   readyUrl: string;
