@@ -21,6 +21,8 @@ const MOVEMENT_LABELS: Record<string, string> = {
   damage: "Daño",
   loss: "Pérdida",
   internal_use: "Consumo interno",
+  layaway_reserve: "Reserva Plan separe",
+  layaway_release: "Liberación Plan separe",
 };
 
 @Component({

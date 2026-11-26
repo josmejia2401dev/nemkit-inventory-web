@@ -12,17 +12,19 @@
     <div>
       <p class="eyebrow">ENTRADAS Y SALIDAS DEL PERÍODO</p>
       <h2>Flujo de caja</h2>
-      <small>Las compras se asumen pagadas al contado. Los retiros no afectan ventas ni utilidad bruta.</small>
+      <small>Los abonos de Plan separe entran a caja; la venta de entrega no se cuenta dos veces. Las compras se asumen pagadas al contado.</small>
     </div>
     <a class="button button-secondary" routerLink="/admin/cash-withdrawals"><i class="pi pi-wallet"></i> Ver retiros</a>
   </div>
 
   <div class="report-summary">
-    <article><small>Entradas por ventas</small><strong>{{ formatMoney(data.inflows.sales) }}</strong></article>
-    <article><small>Ventas cobradas</small><strong>{{ data.inflows.salesCount | number }}</strong></article>
+    <article><small>Ventas cobradas</small><strong>{{ formatMoney(data.inflows.sales) }}</strong></article>
+    <article><small>Abonos Plan separe</small><strong>{{ formatMoney(data.inflows.layawayPayments) }}</strong></article>
+    <article><small>N.° de ventas cobradas</small><strong>{{ data.inflows.salesCount | number }}</strong></article>
     <article><small>Compras registradas</small><strong>{{ formatMoney(data.outflows.purchases) }}</strong></article>
     <article><small>Pagos a empleados</small><strong>{{ formatMoney(data.outflows.employeePayments) }}</strong></article>
     <article><small>Retiros de caja</small><strong>{{ formatMoney(data.outflows.withdrawals) }}</strong></article>
+    <article><small>Devoluciones separe</small><strong>{{ formatMoney(data.outflows.layawayRefunds) }}</strong></article>
     <article><small>Salidas totales</small><strong>{{ formatMoney(data.outflows.total) }}</strong></article>
     <article><small>Neto del período</small><strong>{{ formatMoney(data.net) }}</strong></article>
   </div>

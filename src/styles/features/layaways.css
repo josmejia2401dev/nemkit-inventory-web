@@ -1,0 +1,148 @@
+/* ── Plan separe ──────────────────────────────────────────────────────── */
+
+.layaway-heading-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.layaway-dashboard-grid { margin-top: 14px; }
+
+.layaway-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; margin-bottom: 18px; }
+.layaway-summary-card {
+  position: relative;
+  display: flex;
+  min-height: 116px;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+  padding: 15px 16px;
+  border: 1px solid var(--deploy-border);
+  border-radius: 13px;
+  background: var(--deploy-bg-card);
+  box-shadow: var(--deploy-shadow-sm);
+}
+.layaway-summary-card small { color: var(--deploy-text-secondary); font-size: 10px; font-weight: 600; }
+.layaway-summary-card strong { color: var(--deploy-text); font-size: 25px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+.layaway-summary-card > span:last-child { margin-top: auto; color: var(--deploy-text-muted); font-size: 9px; }
+.layaway-summary-icon { display: grid; width: 28px; height: 28px; place-items: center; margin-bottom: 5px; border: 1px solid rgba(95, 169, 140, .24); border-radius: 8px; color: var(--deploy-accent); background: rgba(39, 102, 80, .14); font-size: 12px; }
+.layaway-summary-card--pending .layaway-summary-icon { color: #F2C46B; border-color: rgba(242, 196, 107, .24); background: rgba(245, 158, 11, .12); }
+.layaway-summary-card--danger .layaway-summary-icon { color: #F08A7E; border-color: rgba(240, 138, 126, .24); background: rgba(239, 68, 68, .12); }
+.layaway-summary-card--ready .layaway-summary-icon { color: #5FD39B; border-color: rgba(95, 211, 155, .24); background: rgba(16, 185, 129, .12); }
+
+.layaway-filter-bar { flex-wrap: wrap; }
+.layaway-filter-bar select { min-height: 38px; }
+.layaway-check { display: flex; align-items: center; gap: 8px; color: var(--deploy-text-secondary); font-size: 11px; font-weight: 600; }
+.layaway-check input { width: 16px; height: 16px; accent-color: var(--deploy-primary); }
+.layaway-check--inline { padding: 0 4px; white-space: nowrap; }
+
+.layaway-row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.layaway-status { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 99px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.layaway-status--active { color: #5FD39B; background: rgba(16, 185, 129, .13); }
+.layaway-status--ready { color: #7FA8FF; background: rgba(59, 130, 246, .13); }
+.layaway-status--completed { color: var(--deploy-text-secondary); background: #111A15; }
+.layaway-status--cancelled { color: #F08A7E; background: rgba(239, 68, 68, .13); }
+.layaway-balance-zero { color: #5FD39B !important; }
+.layaway-overdue { display: inline-flex; align-items: center; gap: 4px; color: #F08A7E; font-size: 9px; font-weight: 650; }
+.layaway-authorized { display: inline-flex; align-items: center; gap: 4px; color: var(--deploy-accent); font-size: 9px; font-weight: 650; }
+
+/* Crear */
+.layaway-create-dialog { width: min(100%, 1040px); }
+.layaway-create-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.layaway-form-block { padding: 15px; border: 1px solid var(--deploy-border); border-radius: 12px; background: #0B100D; }
+.layaway-form-block + .layaway-form-block { margin-top: 14px; }
+.layaway-form-block .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.layaway-form-block .section-heading h3 { margin: 0; color: var(--deploy-text); font-size: 13px; font-weight: 700; letter-spacing: -.3px; }
+.layaway-counter { padding: 3px 8px; border-radius: 99px; color: var(--deploy-text-muted); background: #111A15; font-size: 8px; font-weight: 650; }
+.layaway-search-row { display: flex; gap: 7px; margin-bottom: 9px; }
+.layaway-search-row input { min-width: 0; min-height: 38px; flex: 1; padding: 0 11px; border: 1px solid var(--deploy-border); border-radius: 8px; color: var(--deploy-text); background: var(--deploy-bg-card); font-size: 11px; }
+.layaway-search-row input::placeholder { color: var(--deploy-text-muted); }
+.layaway-result-list { display: flex; max-height: 150px; flex-direction: column; gap: 5px; overflow-y: auto; padding-right: 3px; }
+.layaway-result { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border: 1px solid var(--deploy-border); border-radius: 8px; color: var(--deploy-text); background: #0D1310; text-align: left; cursor: pointer; transition: border-color .15s, background .15s; }
+.layaway-result:hover { border-color: rgba(95, 169, 140, .38); background: #111A15; }
+.layaway-result span { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+.layaway-result strong { overflow: hidden; color: var(--deploy-text); font-size: 10px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.layaway-result small { color: var(--deploy-text-muted); font-size: 8px; }
+.layaway-result i { color: var(--deploy-accent); font-size: 10px; }
+.layaway-empty-note { margin: 0; padding: 10px; border: 1px dashed var(--deploy-border); border-radius: 8px; color: var(--deploy-text-muted); font-size: 10px; line-height: 1.5; }
+.layaway-selected { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid rgba(95, 169, 140, .3); border-radius: 9px; background: rgba(39, 102, 80, .14); }
+.layaway-selected > i { color: var(--deploy-accent); font-size: 13px; }
+.layaway-selected > div { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
+.layaway-selected strong { color: var(--deploy-text); font-size: 11px; }
+.layaway-selected small { color: var(--deploy-text-secondary); font-size: 9px; }
+.layaway-new-customer { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; padding: 10px; border: 1px dashed var(--deploy-border); border-radius: 9px; }
+.layaway-new-customer .form-field { gap: 4px; }
+.layaway-new-customer .button { width: fit-content; }
+.layaway-item-list { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+.layaway-item-row { display: flex; align-items: center; gap: 8px; padding: 8px 9px; border: 1px solid var(--deploy-border); border-radius: 9px; background: #0D1310; }
+.layaway-item-row--readonly { justify-content: space-between; }
+.layaway-item-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
+.layaway-item-copy strong { overflow: hidden; color: var(--deploy-text); font-size: 10px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.layaway-item-copy small { color: var(--deploy-text-muted); font-size: 8px; }
+.layaway-inline-field { display: flex; flex-direction: column; gap: 2px; color: var(--deploy-text-muted); font-size: 7px; font-weight: 650; text-transform: uppercase; }
+.layaway-inline-field input { width: 62px; min-height: 30px; padding: 0 6px; border: 1px solid var(--deploy-border); border-radius: 6px; color: var(--deploy-text); background: var(--deploy-bg-card); font-size: 10px; }
+.layaway-item-total { flex: 0 0 auto; color: var(--deploy-accent); font-size: 10px; font-weight: 700; }
+.layaway-summary-bar { display: flex; align-items: center; justify-content: flex-end; gap: 22px; margin-top: 14px; padding: 12px 16px; border: 1px solid rgba(95, 169, 140, .24); border-radius: 11px; background: rgba(39, 102, 80, .12); }
+.layaway-summary-bar > div { display: flex; flex-direction: column; gap: 2px; text-align: right; }
+.layaway-summary-bar small { color: var(--deploy-text-muted); font-size: 8px; font-weight: 650; text-transform: uppercase; letter-spacing: .8px; }
+.layaway-summary-bar strong { color: var(--deploy-text); font-size: 15px; font-weight: 700; }
+.layaway-summary-bar__pending strong { color: var(--deploy-accent); }
+.layaway-alert { display: flex; align-items: flex-start; gap: 7px; margin: 11px 0 0; padding: 9px 11px; border: 1px solid rgba(242, 196, 107, .3); border-radius: 8px; color: #F2C46B; background: rgba(245, 158, 11, .10); font-size: 10px; line-height: 1.5; }
+.layaway-alert--danger { border-color: rgba(240, 138, 126, .3); color: #F08A7E; background: rgba(239, 68, 68, .10); }
+.layaway-money-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 13px; }
+.layaway-money-summary > div { display: flex; flex-direction: column; gap: 2px; padding: 10px; border: 1px solid var(--deploy-border); border-radius: 9px; background: #0B100D; }
+.layaway-money-summary small { color: var(--deploy-text-muted); font-size: 8px; text-transform: uppercase; letter-spacing: .7px; }
+.layaway-money-summary strong { color: var(--deploy-text); font-size: 14px; }
+.layaway-money-summary__pending strong { color: var(--deploy-accent); }
+.layaway-amount-row { display: flex; align-items: center; gap: 7px; }
+.layaway-amount-row input { flex: 1; }
+
+/* Detalle */
+.layaway-detail-dialog { width: min(100%, 780px); }
+.layaway-detail-head-actions { display: flex; align-items: center; gap: 6px; }
+.layaway-detail-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.layaway-detail-summary > div { display: flex; flex-direction: column; gap: 2px; padding: 10px; border: 1px solid var(--deploy-border); border-radius: 9px; background: #0B100D; }
+.layaway-detail-summary small { color: var(--deploy-text-muted); font-size: 8px; text-transform: uppercase; letter-spacing: .7px; }
+.layaway-detail-summary strong { color: var(--deploy-text); font-size: 13px; }
+.layaway-detail-summary__pending strong { color: var(--deploy-accent); }
+.layaway-progress { height: 6px; overflow: hidden; border-radius: 99px; background: #111A15; }
+.layaway-progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #276650, #5FA98C); transition: width .3s ease; }
+.layaway-detail-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 9px 0 14px; color: var(--deploy-text-secondary); font-size: 9px; }
+.layaway-detail-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.layaway-payment-list { display: flex; flex-direction: column; gap: 6px; }
+.layaway-payment-row { display: flex; align-items: center; gap: 9px; padding: 8px 9px; border: 1px solid var(--deploy-border); border-radius: 8px; background: #0D1310; }
+.layaway-payment-icon { display: grid; width: 26px; height: 26px; flex: 0 0 auto; place-items: center; border-radius: 7px; color: var(--deploy-accent); background: rgba(39, 102, 80, .16); font-size: 10px; }
+.layaway-payment-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
+.layaway-payment-copy strong { color: var(--deploy-text); font-size: 11px; }
+.layaway-payment-copy small { color: var(--deploy-text-secondary); font-size: 8px; }
+.layaway-payment-type { color: var(--deploy-text-muted); font-size: 8px; font-weight: 650; text-transform: uppercase; letter-spacing: .6px; }
+.layaway-detail-notes { display: flex; gap: 6px; margin: 12px 0 0; padding: 9px 11px; border-radius: 8px; color: var(--deploy-text-secondary); background: #111A15; font-size: 10px; line-height: 1.5; }
+.layaway-cancelled-box { display: flex; flex-direction: column; gap: 3px; margin-top: 12px; padding: 10px 12px; border: 1px solid rgba(240, 138, 126, .28); border-radius: 9px; color: #F08A7E; background: rgba(239, 68, 68, .10); font-size: 9px; }
+.layaway-cancelled-box strong { font-size: 11px; }
+.layaway-auth-summary { display: flex; flex-direction: column; gap: 3px; margin: 0 0 13px; padding: 10px 12px; border: 1px solid rgba(95, 169, 140, .28); border-radius: 9px; background: rgba(39, 102, 80, .14); }
+.layaway-auth-summary strong { color: var(--deploy-text); font-size: 12px; }
+.layaway-auth-summary span { color: var(--deploy-text-secondary); font-size: 9px; }
+
+@media (max-width: 1100px) {
+  .layaway-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .layaway-create-grid { grid-template-columns: 1fr; }
+  .layaway-detail-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .layaway-heading-actions { width: 100%; }
+  .layaway-heading-actions .button { flex: 1; justify-content: center; }
+  .layaway-summary-grid { gap: 8px; }
+  .layaway-summary-card { min-height: 102px; padding: 12px; }
+  .layaway-summary-card strong { font-size: 21px; }
+  .layaway-filter-bar .search-box { min-width: 100%; flex-basis: 100%; }
+  .layaway-filter-bar select { flex: 1 1 calc(50% - 8px); }
+  .layaway-row-actions { width: 100%; }
+  .layaway-item-row { flex-wrap: wrap; }
+  .layaway-item-copy { flex-basis: 100%; }
+  .layaway-summary-bar { justify-content: space-between; gap: 10px; }
+  .layaway-money-summary { grid-template-columns: 1fr; }
+  .layaway-new-customer { grid-template-columns: 1fr; }
+  .layaway-detail-head-actions { gap: 4px; }
+}
+@media (max-width: 420px) {
+  .layaway-summary-grid { grid-template-columns: 1fr; }
+  .layaway-detail-summary { grid-template-columns: 1fr; }
+  .layaway-filter-bar select { flex-basis: 100%; }
+}

@@ -1,0 +1,144 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Plan separe</p>
+    <h1>Planes separe</h1>
+    <p class="heading-subtitle">Separa productos, registra abonos y entrega cuando el saldo esté completo.</p>
+  </div>
+  <div class="layaway-heading-actions">
+    @if (isAdmin()) {
+      <button type="button" class="button button-secondary" (click)="openSettings()"><i class="pi pi-cog"></i> Configuración</button>
+    }
+    <button type="button" class="button button-primary" (click)="openCreate()"><i class="pi pi-plus"></i> Nuevo plan separe</button>
+  </div>
+</section>
+
+<div class="layaway-summary-grid">
+  <article class="layaway-summary-card">
+    <span class="layaway-summary-icon"><i class="pi pi-bookmark"></i></span>
+    <small>Activos</small>
+    <strong>{{ summary().activeCount }}</strong>
+    <span>{{ formatMoney(summary().activeBalance) }} por recaudar</span>
+  </article>
+  <article class="layaway-summary-card layaway-summary-card--pending">
+    <span class="layaway-summary-icon"><i class="pi pi-clock"></i></span>
+    <small>Saldo total</small>
+    <strong>{{ formatMoney(summary().activeBalance) }}</strong>
+    <span>En planes activos</span>
+  </article>
+  <article class="layaway-summary-card layaway-summary-card--danger">
+    <span class="layaway-summary-icon"><i class="pi pi-exclamation-triangle"></i></span>
+    <small>Vencidos</small>
+    <strong>{{ summary().overdueCount }}</strong>
+    <span>{{ formatMoney(summary().overdueBalance) }} en mora</span>
+  </article>
+  <article class="layaway-summary-card layaway-summary-card--ready">
+    <span class="layaway-summary-icon"><i class="pi pi-check-circle"></i></span>
+    <small>Listos para entregar</small>
+    <strong>{{ summary().readyCount }}</strong>
+    <span>Saldo en cero</span>
+  </article>
+</div>
+
+<section class="panel catalog-panel">
+  <div class="filter-bar layaway-filter-bar">
+    <div class="filter-title">
+      <span class="panel-icon"><i class="pi pi-bookmark"></i></span>
+      <strong>Planes</strong>
+      <span class="filter-count">{{ totalItems() }}</span>
+    </div>
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input [(ngModel)]="filters.search" (keyup.enter)="applyFilters()" name="layawaySearch" placeholder="Buscar por cliente, documento o celular" />
+    </div>
+    <select [(ngModel)]="filters.status" (ngModelChange)="applyFilters()" name="layawayStatus" aria-label="Filtrar por estado">
+      <option value="">Todos los estados</option>
+      <option value="active">Activos</option>
+      <option value="ready">Listos para entregar</option>
+      <option value="completed">Completados</option>
+      <option value="cancelled">Cancelados</option>
+    </select>
+    <label class="layaway-check layaway-check--inline">
+      <input type="checkbox" [(ngModel)]="filters.overdue" (ngModelChange)="applyFilters()" name="layawayOverdue" />
+      <span>Solo vencidos</span>
+    </label>
+    <button type="button" class="icon-button filter-refresh" title="Actualizar" (click)="load()"><i class="pi pi-refresh"></i></button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-panel"><i class="pi pi-spin pi-spinner"></i><span>Cargando planes separe…</span></div>
+  } @else if (layaways().length) {
+    <div class="table-scroll">
+      <table class="inventory-table">
+        <thead><tr><th>PLAN</th><th>CLIENTE</th><th>PRODUCTOS</th><th>TOTAL</th><th>ABONADO</th><th>SALDO</th><th>VENCE</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
+        <tbody>
+          @for (plan of layaways(); track plan.id) {
+            <tr>
+              <td data-label="Plan"><strong>#{{ plan.id }}</strong><small class="table-subtext">{{ formatDate(plan.startDate) }}</small></td>
+              <td data-label="Cliente"><strong>{{ plan.customerSnapshot.name }}</strong><small class="table-subtext">{{ plan.customerSnapshot.phone || plan.customerSnapshot.document || "—" }}</small></td>
+              <td data-label="Productos">
+                <span>{{ plan.items[0].name }}</span>
+                @if (plan.items.length > 1) { <small class="table-subtext">+{{ plan.items.length - 1 }} más</small> }
+              </td>
+              <td data-label="Total"><strong>{{ formatMoney(plan.total) }}</strong></td>
+              <td data-label="Abonado">{{ formatMoney(plan.paidAmount) }}</td>
+              <td data-label="Saldo"><strong [class.layaway-balance-zero]="plan.balance === 0">{{ formatMoney(plan.balance) }}</strong></td>
+              <td data-label="Vence">
+                <span>{{ formatDate(plan.dueDate) }}</span>
+                @if (plan.overdue) { <small class="layaway-overdue"><i class="pi pi-exclamation-triangle"></i> {{ plan.daysOverdue }}d</small> }
+              </td>
+              <td data-label="Estado">
+                <span class="layaway-status" [class]="'layaway-status--' + plan.status">{{ statusLabel(plan.status) }}</span>
+                <small class="table-subtext">{{ handoverLabel(plan) }}</small>
+              </td>
+              <td data-label="Acciones">
+                <div class="layaway-row-actions">
+                  @if (plan.status === "active") {
+                    <button type="button" class="button button-primary button-small" (click)="onPay(plan)"><i class="pi pi-dollar"></i> Abonar</button>
+                  }
+                  @if (plan.status === "ready") {
+                    <button type="button" class="button button-primary button-small" (click)="onDeliver(plan)"><i class="pi pi-check"></i> Entregar</button>
+                  }
+                  <button type="button" class="icon-button" title="Ver detalle" aria-label="Ver detalle" (click)="openDetail(plan)"><i class="pi pi-eye"></i></button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="totalItems()" (pageChange)="changePage($event)" />
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon"><i class="pi pi-bookmark"></i></span>
+      <strong>Aún no hay planes separe</strong>
+      <p>Separa un producto, registra el abono inicial y lleva el saldo poco a poco.</p>
+      <button type="button" class="button button-primary button-small" (click)="openCreate()"><i class="pi pi-plus"></i> Crear plan separe</button>
+    </div>
+  }
+</section>
+
+@if (createOpen()) {
+  <app-layaway-create-dialog (created)="onCreated()" (closed)="createOpen.set(false)" />
+}
+
+@if (detailOpen() && selected(); as plan) {
+  <app-layaway-detail-dialog
+    [layaway]="plan"
+    (pay)="onPay($event)"
+    (cancel)="onCancel($event)"
+    (deliver)="onDeliver($event)"
+    (closed)="detailOpen.set(false)"
+  />
+}
+
+@if (paymentOpen() && selected(); as plan) {
+  <app-layaway-payment-dialog [layaway]="plan" (saved)="onPaymentSaved($event)" (closed)="paymentOpen.set(false)" />
+}
+
+@if (cancelOpen() && selected(); as plan) {
+  <app-layaway-cancel-dialog [layaway]="plan" [settings]="settings()" (saved)="onCancelSaved($event)" (closed)="cancelOpen.set(false)" />
+}
+
+@if (settingsOpen() && settings(); as currentSettings) {
+  <app-layaway-settings-dialog [settings]="currentSettings" (saved)="onSettingsSaved($event)" (closed)="settingsOpen.set(false)" />
+}

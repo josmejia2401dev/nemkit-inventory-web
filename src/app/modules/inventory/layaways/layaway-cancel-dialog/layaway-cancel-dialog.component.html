@@ -1,0 +1,74 @@
+<div class="dialog-backdrop" (click)="closed.emit()">
+  <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" aria-labelledby="layaway-cancel-title" (click)="$event.stopPropagation()">
+    <header class="dialog-heading">
+      <div>
+        <p class="eyebrow">Plan separe #{{ layaway().id }}</p>
+        <h2 id="layaway-cancel-title">Cancelar / devolver</h2>
+      </div>
+      <button type="button" class="icon-button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+    </header>
+
+    <div class="dialog-form">
+      <div class="layaway-money-summary">
+        <div><small>Abonado</small><strong>{{ formatMoney(layaway().paidAmount) }}</strong></div>
+        <div><small>Saldo</small><strong>{{ formatMoney(layaway().balance) }}</strong></div>
+        <div><small>Estado</small><strong>{{ delivered ? "Entregado" : "Sin entregar" }}</strong></div>
+      </div>
+
+      <div class="form-grid">
+        <label class="form-field">
+          <span>Motivo</span>
+          <select [(ngModel)]="form.reason" name="reason">
+            <option value="customer_changed">El cliente cambió de opinión</option>
+            <option value="payment_default">Incumplimiento de pago</option>
+            <option value="out_of_stock">Sin stock</option>
+            <option value="duplicate">Plan duplicado</option>
+            <option value="other">Otro</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Método de devolución</span>
+          <select [(ngModel)]="form.refundMethod" name="refundMethod">
+            <option value="cash">Efectivo</option>
+            <option value="transfer">Transferencia</option>
+            <option value="nequi">Nequi</option>
+            <option value="daviplata">Daviplata</option>
+            <option value="other">Otro</option>
+          </select>
+        </label>
+        <label class="form-field form-field--wide">
+          <span>Nota</span>
+          <input [(ngModel)]="form.note" name="note" maxlength="300" placeholder="Explica la cancelación" />
+        </label>
+        <label class="form-field form-field--wide">
+          <span>Devolución</span>
+          <input type="number" min="0" [max]="layaway().paidAmount" step="0.01" [(ngModel)]="form.refundAmount" name="refundAmount" />
+          <small class="form-hint">Máximo {{ formatMoney(layaway().paidAmount) }}. La diferencia queda como retención.</small>
+        </label>
+
+        @if (delivered) {
+          <label class="form-field form-field--wide layaway-check">
+            <input type="checkbox" [(ngModel)]="form.productReturned" name="productReturned" (change)="onReturnToggle()" />
+            <span>El cliente devolvió el producto</span>
+          </label>
+          <label class="form-field form-field--wide">
+            <span>Condición del producto</span>
+            <select [(ngModel)]="form.returnCondition" name="returnCondition" [disabled]="!form.productReturned">
+              <option value="resellable">Buen estado · vuelve al stock</option>
+              <option value="damaged">Dañado · no vuelve al stock</option>
+              <option value="not_returned">No devuelto · queda como saldo no recuperado</option>
+            </select>
+          </label>
+        }
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" (click)="closed.emit()">Volver</button>
+        <button type="button" class="button button-danger" [disabled]="saving()" (click)="submit()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-ban'"></i>
+          {{ saving() ? "Cancelando…" : "Confirmar cancelación" }}
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

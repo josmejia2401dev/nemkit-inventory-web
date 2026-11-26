@@ -1,0 +1,66 @@
+<div class="dialog-backdrop" (click)="closed.emit()">
+  <section class="form-dialog" role="dialog" aria-modal="true" aria-labelledby="layaway-settings-title" (click)="$event.stopPropagation()">
+    <header class="dialog-heading">
+      <div>
+        <p class="eyebrow">Configuración</p>
+        <h2 id="layaway-settings-title">Plan separe</h2>
+      </div>
+      <button type="button" class="icon-button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+    </header>
+
+    <div class="dialog-form">
+      <div class="form-grid">
+        <label class="form-field">
+          <span>Abono mínimo (%)</span>
+          <input type="number" min="0" max="100" [(ngModel)]="form.minInitialPercent" name="minInitialPercent" />
+        </label>
+        <label class="form-field">
+          <span>Plazo máximo (meses)</span>
+          <input type="number" min="1" max="60" [(ngModel)]="form.maxTermMonths" name="maxTermMonths" />
+        </label>
+        <label class="form-field">
+          <span>Frecuencia por defecto</span>
+          <select [(ngModel)]="form.defaultFrequency" name="defaultFrequency">
+            <option value="weekly">Semanal</option>
+            <option value="biweekly">Quincenal</option>
+            <option value="monthly">Mensual</option>
+            <option value="custom">Personalizada</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Política de cancelación</span>
+          <select [(ngModel)]="form.cancellationPolicy" name="cancellationPolicy">
+            <option value="refund_all">Devolver todo lo abonado</option>
+            <option value="retain_percent">Retener un porcentaje</option>
+            <option value="manual">Decidir en cada caso</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Retención (%)</span>
+          <input type="number" min="0" max="100" [(ngModel)]="form.retentionPercent" name="retentionPercent" />
+          <small class="form-hint">Solo aplica si la política es “Retener un porcentaje”.</small>
+        </label>
+        <label class="form-field">
+          <span>Entrega inmediata con 0 %</span>
+          <select [(ngModel)]="form.zeroDownImmediatePolicy" name="zeroDownImmediatePolicy">
+            <option value="blocked">Bloqueada</option>
+            <option value="admin_authorization">Requiere autorización de ADMIN</option>
+            <option value="allowed">Permitida sin autorización</option>
+          </select>
+        </label>
+        <label class="form-field form-field--wide layaway-check">
+          <input type="checkbox" [(ngModel)]="form.allowImmediateHandover" name="allowImmediateHandover" />
+          <span>Permitir entrega inmediata (el cliente se lleva el producto con la cuota inicial)</span>
+        </label>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" (click)="closed.emit()">Cancelar</button>
+        <button type="button" class="button button-primary" [disabled]="saving()" (click)="save()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>
+          {{ saving() ? "Guardando…" : "Guardar configuración" }}
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

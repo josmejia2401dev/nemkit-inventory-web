@@ -1,0 +1,169 @@
+<div class="dialog-backdrop" (click)="closed.emit()">
+  <section class="form-dialog layaway-create-dialog" role="dialog" aria-modal="true" aria-labelledby="layaway-create-title" (click)="$event.stopPropagation()">
+    <header class="dialog-heading">
+      <div>
+        <p class="eyebrow">Plan separe</p>
+        <h2 id="layaway-create-title">Nuevo plan separe</h2>
+      </div>
+      <button type="button" class="icon-button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+    </header>
+
+    <div class="dialog-form">
+      <div class="layaway-create-grid">
+        <section class="layaway-form-block">
+          <header class="section-heading"><h3>Cliente</h3><button type="button" class="button-link" (click)="showNewCustomer.set(!showNewCustomer())">{{ showNewCustomer() ? "Cerrar" : "Nuevo cliente" }}</button></header>
+          @if (selectedCustomer(); as customer) {
+            <div class="layaway-selected">
+              <i class="pi pi-user"></i>
+              <div><strong>{{ customer.name }}</strong><small>{{ customer.document || customer.phone || "Sin documento" }}</small></div>
+              <button type="button" class="icon-button" aria-label="Quitar cliente" (click)="selectedCustomer.set(null)"><i class="pi pi-times"></i></button>
+            </div>
+          } @else {
+            <div class="layaway-search-row">
+              <input [ngModel]="customerSearch()" (ngModelChange)="customerSearch.set($event)" (keyup.enter)="searchCustomers()" name="customerSearch" placeholder="Buscar por nombre, documento o celular" />
+              <button type="button" class="button button-secondary button-small" (click)="searchCustomers()"><i class="pi pi-search"></i></button>
+            </div>
+            <div class="layaway-result-list">
+              @for (customer of customers(); track customer.id || customer._id) {
+                <button type="button" class="layaway-result" (click)="selectCustomer(customer)">
+                  <span><strong>{{ customer.name }}</strong><small>{{ customer.document || customer.phone || "Sin documento" }}</small></span>
+                  <i class="pi pi-plus"></i>
+                </button>
+              } @empty {
+                <p class="layaway-empty-note">Sin resultados. Crea el cliente o ajusta la búsqueda.</p>
+              }
+            </div>
+          }
+
+          @if (showNewCustomer()) {
+            <div class="layaway-new-customer">
+              <label class="form-field"><span>Nombre <b>*</b></span><input [(ngModel)]="newCustomer.name" name="newCustomerName" maxlength="100" /></label>
+              <label class="form-field"><span>Documento</span><input [(ngModel)]="newCustomer.document" name="newCustomerDocument" maxlength="40" /></label>
+              <label class="form-field"><span>Teléfono</span><input [(ngModel)]="newCustomer.phone" name="newCustomerPhone" type="tel" maxlength="40" /></label>
+              <label class="form-field"><span>Correo</span><input [(ngModel)]="newCustomer.email" name="newCustomerEmail" type="email" maxlength="254" /></label>
+              <button type="button" class="button button-secondary button-small" (click)="createCustomer()"><i class="pi pi-user-plus"></i> Crear y seleccionar</button>
+            </div>
+          }
+        </section>
+
+        <section class="layaway-form-block">
+          <header class="section-heading"><h3>Productos</h3><span class="layaway-counter">{{ items().length }} en el plan</span></header>
+          <div class="layaway-search-row">
+            <input [ngModel]="productSearch()" (ngModelChange)="productSearch.set($event)" (keyup.enter)="searchProducts()" name="productSearch" placeholder="Buscar producto simple con stock" />
+            <button type="button" class="button button-secondary button-small" (click)="searchProducts()"><i class="pi pi-search"></i></button>
+          </div>
+          <div class="layaway-result-list">
+            @for (product of products(); track product.id) {
+              <button type="button" class="layaway-result" (click)="addProduct(product)">
+                <span><strong>{{ product.name }}</strong><small>{{ product.sku }} · stock {{ product.stock }} · {{ formatMoney(product.salePrice) }}</small></span>
+                <i class="pi pi-plus"></i>
+              </button>
+            } @empty {
+              <p class="layaway-empty-note">No hay productos simples con stock.</p>
+            }
+          </div>
+
+          @if (items().length) {
+            <div class="layaway-item-list">
+              @for (item of items(); track item.product.id; let index = $index) {
+                <div class="layaway-item-row">
+                  <div class="layaway-item-copy"><strong>{{ item.product.name }}</strong><small>{{ item.product.sku }} · stock {{ item.product.stock }}</small></div>
+                  <label class="layaway-inline-field"><span>Cant.</span><input type="number" min="1" [max]="item.product.stock" [ngModel]="item.quantity" (ngModelChange)="updateQuantity(index, $event)" [name]="'quantity' + index" /></label>
+                  <label class="layaway-inline-field"><span>Precio</span><input type="number" min="0" [ngModel]="item.unitPrice" (ngModelChange)="updatePrice(index, $event)" [name]="'price' + index" /></label>
+                  <strong class="layaway-item-total">{{ formatMoney(item.quantity * item.unitPrice) }}</strong>
+                  <button type="button" class="icon-button icon-button--danger" aria-label="Quitar producto" (click)="removeItem(index)"><i class="pi pi-trash"></i></button>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      </div>
+
+      <section class="layaway-form-block">
+        <header class="section-heading"><h3>Condiciones</h3></header>
+        <div class="form-grid">
+          <label class="form-field">
+            <span>Abono inicial</span>
+            <input type="number" min="0" [max]="total()" step="0.01" [(ngModel)]="form.initialPayment" name="initialPayment" />
+          </label>
+          <label class="form-field">
+            <span>Método del abono inicial</span>
+            <select [(ngModel)]="form.initialPaymentMethod" name="initialPaymentMethod">
+              <option value="cash">Efectivo</option>
+              <option value="card">Tarjeta</option>
+              <option value="transfer">Transferencia</option>
+              <option value="nequi">Nequi</option>
+              <option value="daviplata">Daviplata</option>
+              <option value="other">Otro</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Cuota sugerida</span>
+            <input type="number" min="0" step="0.01" [(ngModel)]="form.installmentAmount" name="installmentAmount" />
+          </label>
+          <label class="form-field">
+            <span>Frecuencia</span>
+            <select [(ngModel)]="form.frequency" name="frequency">
+              <option value="weekly">Semanal</option>
+              <option value="biweekly">Quincenal</option>
+              <option value="monthly">Mensual</option>
+              <option value="custom">Personalizada</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Fecha límite</span>
+            <input type="date" [(ngModel)]="form.dueDate" name="dueDate" />
+          </label>
+          <label class="form-field">
+            <span>Entrega</span>
+            <select [(ngModel)]="form.handoverMode" name="handoverMode">
+              <option value="pickup">Recoge en tienda</option>
+              <option value="delivery">Domicilio</option>
+              <option value="immediate">Se lo lleva ahora</option>
+            </select>
+          </label>
+          @if (form.handoverMode === "delivery") {
+            <label class="form-field form-field--wide">
+              <span>Dirección de entrega</span>
+              <input [(ngModel)]="form.deliveryAddress" name="deliveryAddress" maxlength="300" placeholder="Dirección completa" />
+            </label>
+          }
+          <label class="form-field form-field--wide">
+            <span>Notas</span>
+            <input [(ngModel)]="form.notes" name="notes" maxlength="1000" placeholder="Opcional" />
+          </label>
+        </div>
+
+        @if (zeroDownBlocked) {
+          <p class="layaway-alert layaway-alert--danger"><i class="pi pi-ban"></i> La empresa no permite entrega inmediata con 0 %.</p>
+        } @else if (needsAuthorization) {
+          <p class="layaway-alert"><i class="pi pi-shield"></i> La entrega inmediata con 0 % requiere autorización de un administrador.</p>
+        }
+      </section>
+
+      <div class="layaway-summary-bar">
+        <div><small>Total</small><strong>{{ formatMoney(total()) }}</strong></div>
+        <div><small>Abono</small><strong>{{ formatMoney(form.initialPayment) }}</strong></div>
+        <div class="layaway-summary-bar__pending"><small>Saldo</small><strong>{{ formatMoney(balance()) }}</strong></div>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" (click)="closed.emit()">Cancelar</button>
+        <button type="button" class="button button-primary" [disabled]="saving() || zeroDownBlocked" (click)="submit()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>
+          {{ saving() ? "Creando…" : "Crear plan separe" }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  @if (showAuthorization()) {
+    <app-layaway-authorization-dialog
+      [customerId]="selectedCustomer()?.id || 0"
+      [customerName]="selectedCustomer()?.name || ''"
+      [total]="total()"
+      (authorized)="onAuthorized($event)"
+      (closed)="showAuthorization.set(false)"
+    />
+  }
+</div>

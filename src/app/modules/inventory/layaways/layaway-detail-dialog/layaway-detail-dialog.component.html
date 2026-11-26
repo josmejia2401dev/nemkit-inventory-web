@@ -1,0 +1,98 @@
+@if (layaway(); as plan) {
+  <div class="dialog-backdrop" (click)="closed.emit()">
+    <section class="form-dialog layaway-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="layaway-detail-title" (click)="$event.stopPropagation()">
+      <header class="dialog-heading">
+        <div>
+          <p class="eyebrow">Plan separe #{{ plan.id }}</p>
+          <h2 id="layaway-detail-title">{{ plan.customerSnapshot.name }}</h2>
+        </div>
+        <div class="layaway-detail-head-actions">
+          <span class="layaway-status" [class]="'layaway-status--' + plan.status">{{ statusLabel(plan.status) }}</span>
+          <button type="button" class="icon-button" aria-label="Imprimir" (click)="print()"><i class="pi pi-print"></i></button>
+          <button type="button" class="icon-button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+        </div>
+      </header>
+
+      <div class="dialog-form">
+        <div class="layaway-detail-summary">
+          <div><small>Total</small><strong>{{ formatMoney(plan.total) }}</strong></div>
+          <div><small>Abonado</small><strong>{{ formatMoney(plan.paidAmount) }}</strong></div>
+          <div class="layaway-detail-summary__pending"><small>Saldo</small><strong>{{ formatMoney(plan.balance) }}</strong></div>
+          <div><small>Vence</small><strong>{{ formatDate(plan.dueDate) }}</strong></div>
+        </div>
+
+        <div class="layaway-progress" [attr.aria-label]="'Progreso de pago: ' + plan.progressPercent + '%'">
+          <span [style.width.%]="plan.progressPercent"></span>
+        </div>
+        <p class="layaway-detail-meta">
+          <span><i class="pi pi-calendar"></i> Inicio {{ formatDate(plan.startDate) }}</span>
+          <span><i class="pi pi-truck"></i> {{ handoverLabel(plan) }}</span>
+          @if (plan.overdue) {
+            <span class="layaway-overdue"><i class="pi pi-exclamation-triangle"></i> Vencido hace {{ plan.daysOverdue }} día(s)</span>
+          }
+          @if (plan.authorization?.authorizedByName) {
+            <span class="layaway-authorized"><i class="pi pi-shield"></i> Autorizado por {{ plan.authorization?.authorizedByName }}</span>
+          }
+        </p>
+
+        <section class="layaway-form-block">
+          <header class="section-heading"><h3>Productos</h3><span class="layaway-counter">{{ plan.items.length }}</span></header>
+          <div class="layaway-item-list">
+            @for (item of plan.items; track item.productId) {
+              <div class="layaway-item-row layaway-item-row--readonly">
+                <div class="layaway-item-copy"><strong>{{ item.name }}</strong><small>{{ item.sku }} · {{ item.quantity }} × {{ formatMoney(item.unitPrice) }}</small></div>
+                <strong class="layaway-item-total">{{ formatMoney(item.lineTotal) }}</strong>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="layaway-form-block">
+          <header class="section-heading"><h3>Abonos</h3><span class="layaway-counter">{{ plan.payments?.length || 0 }}</span></header>
+          @if (plan.payments?.length) {
+            <div class="layaway-payment-list">
+              @for (payment of plan.payments; track payment.id) {
+                <div class="layaway-payment-row">
+                  <span class="layaway-payment-icon"><i class="pi pi-dollar"></i></span>
+                  <div class="layaway-payment-copy">
+                    <strong>{{ formatMoney(payment.amount) }}</strong>
+                    <small>{{ formatDate(payment.date) }} · {{ methodLabel(payment.method) }}</small>
+                  </div>
+                  <small class="layaway-payment-type">{{ payment.type === "initial" ? "Inicial" : "Abono" }}</small>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="layaway-empty-note">Aún no hay abonos registrados.</p>
+          }
+        </section>
+
+        @if (plan.notes) {
+          <p class="layaway-detail-notes"><i class="pi pi-comment"></i> {{ plan.notes }}</p>
+        }
+
+        @if (plan.status === "cancelled" && plan.cancellation) {
+          <div class="layaway-cancelled-box">
+            <strong>Plan cancelado</strong>
+            <span>Devolución: {{ formatMoney(plan.cancellation.refundAmount) }} · Retención: {{ formatMoney(plan.cancellation.retainedAmount) }}</span>
+            @if (plan.cancellation.writeOffAmount > 0) {
+              <span>Saldo no recuperado: {{ formatMoney(plan.cancellation.writeOffAmount) }}</span>
+            }
+          </div>
+        }
+
+        <div class="dialog-actions">
+          <button type="button" class="button button-secondary" (click)="closed.emit()">Cerrar</button>
+          @if (plan.status === "active") {
+            <button type="button" class="button button-secondary" (click)="cancel.emit(plan)"><i class="pi pi-ban"></i> Cancelar</button>
+            <button type="button" class="button button-primary" (click)="pay.emit(plan)"><i class="pi pi-dollar"></i> Registrar abono</button>
+          }
+          @if (plan.status === "ready") {
+            <button type="button" class="button button-secondary" (click)="cancel.emit(plan)"><i class="pi pi-ban"></i> Cancelar</button>
+            <button type="button" class="button button-primary" (click)="deliver.emit(plan)"><i class="pi pi-check"></i> Entregar</button>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+}

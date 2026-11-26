@@ -53,3 +53,4 @@
 /* Administración */
 @import "./styles/features/feedback.css";
 @import "./styles/features/order-cancel.css";
+@import "./styles/features/layaways.css";

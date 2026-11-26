@@ -45,6 +45,8 @@ export class DashboardComponent implements OnInit {
       damage: "Daño",
       loss: "Pérdida",
       internal_use: "Consumo interno",
+      layaway_reserve: "Reserva Plan separe",
+      layaway_release: "Liberación Plan separe",
     };
 
     return labels[type] ?? type;

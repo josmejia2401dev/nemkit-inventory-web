@@ -70,6 +70,47 @@
       </article>
     </div>
 
+    @if (data.layaways; as layaways) {
+      <div class="stat-grid layaway-dashboard-grid">
+        <article class="stat-card stat-card--green">
+          <div class="stat-top">
+            <span class="stat-icon"><i class="pi pi-bookmark"></i></span>
+            <span class="stat-note">PLAN SEPARE</span>
+          </div>
+          <strong class="stat-value">{{ layaways.activeCount | number }}</strong>
+          <span class="stat-label">Planes activos</span>
+          <a routerLink="../layaways" class="stat-link">Ver planes <i class="pi pi-arrow-up-right"></i></a>
+        </article>
+        <article class="stat-card stat-card--amber">
+          <div class="stat-top">
+            <span class="stat-icon"><i class="pi pi-wallet"></i></span>
+            <span class="stat-note">POR RECAUDAR</span>
+          </div>
+          <strong class="stat-value stat-value--money">{{ currency.format(layaways.activeBalance || 0) }}</strong>
+          <span class="stat-label">Saldo de planes activos</span>
+          <span class="stat-caption">Incluye planes vencidos</span>
+        </article>
+        <article class="stat-card stat-card--rose">
+          <div class="stat-top">
+            <span class="stat-icon"><i class="pi pi-exclamation-triangle"></i></span>
+            <span class="stat-note">REQUIERE SEGUIMIENTO</span>
+          </div>
+          <strong class="stat-value">{{ layaways.overdueCount | number }}</strong>
+          <span class="stat-label">Planes vencidos</span>
+          <a routerLink="../layaways" [queryParams]="{ overdue: 'true' }" class="stat-link">Ver vencidos <i class="pi pi-arrow-up-right"></i></a>
+        </article>
+        <article class="stat-card stat-card--ink">
+          <div class="stat-top">
+            <span class="stat-icon"><i class="pi pi-check-circle"></i></span>
+            <span class="stat-note">SALDO EN CERO</span>
+          </div>
+          <strong class="stat-value">{{ layaways.readyCount | number }}</strong>
+          <span class="stat-label">Listos para entregar</span>
+          <a routerLink="../layaways" [queryParams]="{ status: 'ready' }" class="stat-link">Entregar <i class="pi pi-arrow-up-right"></i></a>
+        </article>
+      </div>
+    }
+
     <div class="dashboard-grid">
       <section class="panel recent-panel">
         <div class="panel-heading">

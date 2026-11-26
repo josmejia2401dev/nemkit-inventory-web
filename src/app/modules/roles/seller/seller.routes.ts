@@ -7,6 +7,7 @@ import { productCatalogRoute } from "../../inventory/products/products.routes";
 import { customerDirectoryRoute } from "../../inventory/contacts/contacts.routes";
 import { salesRoute } from "../../inventory/documents/documents.routes";
 import { deliveryOperationsRoute } from "../../inventory/deliveries/deliveries.routes";
+import { layawaysRoute } from "../../inventory/layaways/layaways.routes";
 
 export const sellerRoutes: Routes = [
   {
@@ -20,6 +21,7 @@ export const sellerRoutes: Routes = [
         loadComponent: () => import("./dashboard/seller-dashboard.component").then((m) => m.SellerDashboardComponent),
       },
       salesRoute,
+      layawaysRoute,
       deliveryOperationsRoute,
       customerDirectoryRoute,
       productCatalogRoute,

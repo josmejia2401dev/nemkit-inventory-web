@@ -11,6 +11,7 @@ export class CashierShellComponent {
   navItems: NavItem[] = [
     { path: "/cashier/dashboard", label: "Resumen", icon: "pi pi-chart-pie" },
     { path: "/cashier/sales", label: "Ventas", icon: "pi pi-receipt" },
+    { path: "/cashier/layaways", label: "Plan separe", icon: "pi pi-bookmark" },
     { path: "/cashier/products", label: "Productos", icon: "pi pi-box" },
     { path: "/cashier/deliveries", label: "Domicilios", icon: "pi pi-send" },
     { path: "/cashier/customers", label: "Clientes", icon: "pi pi-users" },

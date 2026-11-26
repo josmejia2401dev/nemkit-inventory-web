@@ -8,6 +8,7 @@ import { customerDirectoryRoute, supplierDirectoryRoute } from "../../inventory/
 import { purchasesRoute, salesRoute } from "../../inventory/documents/documents.routes";
 import { deliveryOperationsRoute } from "../../inventory/deliveries/deliveries.routes";
 import { kitchenServiceRoute } from "../../inventory/kitchen/kitchen.routes";
+import { layawaysRoute } from "../../inventory/layaways/layaways.routes";
 
 export const adminRoutes: Routes = [
   {
@@ -55,6 +56,7 @@ export const adminRoutes: Routes = [
         loadComponent: () => import("../../inventory/tables/tables.component").then((m) => m.TablesComponent),
       },
       kitchenServiceRoute,
+      layawaysRoute,
       ...foundationProfileRoutes,
       ...foundationFeedbackRoutes,
     ],

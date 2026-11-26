@@ -1,0 +1,46 @@
+<div class="dialog-backdrop" (click)="closed.emit()">
+  <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" aria-labelledby="layaway-auth-title" (click)="$event.stopPropagation()">
+    <header class="dialog-heading">
+      <div>
+        <p class="eyebrow">Entrega inmediata · 0 %</p>
+        <h2 id="layaway-auth-title">Autorización del administrador</h2>
+      </div>
+      <button type="button" class="icon-button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+    </header>
+
+    <div class="dialog-form">
+      <p class="layaway-auth-summary">
+        <strong>{{ customerName() || "Cliente" }}</strong>
+        <span>{{ formatMoney(total()) }} · el producto sale sin abono inicial</span>
+      </p>
+
+      <div class="form-grid">
+        <label class="form-field form-field--wide">
+          <span>Correo del administrador <b>*</b></span>
+          <input type="email" [(ngModel)]="form.adminEmail" name="adminEmail" autocomplete="username" maxlength="254" />
+        </label>
+        <label class="form-field form-field--wide">
+          <span>Contraseña <b>*</b></span>
+          <input type="password" [(ngModel)]="form.adminPassword" name="adminPassword" autocomplete="current-password" maxlength="128" />
+        </label>
+        <label class="form-field form-field--wide">
+          <span>Motivo</span>
+          <input [(ngModel)]="form.reason" name="authorizationReason" maxlength="300" placeholder="Ej. cliente frecuente, autorización del dueño" />
+        </label>
+      </div>
+
+      <p class="form-hint">
+        <i class="pi pi-shield"></i>
+        La autorización vale 10 minutos, es de un solo uso y queda registrada en el plan.
+      </p>
+
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" (click)="closed.emit()">Cancelar</button>
+        <button type="button" class="button button-primary" [disabled]="saving()" (click)="submit()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>
+          {{ saving() ? "Autorizando…" : "Autorizar y continuar" }}
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

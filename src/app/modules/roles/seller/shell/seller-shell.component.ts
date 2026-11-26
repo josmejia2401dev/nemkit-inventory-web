@@ -11,6 +11,7 @@ export class SellerShellComponent {
   navItems: NavItem[] = [
     { path: "/seller/dashboard", label: "Resumen", icon: "pi pi-chart-pie" },
     { path: "/seller/sales", label: "Ventas", icon: "pi pi-receipt" },
+    { path: "/seller/layaways", label: "Plan separe", icon: "pi pi-bookmark" },
     { path: "/seller/products", label: "Productos", icon: "pi pi-box" },
     { path: "/seller/deliveries", label: "Domicilios", icon: "pi pi-send" },
     { path: "/seller/customers", label: "Clientes", icon: "pi pi-users" },

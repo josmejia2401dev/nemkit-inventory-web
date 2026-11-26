@@ -7,4 +7,9 @@ export interface PageResult<T> {
     total?: number;
     totalPages?: number;
   };
+  metadata?: {
+    pagination?: PageResult<T>["pagination"];
+    summary?: unknown;
+    [key: string]: unknown;
+  };
 }

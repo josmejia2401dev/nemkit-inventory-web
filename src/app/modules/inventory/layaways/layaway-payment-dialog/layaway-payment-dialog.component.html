@@ -1,0 +1,60 @@
+<div class="dialog-backdrop" (click)="closed.emit()">
+  <section class="form-dialog form-dialog--narrow" role="dialog" aria-modal="true" aria-labelledby="layaway-payment-title" (click)="$event.stopPropagation()">
+    <header class="dialog-heading">
+      <div>
+        <p class="eyebrow">Plan separe #{{ layaway().id }}</p>
+        <h2 id="layaway-payment-title">Registrar abono</h2>
+      </div>
+      <button type="button" class="icon-button" aria-label="Cerrar" (click)="closed.emit()"><i class="pi pi-times"></i></button>
+    </header>
+
+    <div class="dialog-form">
+      <div class="layaway-money-summary">
+        <div><small>Total</small><strong>{{ formatMoney(layaway().total) }}</strong></div>
+        <div><small>Abonado</small><strong>{{ formatMoney(layaway().paidAmount) }}</strong></div>
+        <div class="layaway-money-summary__pending"><small>Saldo</small><strong>{{ formatMoney(layaway().balance) }}</strong></div>
+      </div>
+
+      <div class="form-grid">
+        <label class="form-field form-field--wide">
+          <span>Monto del abono <b>*</b></span>
+          <div class="layaway-amount-row">
+            <input type="number" min="0.01" [max]="layaway().balance" step="0.01" [(ngModel)]="form.amount" name="amount" />
+            <button type="button" class="button button-secondary button-small" (click)="payFull()">Pagar saldo</button>
+          </div>
+        </label>
+        <label class="form-field">
+          <span>Método</span>
+          <select [(ngModel)]="form.method" name="method">
+            <option value="cash">Efectivo</option>
+            <option value="card">Tarjeta</option>
+            <option value="transfer">Transferencia</option>
+            <option value="nequi">Nequi</option>
+            <option value="daviplata">Daviplata</option>
+            <option value="other">Otro</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Fecha</span>
+          <input type="date" [(ngModel)]="form.date" name="date" />
+        </label>
+        <label class="form-field form-field--wide">
+          <span>Referencia</span>
+          <input [(ngModel)]="form.reference" name="reference" maxlength="100" placeholder="Número de transferencia o comprobante" />
+        </label>
+        <label class="form-field form-field--wide">
+          <span>Notas</span>
+          <input [(ngModel)]="form.notes" name="notes" maxlength="300" placeholder="Opcional" />
+        </label>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="button button-secondary" (click)="closed.emit()">Cancelar</button>
+        <button type="button" class="button button-primary" [disabled]="saving()" (click)="submit()">
+          <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-dollar'"></i>
+          {{ saving() ? "Registrando…" : "Registrar abono" }}
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

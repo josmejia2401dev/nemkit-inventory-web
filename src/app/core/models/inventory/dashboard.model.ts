@@ -27,6 +27,12 @@ export interface InventoryDashboardSummary {
     cancelled: number;
     avgDeliveryMinutes: number | null;
   };
+  layaways?: {
+    activeCount: number;
+    activeBalance: number;
+    overdueCount: number;
+    readyCount: number;
+  };
 }
 
 export interface InventoryStockAlert {

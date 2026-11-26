@@ -36,7 +36,13 @@ export interface CashWithdrawalSummary {
 
 export interface CashFlowReport {
   range: { from: string; to: string };
-  inflows: { sales: number; salesCount: number };
+  inflows: {
+    sales: number;
+    salesCount: number;
+    layawayPayments: number;
+    layawayPaymentsCount: number;
+    total: number;
+  };
   outflows: {
     purchases: number;
     purchasesCount: number;
@@ -44,6 +50,8 @@ export interface CashFlowReport {
     employeePaymentsCount: number;
     withdrawals: number;
     withdrawalsCount: number;
+    layawayRefunds: number;
+    layawayRefundsCount: number;
     total: number;
   };
   net: number;

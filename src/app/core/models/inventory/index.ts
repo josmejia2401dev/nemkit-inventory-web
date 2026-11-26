@@ -2,6 +2,7 @@ export * from "./contact.model";
 export * from "./dashboard.model";
 export * from "./document.model";
 export * from "./employee.model";
+export * from "./layaway.model";
 export * from "./movement.model";
 export * from "./page-result.model";
 export * from "./payment.model";
