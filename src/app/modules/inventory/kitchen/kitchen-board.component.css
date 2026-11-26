@@ -18,7 +18,7 @@
 .kitchen-col {
   min-width: 0;
   min-height: 240px;
-  box-shadow: 0 4px 15px rgba(31, 57, 45, 0.035);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.21);
 }
 
 .kitchen-col-head {
@@ -43,7 +43,7 @@
 .kitchen-card {
   padding: 14px;
   border-radius: 13px;
-  box-shadow: 0 3px 11px rgba(31, 57, 45, 0.035);
+  box-shadow: 0 3px 11px rgba(0, 0, 0, 0.21);
 }
 
 .kitchen-card-head strong {
@@ -122,9 +122,9 @@
     gap: 7px;
     margin: 0 0 13px;
     padding: 5px;
-    border: 1px solid rgba(36, 65, 52, 0.08);
+    border: 1px solid rgba(30, 42, 36, 0.28);
     border-radius: 13px;
-    background: #f1f5ef;
+    background: rgba(95, 169, 140, .13);
   }
 
   .kitchen-mobile-tabs button {
@@ -137,7 +137,7 @@
     padding: 7px 8px;
     border: 1px solid transparent;
     border-radius: 10px;
-    color: #617168;
+    color: #DCE5DF;
     background: transparent;
     font-size: 10px;
     font-weight: 650;
@@ -155,16 +155,16 @@
     height: 22px;
     place-items: center;
     border-radius: 99px;
-    color: #6c7e70;
-    background: rgba(255, 255, 255, 0.8);
+    color: #DCE5DF;
+    background: rgba(13, 19, 16, 0.90);
     font-size: 10px;
   }
 
   .kitchen-mobile-tabs button.kitchen-mobile-tab--active {
-    border-color: rgba(39, 102, 80, 0.12);
-    color: #28553b;
-    background: #fff;
-    box-shadow: 0 2px 7px rgba(31, 57, 45, 0.06);
+    border-color: rgba(30, 42, 36, 0.32);
+    color: #DCE5DF;
+    background: #0D1310;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.24);
   }
 
   .kitchen-board {

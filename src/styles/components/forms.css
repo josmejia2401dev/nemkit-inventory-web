@@ -23,5 +23,5 @@
 .ng-invalid-border,
 input.p-inputtext.ng-touched.ng-invalid {
   border-color: var(--deploy-error) !important;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.30) !important;
 }

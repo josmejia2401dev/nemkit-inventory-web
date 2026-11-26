@@ -4,9 +4,9 @@
 
 .category-intro {
   min-height: 72px;
-  border-color: rgba(36, 65, 52, 0.1);
+  border-color: rgba(30, 42, 36, 0.30);
   border-radius: 15px;
-  background: linear-gradient(110deg, #eff4ec, #f8f7ef);
+  background: linear-gradient(110deg, #0D1310, #111A15);
 }
 
 .category-intro-icon {
@@ -28,7 +28,7 @@
   align-items: center;
   gap: 6px;
   margin-left: auto;
-  color: #76907a;
+  color: #A6B3AB;
   font-size: 10px;
   font-weight: 650;
 }
@@ -39,15 +39,15 @@
 
 .category-card {
   min-height: 205px;
-  border-color: rgba(36, 65, 52, 0.1);
+  border-color: rgba(30, 42, 36, 0.30);
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(31, 57, 45, 0.04);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.22);
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 }
 
 .category-card:hover {
-  border-color: rgba(39, 102, 80, 0.2);
-  box-shadow: 0 10px 22px rgba(31, 57, 45, 0.08);
+  border-color: rgba(30, 42, 36, 0.40);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
   transform: translateY(-2px);
 }
 

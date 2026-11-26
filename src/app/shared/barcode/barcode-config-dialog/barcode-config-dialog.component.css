@@ -13,10 +13,10 @@
   align-items: center;
   gap: 7px;
   padding: 8px 11px;
-  border: 1px solid rgba(36, 65, 52, 0.08);
+  border: 1px solid rgba(30, 42, 36, 0.28);
   border-radius: 9px;
-  color: #6d7d72;
-  background: #f8faf6;
+  color: #DCE5DF;
+  background: #0D1310;
   font-size: 9px;
   font-weight: 600;
 }
@@ -25,28 +25,28 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #b8c2bb;
-  box-shadow: 0 0 0 3px rgba(184, 194, 187, 0.16);
+  background: #111A15;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.34);
 }
 
 .barcode-config-status--active {
-  color: #2f7a4f;
-  background: #f0f8f1;
-  border-color: rgba(47, 122, 79, 0.16);
+  color: #5FA98C;
+  background: rgba(95, 169, 140, .13);
+  border-color: rgba(30, 42, 36, 0.36);
 }
 
 .barcode-config-status--active .barcode-config-dot {
-  background: #3aa564;
-  box-shadow: 0 0 0 3px rgba(58, 165, 100, 0.16);
+  background: rgba(16, 185, 129, .14);
+  box-shadow: 0 0 0 3px rgba(39, 102, 80, 0.31);
 }
 
 .barcode-config-status--configured .barcode-config-dot {
-  background: #c08a4a;
-  box-shadow: 0 0 0 3px rgba(192, 138, 74, 0.16);
+  background: #276650;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.34);
 }
 
 .barcode-config-status--off .barcode-config-dot {
-  background: #aab3ac;
+  background: #111A15;
 }
 
 .barcode-config-test {
@@ -55,26 +55,26 @@
   gap: 8px;
   min-height: 44px;
   padding: 11px 13px;
-  border: 1px dashed rgba(36, 65, 52, 0.18);
+  border: 1px dashed rgba(30, 42, 36, 0.38);
   border-radius: 10px;
-  color: #7b8980;
-  background: #fbfcf9;
+  color: #A6B3AB;
+  background: #0D1310;
   font-size: 9px;
 }
 
 .barcode-config-test i {
-  color: #8d9a91;
+  color: #A6B3AB;
   font-size: 13px;
 }
 
 .barcode-config-test--ok {
-  border-color: rgba(47, 122, 79, 0.26);
-  color: #32684f;
-  background: #f1f8f1;
+  border-color: rgba(30, 42, 36, 0.46);
+  color: #5FA98C;
+  background: #0D1310;
 }
 
 .barcode-config-test--ok i {
-  color: #3aa564;
+  color: #5FD39B;
 }
 
 .barcode-config-test strong {
@@ -87,13 +87,13 @@
   gap: 5px;
   margin: 0;
   padding-left: 18px;
-  color: #728176;
+  color: #DCE5DF;
   font-size: 9px;
   line-height: 1.55;
 }
 
 .barcode-config-steps strong {
-  color: #4c6053;
+  color: #DCE5DF;
   font-weight: 650;
 }
 
@@ -102,9 +102,9 @@
   align-items: flex-start;
   gap: 9px;
   padding: 11px 12px;
-  border: 1px solid rgba(36, 65, 52, 0.08);
+  border: 1px solid rgba(30, 42, 36, 0.28);
   border-radius: 10px;
-  background: #fafbf8;
+  background: #0D1310;
   cursor: pointer;
 }
 
@@ -112,7 +112,7 @@
   width: 15px;
   height: 15px;
   margin-top: 1px;
-  accent-color: #397252;
+  accent-color: #DCE5DF;
 }
 
 .barcode-config-toggle span {
@@ -122,13 +122,13 @@
 }
 
 .barcode-config-toggle strong {
-  color: #41564a;
+  color: #DCE5DF;
   font-size: 9px;
   font-weight: 650;
 }
 
 .barcode-config-toggle small {
-  color: #94a097;
+  color: #A6B3AB;
   font-size: 8px;
 }
 
@@ -165,14 +165,14 @@
   align-items: flex-start;
   gap: 6px;
   margin: 0;
-  color: #94a097;
+  color: #A6B3AB;
   font-size: 8px;
   line-height: 1.5;
 }
 
 .barcode-config-note i {
   margin-top: 1px;
-  color: #6d8a74;
+  color: #5FA98C;
   font-size: 9px;
 }
 

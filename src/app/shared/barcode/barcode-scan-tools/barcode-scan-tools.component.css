@@ -16,10 +16,10 @@
   align-items: center;
   gap: 8px;
   padding: 0 11px;
-  border: 1px solid rgba(36, 65, 52, 0.12);
+  border: 1px solid rgba(30, 42, 36, 0.32);
   border-radius: 10px;
-  color: #4d6557;
-  background: #fff;
+  color: #DCE5DF;
+  background: #0D1310;
   font: inherit;
   text-align: left;
   white-space: nowrap;
@@ -28,13 +28,13 @@
 }
 
 .barcode-scan-tools__gun:hover {
-  color: #2f6b4d;
-  border-color: rgba(47, 107, 77, 0.28);
-  background: #f3f8f2;
+  color: #5FA98C;
+  border-color: rgba(30, 42, 36, 0.48);
+  background: #111A15;
 }
 
 .barcode-scan-tools__gun:focus-visible {
-  outline: 2px solid #c9a967;
+  outline: 2px solid #5FA98C;
   outline-offset: 2px;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .barcode-scan-tools__copy small {
-  color: #8a988e;
+  color: #A6B3AB;
   font-size: 8px;
   font-weight: 550;
 }
@@ -65,37 +65,37 @@
   height: 6px;
   flex: 0 0 auto;
   border-radius: 50%;
-  background: #b8c2bb;
-  box-shadow: 0 0 0 2px #fff;
+  background: #111A15;
+  box-shadow: 0 0 0 2px #F3F6F4;
 }
 
 .barcode-scan-tools__gun--active {
-  color: #2f7a4f;
-  border-color: rgba(47, 122, 79, 0.24);
-  background: #f0f8f1;
+  color: #5FA98C;
+  border-color: rgba(30, 42, 36, 0.44);
+  background: rgba(95, 169, 140, .13);
 }
 
 .barcode-scan-tools__gun--active .barcode-scan-tools__dot {
-  background: #3aa564;
+  background: rgba(16, 185, 129, .14);
 }
 
 .barcode-scan-tools__gun--configured {
-  color: #a8731f;
-  border-color: rgba(168, 115, 31, 0.24);
-  background: #fdf6e8;
+  color: #F2C46B;
+  border-color: rgba(95, 169, 140, 0.34);
+  background: rgba(245, 158, 11, .12);
 }
 
 .barcode-scan-tools__gun--configured .barcode-scan-tools__dot {
-  background: #d19a3f;
+  background: rgba(245, 158, 11, .14);
 }
 
 .barcode-scan-tools__gun--off {
-  color: #8f9a92;
-  background: #f7f8f5;
+  color: #A6B3AB;
+  background: #0D1310;
 }
 
 .barcode-scan-tools__gun--off .barcode-scan-tools__dot {
-  background: #aab3ac;
+  background: #111A15;
 }
 
 @media (max-width: 760px) {

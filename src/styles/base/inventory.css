@@ -1,4 +1,14 @@
-body { margin: 0; background: #f7f7f2; color: #1b3028; }
+body {
+  margin: 0;
+  color: var(--deploy-text);
+  background-color: var(--deploy-bg);
+  background-image:
+    radial-gradient(900px 520px at 78% -10%, rgba(39, 102, 80, 0.16), transparent 66%),
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: auto, 56px 56px, 56px 56px;
+  background-attachment: fixed;
+}
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }

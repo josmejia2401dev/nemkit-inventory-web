@@ -18,17 +18,17 @@
   min-width: 150px;
   min-height: 42px;
   padding: 0 11px;
-  border: 1px solid rgba(36, 65, 52, 0.12);
+  border: 1px solid rgba(30, 42, 36, 0.32);
   border-radius: 10px;
-  color: #42584a;
-  background: #fff;
+  color: #DCE5DF;
+  background: #0D1310;
   font-size: 12px;
 }
 
 .product-status-select:focus {
-  border-color: #82a38b;
+  border-color: rgba(95, 169, 140, .35);
   outline: 0;
-  box-shadow: 0 0 0 3px rgba(39, 102, 80, 0.08);
+  box-shadow: 0 0 0 3px rgba(39, 102, 80, 0.23);
 }
 
 app-product-table {

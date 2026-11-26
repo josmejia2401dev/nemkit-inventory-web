@@ -15,22 +15,22 @@
   height: 34px;
   place-items: center;
   padding: 0;
-  border: 1px solid rgba(36, 65, 52, 0.1);
+  border: 1px solid rgba(30, 42, 36, 0.30);
   border-radius: 10px;
-  color: #4d6557;
-  background: #fff;
+  color: #DCE5DF;
+  background: #0D1310;
   cursor: pointer;
   transition: color 0.18s, border-color 0.18s, background 0.18s;
 }
 
 .barcode-scanner-trigger:hover {
-  color: #2f6b4d;
-  border-color: rgba(47, 107, 77, 0.28);
-  background: #f3f8f2;
+  color: #5FA98C;
+  border-color: rgba(30, 42, 36, 0.48);
+  background: #111A15;
 }
 
 .barcode-scanner-trigger:focus-visible {
-  outline: 2px solid #c9a967;
+  outline: 2px solid #5FA98C;
   outline-offset: 2px;
 }
 
@@ -39,20 +39,20 @@
 }
 
 .barcode-scanner-trigger--active {
-  color: #2f7a4f;
-  border-color: rgba(47, 122, 79, 0.24);
-  background: #f0f8f1;
+  color: #5FA98C;
+  border-color: rgba(30, 42, 36, 0.44);
+  background: rgba(95, 169, 140, .13);
 }
 
 .barcode-scanner-trigger--configured {
-  color: #a8731f;
-  border-color: rgba(168, 115, 31, 0.24);
-  background: #fdf6e8;
+  color: #F2C46B;
+  border-color: rgba(95, 169, 140, 0.34);
+  background: rgba(245, 158, 11, .12);
 }
 
 .barcode-scanner-trigger--off {
-  color: #9aa49d;
-  background: #f7f8f5;
+  color: #A6B3AB;
+  background: #0D1310;
 }
 
 .barcode-scanner-dot {
@@ -62,20 +62,20 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #b8c2bb;
-  box-shadow: 0 0 0 1.5px #fff;
+  background: #111A15;
+  box-shadow: 0 0 0 1.5px #F3F6F4;
 }
 
 .barcode-scanner-trigger--active .barcode-scanner-dot {
-  background: #3aa564;
+  background: rgba(16, 185, 129, .14);
 }
 
 .barcode-scanner-trigger--configured .barcode-scanner-dot {
-  background: #d19a3f;
+  background: rgba(245, 158, 11, .14);
 }
 
 .barcode-scanner-trigger--off .barcode-scanner-dot {
-  background: #aab3ac;
+  background: #111A15;
 }
 
 /* Mismo lenguaje visual que el botón de cámara reutilizable. */
@@ -85,29 +85,29 @@
   height: 34px;
   place-items: center;
   padding: 0;
-  border: 1px solid rgba(36, 65, 52, 0.1);
+  border: 1px solid rgba(30, 42, 36, 0.30);
   border-radius: 10px;
-  color: #4d6557;
-  background: #fff;
+  color: #DCE5DF;
+  background: #0D1310;
   cursor: pointer;
   transition: color 0.18s, border-color 0.18s, background 0.18s;
 }
 
 .barcode-camera-trigger:hover:not(:disabled) {
-  color: #2f6b4d;
-  border-color: rgba(47, 107, 77, 0.28);
-  background: #f3f8f2;
+  color: #5FA98C;
+  border-color: rgba(30, 42, 36, 0.48);
+  background: #111A15;
 }
 
 .barcode-camera-trigger:focus-visible {
-  outline: 2px solid #c9a967;
+  outline: 2px solid #5FA98C;
   outline-offset: 2px;
 }
 
 .barcode-camera-trigger--unsupported {
-  color: #aab3ac;
+  color: #A6B3AB;
   cursor: not-allowed;
-  background: #f7f8f5;
+  background: #0D1310;
 }
 
 .barcode-camera-trigger i {

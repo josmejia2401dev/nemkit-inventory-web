@@ -5,7 +5,7 @@
 .movement-banner {
   min-height: 100px;
   border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(38, 79, 62, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
 }
 
 .movement-banner-mark {
@@ -22,17 +22,17 @@
   min-width: 210px;
   min-height: 42px;
   padding: 0 11px;
-  border: 1px solid rgba(36, 65, 52, 0.12);
+  border: 1px solid rgba(30, 42, 36, 0.32);
   border-radius: 10px;
-  color: #42584a;
-  background: #fff;
+  color: #DCE5DF;
+  background: #0D1310;
   font-size: 12px;
 }
 
 .movement-type-filter:focus {
-  border-color: #82a38b;
+  border-color: rgba(95, 169, 140, .35);
   outline: 0;
-  box-shadow: 0 0 0 3px rgba(39, 102, 80, 0.08);
+  box-shadow: 0 0 0 3px rgba(39, 102, 80, 0.23);
 }
 
 .movement-table .movement-products {
@@ -48,7 +48,7 @@
 
 .movement-table .movement-products b {
   flex: 0 0 auto;
-  color: #426b50;
+  color: #DCE5DF;
 }
 
 .movement-table .movement-type-pill {

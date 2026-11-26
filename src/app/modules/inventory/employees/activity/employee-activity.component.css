@@ -22,9 +22,9 @@
   align-items: end;
   gap: 10px;
   padding: 14px;
-  border: 1px solid rgba(36, 65, 52, 0.08);
+  border: 1px solid rgba(30, 42, 36, 0.28);
   border-radius: 14px;
-  background: #f8faf7;
+  background: #0D1310;
 }
 
 .employee-activity-filters .button {
@@ -42,39 +42,39 @@
   min-width: 0;
   gap: 7px;
   padding: 16px;
-  border: 1px solid rgba(36, 65, 52, 0.08);
+  border: 1px solid rgba(30, 42, 36, 0.28);
   border-radius: 14px;
-  background: #fff;
+  background: #0D1310;
 }
 
 .employee-activity-grid small {
-  color: #718177;
+  color: #DCE5DF;
   font-size: 12px;
 }
 
 .employee-activity-grid strong {
   overflow-wrap: anywhere;
-  color: #203d30;
+  color: #F3F6F4;
   font-size: clamp(17px, 2vw, 22px);
 }
 
 .employee-activity-grid span {
-  color: #849188;
+  color: #A6B3AB;
   font-size: 11px;
 }
 
 .employee-activity-grid .employee-activity-card--alert {
-  border-color: #f1dfca;
-  background: #fffaf4;
+  border-color: #1E2A24;
+  background: rgba(245, 158, 11, .12);
 }
 
 .employee-activity-grid .employee-activity-card--alert strong {
-  color: #9b5f2d;
+  color: #F2C46B;
 }
 
 .employee-activity-grid .employee-activity-card--paid {
-  border-color: #dcebe1;
-  background: #f5faf6;
+  border-color: rgba(95, 169, 140, .35);
+  background: #0D1310;
 }
 
 .employee-activity-note {
@@ -82,14 +82,14 @@
   align-items: flex-start;
   gap: 8px;
   margin: 0;
-  color: #748278;
+  color: #DCE5DF;
   font-size: 12px;
   line-height: 1.5;
 }
 
 .employee-activity-note i {
   margin-top: 2px;
-  color: #5a8069;
+  color: #A6B3AB;
 }
 
 @media (max-width: 680px) {

@@ -27,10 +27,10 @@
   gap: 8px 18px;
   margin: 0 0 20px;
   padding: 11px 13px;
-  border: 1px solid rgba(39, 102, 80, 0.1);
+  border: 1px solid rgba(30, 42, 36, 0.30);
   border-radius: 11px;
-  color: #54705c;
-  background: #f6f9f5;
+  color: #DCE5DF;
+  background: #0D1310;
 }
 
 .transaction-dialog-notice span {
@@ -42,7 +42,7 @@
 }
 
 .transaction-dialog-notice i {
-  color: #52815f;
+  color: #DCE5DF;
 }
 
 .transaction-section-heading {
@@ -59,8 +59,8 @@
   flex: 0 0 auto;
   place-items: center;
   border-radius: 9px;
-  color: #3e7050;
-  background: #edf4ec;
+  color: #DCE5DF;
+  background: #0D1310;
   font-size: 9px;
   font-weight: 750;
 }
@@ -71,12 +71,12 @@
 }
 
 .transaction-section-heading strong {
-  color: #354e3e;
+  color: #DCE5DF;
   font-size: 11px;
 }
 
 .transaction-section-heading small {
-  color: #8a968e;
+  color: #A6B3AB;
   font-size: 9px;
 }
 
@@ -111,12 +111,12 @@
 .transaction-dialog--sale .items-heading {
   margin-top: 22px;
   padding-top: 17px;
-  border-top: 1px solid rgba(36, 65, 52, 0.08);
+  border-top: 1px solid rgba(30, 42, 36, 0.28);
 }
 
 .items-heading > div > small {
   max-width: 52ch;
-  color: #87938b;
+  color: #A6B3AB;
   font-size: 9px;
   line-height: 1.5;
 }
@@ -139,8 +139,8 @@
   grid-template-columns: minmax(170px, 1fr) 90px 150px 110px 38px;
   gap: 11px;
   padding: 13px;
-  border-color: rgba(36, 65, 52, 0.1);
-  background: #fbfcfa;
+  border-color: rgba(30, 42, 36, 0.30);
+  background: #0D1310;
 }
 
 .transaction-product { grid-area: product; }
@@ -150,7 +150,7 @@
 .transaction-remove { grid-area: remove; }
 
 .transaction-item .form-field > span {
-  color: #64756a;
+  color: #DCE5DF;
   font-size: 9px;
 }
 
@@ -164,17 +164,17 @@
 .transaction-line-total {
   min-height: 43px;
   padding-left: 10px;
-  border-left: 1px solid rgba(36, 65, 52, 0.08);
+  border-left: 1px solid rgba(30, 42, 36, 0.28);
 }
 
 .transaction-line-total small,
 .quantity-availability {
-  color: #849188;
+  color: #A6B3AB;
   font-size: 9px;
 }
 
 .transaction-line-total strong {
-  color: #315c41;
+  color: #DCE5DF;
   font-size: 12px;
 }
 
@@ -189,9 +189,9 @@
   min-height: 70px;
   margin-top: 17px;
   padding: 14px 17px;
-  border: 1px solid rgba(39, 102, 80, 0.1);
+  border: 1px solid rgba(30, 42, 36, 0.30);
   border-radius: 13px;
-  background: linear-gradient(120deg, #f3f7f1, #f8faf6);
+  background: linear-gradient(120deg, #0D1310, #0D1310);
 }
 
 .transaction-total > span {
@@ -200,21 +200,21 @@
 }
 
 .transaction-total > span > small {
-  color: #6d8172;
+  color: #DCE5DF;
   font-size: 9px;
   font-weight: 750;
   letter-spacing: 0.7px;
 }
 
 .transaction-total > span > strong {
-  color: #829087;
+  color: #A6B3AB;
   font-size: 9px;
   font-weight: 500;
   letter-spacing: 0;
 }
 
 .transaction-total > strong {
-  color: #244b35;
+  color: #F3F6F4;
   font-size: clamp(18px, 2.4vw, 24px);
   white-space: nowrap;
 }
@@ -248,7 +248,7 @@
     height: 4px;
     margin: calc(9px + env(safe-area-inset-top)) auto 0;
     border-radius: 99px;
-    background: rgba(36, 65, 52, 0.18);
+    background: rgba(39, 102, 80, 0.30);
   }
 
   .transaction-dialog--sale .transaction-dialog-heading {
@@ -367,8 +367,8 @@
     gap: 10px;
     padding: 12px;
     border-radius: 13px;
-    background: #fff;
-    box-shadow: 0 3px 12px rgba(31, 57, 45, 0.045);
+    background: #0D1310;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
   }
 
   .transaction-dialog--sale .transaction-product {
@@ -404,7 +404,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 2px 0;
-    border-top: 1px solid rgba(36, 65, 52, 0.08);
+    border-top: 1px solid rgba(30, 42, 36, 0.28);
     border-left: 0;
   }
 

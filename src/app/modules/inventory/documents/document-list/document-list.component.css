@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #4d7157;
+  color: #DCE5DF;
 }
 
 .document-order-state > i {
@@ -25,16 +25,16 @@
   place-items: center;
   border-radius: 9px;
   color: inherit;
-  background: #edf4ec;
+  background: #0D1310;
   font-size: 12px;
 }
 
 .document-order-state--delivery {
-  color: #426b84;
+  color: #7FA8FF;
 }
 
 .document-order-state--delivery > i {
-  background: #eaf2f7;
+  background: rgba(59, 130, 246, .14);
 }
 
 .document-order-state > span {
@@ -43,18 +43,18 @@
 }
 
 .document-order-state small {
-  color: #89968d;
+  color: #A6B3AB;
   font-size: 8px;
 }
 
 .document-order-state strong {
-  color: #385543;
+  color: #DCE5DF;
   font-size: 10px;
   font-weight: 700;
 }
 
 .document-order-state--delivery strong {
-  color: #3f6177;
+  color: #7FA8FF;
 }
 
 .document-order-progress {
@@ -68,16 +68,16 @@
   height: 4px;
   flex: 1 1 0;
   border-radius: 99px;
-  background: #e7ece7;
+  background: #0A0F0C;
 }
 
 .document-order-progress .document-order-progress-step--done {
-  background: #85aa8a;
+  background: #0D1310;
 }
 
 .document-order-progress .document-order-progress-step--current {
   background: #276650;
-  box-shadow: 0 0 0 2px rgba(39, 102, 80, 0.12);
+  box-shadow: 0 0 0 2px rgba(39, 102, 80, 0.27);
 }
 
 .document-actions-cell {
@@ -154,8 +154,8 @@
   .document-actions .icon-button {
     width: 44px;
     height: 44px;
-    border: 1px solid rgba(36, 65, 52, 0.11);
-    background: #fafbf8;
+    border: 1px solid rgba(30, 42, 36, 0.31);
+    background: rgba(95, 169, 140, .13);
   }
 }
 

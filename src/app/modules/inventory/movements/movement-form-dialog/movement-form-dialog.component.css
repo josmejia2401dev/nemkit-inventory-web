@@ -12,7 +12,7 @@
   z-index: 1;
   margin: 18px -23px -21px;
   padding: 14px 23px 21px;
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(13, 19, 16, 0.97);
 }
 
 .label-short {
@@ -36,7 +36,7 @@
     height: 4px;
     margin: 9px auto 0;
     border-radius: 99px;
-    background: rgba(36, 65, 52, 0.18);
+    background: rgba(39, 102, 80, 0.30);
   }
 
   .movement-dialog .dialog-form {
@@ -82,8 +82,8 @@
     align-items: flex-start;
     padding: 12px;
     border-radius: 13px;
-    background: #fff;
-    box-shadow: 0 3px 12px rgba(31, 57, 45, 0.04);
+    background: #0D1310;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
   }
 
   .movement-dialog .item-product select,

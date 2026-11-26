@@ -25,9 +25,9 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border: 1px solid rgba(36, 65, 52, 0.09);
+  border: 1px solid rgba(30, 42, 36, 0.29);
   border-radius: 16px;
-  background: #f8faf7;
+  background: #0D1310;
 }
 
 .employee-payment-summary > div {
@@ -37,12 +37,12 @@
 }
 
 .employee-payment-summary span {
-  color: #718177;
+  color: #DCE5DF;
   font-size: 12px;
 }
 
 .employee-payment-summary strong {
-  color: #203d30;
+  color: #F3F6F4;
   font-size: 20px;
 }
 
@@ -64,9 +64,9 @@
 
 .employee-payment-table-wrap .employee-total-footer td {
   padding: 14px;
-  border-top: 2px solid rgba(36, 65, 52, 0.14);
-  color: #294536;
-  background: #f5f8f4;
+  border-top: 2px solid rgba(30, 42, 36, 0.34);
+  color: #F3F6F4;
+  background: #0D1310;
   font-size: 12px;
 }
 
@@ -81,7 +81,7 @@
 .employee-payment-table-wrap .employee-total-footer small {
   display: block;
   margin-top: 4px;
-  color: #758279;
+  color: #DCE5DF;
   font-size: 11px;
   font-weight: 400;
 }
@@ -123,9 +123,9 @@
     justify-content: space-between;
     gap: 10px;
     padding: 12px;
-    border: 1px solid rgba(36, 65, 52, 0.11);
+    border: 1px solid rgba(30, 42, 36, 0.31);
     border-radius: 13px;
-    background: #f5f8f4;
+    background: #0D1310;
   }
 
   .employee-payment-table-wrap .employee-total-footer td,

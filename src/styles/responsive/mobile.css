@@ -6,11 +6,11 @@
     padding-bottom: calc(18px + env(safe-area-inset-bottom));
     transform: translateX(-102%);
     transition: transform .22s ease;
-    box-shadow: 12px 0 30px rgba(0, 0, 0, .12);
+    box-shadow: 12px 0 30px rgba(0, 0, 0, 0.30);
   }
 
   .sidebar--open { transform: translateX(0); }
-  .sidebar-backdrop { position: fixed; z-index: 25; inset: 0; display: block; border: 0; background: rgba(14, 34, 24, .38); backdrop-filter: blur(2px); }
+  .sidebar-backdrop { position: fixed; z-index: 25; inset: 0; display: block; border: 0; background: rgba(39, 102, 80, 0.45); backdrop-filter: blur(2px); }
   .main-area { margin-left: 0; }
   .mobile-menu { display: inline-grid !important; }
 }
@@ -33,9 +33,9 @@
     justify-content: center;
     gap: 8px;
     padding: 7px 8px calc(7px + env(safe-area-inset-bottom));
-    border-top: 1px solid rgba(36, 65, 52, .1);
-    background: rgba(255, 255, 252, .96);
-    box-shadow: 0 -8px 24px rgba(31, 57, 45, .07);
+    border-top: 1px solid rgba(30, 42, 36, 0.30);
+    background: rgba(13, 19, 16, 0.97);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
   }
@@ -51,14 +51,14 @@
     justify-content: center;
     gap: 4px;
     border-radius: 12px;
-    color: #849188;
+    color: #A6B3AB;
     font-size: 11px;
     font-weight: 550;
     -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-tab-bar a i { font-size: 18px; }
-  .mobile-tab-bar a.mobile-tab--active { color: #276650; background: #edf4ee; }
+  .mobile-tab-bar a.mobile-tab--active { color: #5FA98C; background: rgba(95, 169, 140, .13); }
 
   .page-heading { align-items: center; gap: 12px; }
   .page-heading h1 { font-size: 28px; }
@@ -100,10 +100,10 @@
     display: grid;
     gap: 0;
     padding: 8px 13px;
-    border: 1px solid rgba(36, 65, 52, .1);
+    border: 1px solid rgba(30, 42, 36, 0.30);
     border-radius: 13px;
-    background: #fff;
-    box-shadow: 0 3px 12px rgba(31, 57, 45, .045);
+    background: #0D1310;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22);
   }
   .inventory-table td,
   .inventory-table th:first-child,
@@ -117,15 +117,15 @@
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    border-bottom: 1px solid rgba(36, 65, 52, .07);
-    color: #586a5e;
+    border-bottom: 1px solid rgba(30, 42, 36, 0.27);
+    color: #DCE5DF;
     font-size: 13px;
     text-align: right;
   }
   .inventory-table td::before {
     content: attr(data-label);
     flex: 0 0 auto;
-    color: #849188;
+    color: #A6B3AB;
     font-size: 11px;
     font-weight: 650;
     text-align: left;
@@ -137,7 +137,7 @@
   .inventory-table td[data-label="Productos"] {
     display: block;
     padding: 5px 0 12px;
-    border-bottom: 1px solid rgba(36, 65, 52, .09);
+    border-bottom: 1px solid rgba(30, 42, 36, 0.29);
     text-align: left;
   }
   .inventory-table td[data-label="Producto"]::before,
@@ -151,7 +151,7 @@
   .sku-code { font-size: 12px; }
   .status-pill, .movement-type-pill { font-size: 11px; }
   .row-actions { gap: 6px; }
-  .row-actions .icon-button { border: 1px solid rgba(36, 65, 52, .1); background: #fafbf8; }
+  .row-actions .icon-button { border: 1px solid rgba(30, 42, 36, 0.30); background: rgba(95, 169, 140, .13); }
   .movement-products { align-items: flex-start; font-size: 13px; }
   .movement-products b { font-size: 12px; }
   .notes-cell { max-width: none; text-align: left !important; }
@@ -192,7 +192,7 @@
     font-size: 16px;
   }
   .form-field textarea { min-height: 100px; }
-  .dialog-actions { position: sticky; bottom: calc(-20px - env(safe-area-inset-bottom)); margin-right: -18px; margin-left: -18px; padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); background: rgba(255, 255, 255, .97); }
+  .dialog-actions { position: sticky; bottom: calc(-20px - env(safe-area-inset-bottom)); margin-right: -18px; margin-left: -18px; padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); background: rgba(13, 19, 16, 0.97); }
   .dialog-actions .button { min-height: 48px; flex: 1; }
   .movement-item-row { gap: 8px; padding: 12px; }
   .item-product { flex-basis: 100%; }

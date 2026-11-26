@@ -9,6 +9,6 @@
 }
 
 .content-loader__icon {
-  color: var(--deploy-primary);
+  color: var(--deploy-accent);
   font-size: 1rem;
 }

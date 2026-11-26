@@ -1,8 +1,8 @@
 .employee-performance-table .employee-total-footer td {
   padding: 14px 12px;
-  border-top: 2px solid rgba(36, 65, 52, 0.14);
-  color: #294536;
-  background: #f5f8f4;
+  border-top: 2px solid rgba(30, 42, 36, 0.34);
+  color: #F3F6F4;
+  background: #0D1310;
   font-size: 11px;
   font-weight: 650;
 }
@@ -13,7 +13,7 @@
 }
 
 .employee-performance-table .employee-total-footer td strong {
-  color: #203d30;
+  color: #F3F6F4;
   font-weight: 750;
 }
 
@@ -28,9 +28,9 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0 14px;
     padding: 12px;
-    border: 1px solid rgba(36, 65, 52, 0.11);
+    border: 1px solid rgba(30, 42, 36, 0.31);
     border-radius: 13px;
-    background: #f5f8f4;
+    background: #0D1310;
   }
 
   .employee-performance-table .employee-total-footer td,
@@ -50,12 +50,12 @@
   .employee-performance-table .employee-total-footer td:first-child {
     grid-column: 1 / -1;
     justify-content: flex-start;
-    border-bottom: 1px solid rgba(36, 65, 52, 0.1);
+    border-bottom: 1px solid rgba(30, 42, 36, 0.30);
     font-size: 13px;
   }
 
   .employee-performance-table .employee-total-footer td::before {
-    color: #758279;
+    color: #DCE5DF;
     content: "";
     font-size: 10px;
     font-weight: 500;

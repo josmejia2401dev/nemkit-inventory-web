@@ -6,7 +6,7 @@
   min-height: 46px;
   padding-inline: 18px;
   border-radius: 12px;
-  box-shadow: 0 7px 18px rgba(39, 102, 80, 0.14);
+  box-shadow: 0 7px 18px rgba(39, 102, 80, 0.29);
 }
 
 .sales-flow-guide {
@@ -16,10 +16,10 @@
   gap: 18px;
   margin: 0 0 18px;
   padding: 16px 18px;
-  border: 1px solid rgba(36, 65, 52, 0.1);
+  border: 1px solid rgba(30, 42, 36, 0.30);
   border-radius: 15px;
-  background: linear-gradient(120deg, #fff 0%, #f8faf6 100%);
-  box-shadow: 0 4px 14px rgba(31, 57, 45, 0.035);
+  background: linear-gradient(120deg, #0D1310 0%, #0D1310 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.21);
 }
 
 .sales-flow-guide-heading {
@@ -36,8 +36,8 @@
   flex: 0 0 auto;
   place-items: center;
   border-radius: 12px;
-  color: #276650;
-  background: #eaf2eb;
+  color: #5FA98C;
+  background: rgba(95, 169, 140, .13);
   font-size: 15px;
 }
 
@@ -49,13 +49,13 @@
 }
 
 .sales-flow-guide-heading strong {
-  color: #2d4838;
+  color: #DCE5DF;
   font-size: 12px;
 }
 
 .sales-flow-guide-heading small,
 .sales-flow-option small {
-  color: #829087;
+  color: #A6B3AB;
   font-size: 10px;
 }
 
@@ -75,16 +75,16 @@
   width: fit-content;
   padding: 5px 8px;
   border-radius: 99px;
-  color: #487052;
-  background: #edf4ec;
+  color: #DCE5DF;
+  background: #0D1310;
   font-size: 9px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .sales-flow-mode--delivery {
-  color: #426b84;
-  background: #eaf2f7;
+  color: #7FA8FF;
+  background: rgba(59, 130, 246, .14);
 }
 
 .sales-flow-steps {
@@ -92,14 +92,14 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
-  color: #627168;
+  color: #DCE5DF;
   font-size: 9px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .sales-flow-steps i {
-  color: #b3bdb5;
+  color: #7D8A82;
   font-size: 9px;
 }
 
@@ -130,7 +130,7 @@
 
   .sales-flow-guide-heading {
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(36, 65, 52, 0.08);
+    border-bottom: 1px solid rgba(30, 42, 36, 0.28);
   }
 
   .sales-flow-options {

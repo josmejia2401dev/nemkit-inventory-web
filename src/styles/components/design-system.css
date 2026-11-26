@@ -17,7 +17,7 @@
 }
 
 .deploy-card-glass {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(13, 19, 16, 0.80);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--deploy-border);
@@ -52,11 +52,11 @@
   transform: translateY(-2px);
 }
 
-.deploy-stat-card--success::before { background: linear-gradient(90deg, #10B981, #34D399); }
-.deploy-stat-card--danger::before { background: linear-gradient(90deg, #EF4444, #F87171); }
-.deploy-stat-card--primary::before { background: linear-gradient(90deg, #6366F1, #818CF8); }
-.deploy-stat-card--warning::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
-.deploy-stat-card--info::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.deploy-stat-card--success::before { background: linear-gradient(90deg, rgba(16, 185, 129, .14), rgba(16, 185, 129, .14)); }
+.deploy-stat-card--danger::before { background: linear-gradient(90deg, rgba(239, 68, 68, .14), rgba(239, 68, 68, .14)); }
+.deploy-stat-card--primary::before { background: linear-gradient(90deg, rgba(59, 130, 246, .14), rgba(59, 130, 246, .14)); }
+.deploy-stat-card--warning::before { background: linear-gradient(90deg, rgba(245, 158, 11, .14), rgba(245, 158, 11, .14)); }
+.deploy-stat-card--info::before { background: linear-gradient(90deg, rgba(59, 130, 246, .14), rgba(59, 130, 246, .14)); }
 
 /* ═══════════════════════════════════════════════════
    Tables
@@ -119,29 +119,29 @@
 }
 
 .deploy-badge--running {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
+  background: rgba(17, 26, 21, 0.20);
+  color: #5FD39B;
 }
 
 .deploy-badge--stopped,
 .deploy-badge--exited {
-  background: rgba(239, 68, 68, 0.1);
-  color: #DC2626;
+  background: rgba(30, 42, 36, 0.20);
+  color: #F08A7E;
 }
 
 .deploy-badge--online {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
+  background: rgba(17, 26, 21, 0.20);
+  color: #5FD39B;
 }
 
 .deploy-badge--offline {
-  background: rgba(239, 68, 68, 0.1);
-  color: #DC2626;
+  background: rgba(30, 42, 36, 0.20);
+  color: #F08A7E;
 }
 
 .deploy-badge--unknown {
-  background: rgba(148, 163, 184, 0.15);
-  color: #64748B;
+  background: rgba(30, 42, 36, 0.25);
+  color: #7FA8FF;
 }
 
 .deploy-badge__dot {
@@ -264,10 +264,10 @@
 
 /* Danger dialog variant */
 .deploy-dialog--danger .p-dialog-header {
-  background: rgba(239, 68, 68, 0.04) !important;
-  border-bottom-color: rgba(239, 68, 68, 0.1) !important;
+  background: rgba(30, 42, 36, 0.14) !important;
+  border-bottom-color: rgba(239, 68, 68, 0.20) !important;
 }
 
 .deploy-dialog--danger .p-dialog-title {
-  color: #DC2626 !important;
+  color: #F08A7E !important;
 }

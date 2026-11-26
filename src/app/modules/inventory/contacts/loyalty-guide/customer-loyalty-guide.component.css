@@ -4,16 +4,16 @@
 
 .loyalty-guide {
   margin: 10px 0 16px;
-  border: 1px solid rgba(36, 65, 52, 0.1);
+  border: 1px solid rgba(30, 42, 36, 0.30);
   border-radius: 10px;
-  background: #fbfcfa;
-  color: #526357;
+  background: #0D1310;
+  color: #DCE5DF;
   font-size: 12px;
 }
 
 .loyalty-guide summary {
   padding: 10px 12px;
-  color: #365642;
+  color: #DCE5DF;
   cursor: pointer;
   font-weight: 650;
   list-style-position: inside;
@@ -49,10 +49,10 @@
   font-weight: 700;
 }
 
-.loyalty-guide-tier--bronze { color: #996342; }
-.loyalty-guide-tier--silver { color: #68737b; }
-.loyalty-guide-tier--gold { color: #a87813; }
-.loyalty-guide-tier--platinum { color: #537181; }
+.loyalty-guide-tier--bronze { color: #F2C46B; }
+.loyalty-guide-tier--silver { color: #DCE5DF; }
+.loyalty-guide-tier--gold { color: #F2C46B; }
+.loyalty-guide-tier--platinum { color: #7FA8FF; }
 
 @media (max-width: 480px) {
   .loyalty-guide-content li {

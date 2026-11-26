@@ -1,20 +1,23 @@
-/* Nemkit Inventory visual layer */
+/* Nemkit Inventory · base oscura + acento petróleo */
 :root {
   --deploy-primary: #276650;
-  --deploy-primary-hover: #1c5140;
-  --deploy-primary-50: #e9f2ed;
-  --deploy-primary-subtle: rgba(39, 102, 80, 0.07);
-  --deploy-accent: #d8aa62;
-  --deploy-bg: #f7f7f2;
-  --deploy-bg-card: #ffffff;
-  --deploy-text: #1b3028;
-  --deploy-text-secondary: #68756e;
-  --deploy-text-muted: #929c96;
-  --deploy-border: rgba(36, 65, 52, 0.11);
-  --deploy-border-hover: rgba(36, 65, 52, 0.22);
-  --deploy-shadow-sm: 0 4px 18px rgba(31, 57, 45, 0.045);
-  --deploy-shadow-md: 0 12px 28px rgba(31, 57, 45, 0.08);
+  --deploy-primary-hover: #327A60;
+  --deploy-primary-50: rgba(39, 102, 80, 0.16);
+  --deploy-primary-subtle: rgba(95, 169, 140, 0.12);
+  --deploy-primary-glow: rgba(39, 102, 80, 0.38);
+  --deploy-accent: #5FA98C;
+  --deploy-accent-hover: #7FBFA6;
+  --deploy-accent-subtle: rgba(95, 169, 140, 0.12);
+  --deploy-bg: #070A08;
+  --deploy-bg-card: #0D1310;
+  --deploy-text: #F3F6F4;
+  --deploy-text-secondary: #A6B3AB;
+  --deploy-text-muted: #7D8A82;
+  --deploy-border: #1E2A24;
+  --deploy-border-hover: #2A3A32;
+  --deploy-shadow-sm: 0 4px 18px rgba(0, 0, 0, 0.45);
+  --deploy-shadow-md: 0 12px 28px rgba(0, 0, 0, 0.55);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  color: #1b3028;
-  background: #f7f7f2;
+  color: var(--deploy-text);
+  background: var(--deploy-bg);
 }

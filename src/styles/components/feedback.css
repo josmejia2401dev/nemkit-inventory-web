@@ -17,11 +17,11 @@
 }
 
 .deploy-progress-fill--cpu {
-  background: linear-gradient(90deg, #6366F1, #818CF8);
+  background: linear-gradient(90deg, rgba(59, 130, 246, .14), rgba(59, 130, 246, .14));
 }
 
 .deploy-progress-fill--ram {
-  background: linear-gradient(90deg, #EC4899, #F472B6);
+  background: linear-gradient(90deg, rgba(95, 169, 140, .12), rgba(95, 169, 140, .12));
 }
 
 /* ═══════════════════════════════════════════════════

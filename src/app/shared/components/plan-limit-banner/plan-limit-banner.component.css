@@ -12,7 +12,7 @@
 }
 
 .plan-limit-banner i {
-  color: var(--deploy-primary);
+  color: var(--deploy-accent);
   font-size: 0.9375rem;
 }
 
@@ -22,8 +22,8 @@
 }
 
 .plan-limit-banner--reached {
-  border-color: rgba(245, 158, 11, 0.45);
-  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(95, 169, 140, 0.40);
+  background: rgba(95, 169, 140, 0.17);
   color: var(--deploy-text);
 }
 
