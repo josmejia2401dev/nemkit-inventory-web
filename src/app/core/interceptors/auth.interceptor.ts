@@ -25,6 +25,8 @@ const PUBLIC_PATHS = [
   "/foundation/auth/users/register",
   "/foundation/auth/users/refresh",
   "/foundation/auth/users/forgot-password",
+  "/foundation/auth/users/verify-email",
+  "/foundation/auth/users/resend-verification",
   "/foundation/auth/employees/login",
   "/foundation/auth/employees/refresh",
   "/foundation/auth/employees/forgot-password",

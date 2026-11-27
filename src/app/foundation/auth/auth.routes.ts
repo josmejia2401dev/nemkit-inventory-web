@@ -14,6 +14,13 @@ export const foundationAuthRoutes: Routes = [
       ),
   },
   {
+    path: "verify-email",
+    loadComponent: () =>
+      import("./verify-email/verify-email.component").then(
+        (module) => module.VerifyEmailComponent,
+      ),
+  },
+  {
     path: "employee/login",
     loadComponent: () =>
       import("./employee-login/employee-login.component").then(

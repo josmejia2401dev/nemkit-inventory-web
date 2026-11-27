@@ -51,6 +51,12 @@ export class LoginComponent {
         },
         error: (err) => {
           this.loading.set(false);
+          if (err?.error?.code === "EMAIL_NOT_VERIFIED") {
+            this.router.navigate(["/verify-email"], {
+              queryParams: { email: this.email },
+            });
+            return;
+          }
           this.error.set(
             err.error?.message ??
               "No pudimos iniciar sesión. Revisa tus datos.",

@@ -6,8 +6,6 @@ import { InputTextModule } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
 import { MessageModule } from "primeng/message";
 import { ApiService } from "../../../core/services/api.service";
-import { AuthStore } from "../../../core/store/auth.store";
-import { homeForRoles } from "../../../core/guards/role-home";
 
 @Component({
   selector: "app-register",
@@ -24,7 +22,6 @@ import { homeForRoles } from "../../../core/guards/role-home";
 })
 export class RegisterComponent {
   private api = inject(ApiService);
-  private store = inject(AuthStore);
   private router = inject(Router);
 
   fullName = "";
@@ -47,14 +44,13 @@ export class RegisterComponent {
       })
       .subscribe({
         next: (response) => {
-          this.store.setSession(
-            response.data.user,
-            response.data.accessToken,
-            response.data.refreshToken,
-            response.data.company,
-          );
           this.loading.set(false);
-          this.router.navigateByUrl(homeForRoles(response.data.user?.roles));
+          this.router.navigate(["/verify-email"], {
+            queryParams: {
+              email: this.email,
+              sent: response.data?.verificationEmailSent === false ? "0" : "1",
+            },
+          });
         },
         error: (error) => {
           this.loading.set(false);

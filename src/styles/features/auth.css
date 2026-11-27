@@ -48,3 +48,11 @@
 .auth-legal { position: absolute; bottom: 28px; color: #A6B3AB; font-size: 8px; }
 .auth-mobile-brand { display: none; }
 .auth-message { width: 100%; margin-bottom: 13px; }
+
+.verify-note { display: flex; gap: 10px; margin: 0 0 18px; padding: 12px 13px; border: 1px solid rgba(224, 177, 95, .22); border-radius: 10px; background: rgba(224, 177, 95, .06); }
+.verify-note i { margin-top: 2px; color: #E0B15F; font-size: 13px; }
+.verify-note p { margin: 0; color: #C9B28A; font-size: 10px; line-height: 1.6; }
+.verify-note strong { color: #F2C46B; }
+.verify-resend { display: flex; justify-content: center; margin-top: 14px; }
+.text-button { border: 0; color: #5FA98C; background: transparent; cursor: pointer; font: inherit; font-size: 9px; font-weight: 700; padding: 6px 8px; }
+.text-button:disabled { color: #6F8077; cursor: default; }

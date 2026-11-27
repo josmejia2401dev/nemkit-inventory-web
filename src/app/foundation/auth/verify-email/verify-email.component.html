@@ -1,0 +1,116 @@
+<main class="auth-page">
+  <div class="auth-art">
+    <a routerLink="/login" class="brand brand--light"
+      ><span class="brand-mark">
+        <img src="/icons/inventory-mark.svg" alt="" aria-hidden="true" />
+      </span><span class="brand-copy"
+        ><strong>nemkit</strong><small>INVENTARIO</small></span
+      ></a
+    >
+    <div class="auth-art-copy">
+      <span class="art-kicker"><i class="pi pi-envelope"></i> UN ÚLTIMO PASO</span>
+      <h1>Revisa tu correo.<br /><em>Activa tu cuenta.</em></h1>
+      <p>
+        Te enviamos un código para confirmar que el correo es tuyo. Sin ese
+        paso, la cuenta todavía no puede entrar al sistema.
+      </p>
+    </div>
+    <div class="art-orbit orbit-one"></div>
+    <div class="art-orbit orbit-two"></div>
+    <div class="art-card art-card--one">
+      <span class="art-card-icon"><i class="pi pi-shield"></i></span
+      ><span
+        ><small>SEGURIDAD</small><strong>Tu cuenta, solo tuya</strong></span
+      ><i class="pi pi-check-circle art-check"></i>
+    </div>
+    <span class="art-footer">REVISA SPAM SI NO LO ENCUENTRAS.</span>
+  </div>
+
+  <section class="auth-form-side">
+    <div class="auth-mobile-brand">
+      <a routerLink="/login" class="brand"
+        ><span class="brand-mark">
+          <img src="/icons/inventory-mark.svg" alt="" aria-hidden="true" />
+        </span><span class="brand-copy"
+          ><strong>nemkit</strong><small>INVENTARIO</small></span
+        ></a
+      >
+    </div>
+
+    <div class="auth-form-wrap">
+      <span class="auth-overline">VERIFICA TU CORREO</span>
+      <h2>Activa tu cuenta</h2>
+      <p class="auth-lead">
+        Enviamos un código de 6 dígitos a
+        <strong>{{ email || "tu correo" }}</strong>. Vence en 10 minutos.
+      </p>
+
+      <div class="verify-note">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        <p>
+          Si no ves el correo, revisa la carpeta de <strong>spam</strong> y marca
+          el remitente como seguro.
+        </p>
+      </div>
+
+      @if (notice()) {
+        <p-message severity="success" [text]="notice()!" class="auth-message" />
+      }
+      @if (error()) {
+        <p-message severity="error" [text]="error()!" class="auth-message" />
+      }
+
+      <form (ngSubmit)="submit()" class="auth-form">
+        <label class="field-label" for="code">Código de verificación</label>
+        <span class="input-wrap"
+          ><i class="pi pi-key"></i
+          ><input
+            id="code"
+            pInputText
+            [(ngModel)]="code"
+            name="code"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            placeholder="000000"
+            autocomplete="one-time-code"
+            maxlength="8"
+            required
+        /></span>
+        <p-button
+          type="submit"
+          label="Verificar y entrar"
+          icon="pi pi-check"
+          iconPos="right"
+          [loading]="loading()"
+          styleClass="auth-submit"
+        />
+      </form>
+
+      <div class="verify-resend">
+        <button
+          type="button"
+          class="text-button"
+          [disabled]="cooldown() > 0 || resendLoading()"
+          (click)="resend()"
+        >
+          @if (resendLoading()) {
+            Enviando…
+          } @else if (cooldown() > 0) {
+            Reenviar en {{ cooldown() }} s
+          } @else {
+            Reenviar código
+          }
+        </button>
+      </div>
+
+      <p class="auth-switch">
+        ¿Ya verificaste?
+        <a routerLink="/login">Inicia sesión <i class="pi pi-arrow-up-right"></i></a>
+      </p>
+    </div>
+
+    <span class="auth-legal">
+      El código es de un solo uso y vence en 10 minutos.
+    </span>
+  </section>
+</main>
