@@ -9,11 +9,11 @@ import {
 } from "../../../core/services/inventory.service";
 import { DeliveriesApi, DeliveryProof } from "./deliveries.api";
 import { EmployeesApi } from "../employees/employees.api";
-import { NotificationService } from "../../../core/services/notification.service";
-import { ConfirmService } from "../../../core/services/confirm.service";
-import { formatCurrency } from "../../../shared/utils/currency.util";
+import { NotificationService } from "@nemkit/foundation-web";
+import { ConfirmService } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
 import { ORDER_STATUS_LABELS } from "../order-status.constants";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
 
 const STATUS_LABELS: Record<DeliveryStatus, string> = ORDER_STATUS_LABELS;
 const DELIVERY_FLOW: DeliveryStatus[] = ["pending", "on_route", "delivered"];

@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 import { InventoryLoyaltyRule, LoyaltyTier } from "../../../../core/services/inventory.service";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 
 @Component({
   selector: "app-customer-loyalty-guide",

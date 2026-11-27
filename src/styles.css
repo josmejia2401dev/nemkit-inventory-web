@@ -1,56 +1,20 @@
 @import "tailwindcss";
 @import "primeicons/primeicons.css";
 
-/* ═══════════════════════════════════════════════════
-   NEMKIT INVENTORY — entrada de estilos
-   Las capas se importan en el mismo orden en que se
-   definieron originalmente para no alterar la cascada.
-   ═══════════════════════════════════════════════════ */
+/* Base visual compartida + acento del producto */
+@import "@nemkit/foundation-web/styles/foundation.css";
+@import "@nemkit/foundation-web/styles/accents/inventory.css";
 
-/* Tokens y base */
-@import "./styles/tokens.css";
-@import "./styles/base/reset.css";
-
-/* Componentes del design system */
-@import "./styles/components/design-system.css";
-@import "./styles/layout/sidebar.css";
-@import "./styles/components/feedback.css";
-@import "./styles/components/forms.css";
-@import "./styles/utilities.css";
-@import "./styles/responsive/deploy.css";
-
-/* Tema de inventario */
-@import "./styles/themes/inventory.css";
-@import "./styles/base/inventory.css";
-
-/* Shell de la aplicación */
-@import "./styles/layout/shell.css";
-@import "./styles/components/page-actions.css";
+/* Dominio de inventario */
 @import "./styles/features/dashboard.css";
-@import "./styles/components/states.css";
 @import "./styles/features/products.css";
 @import "./styles/components/dialogs-inventory.css";
 @import "./styles/features/categories.css";
 @import "./styles/features/movements.css";
-
-/* Autenticación y perfil */
-@import "./styles/features/auth.css";
-@import "./styles/features/profile.css";
-@import "./styles/responsive/core.css";
-
-/* Documentos, reportes e impresión */
 @import "./styles/features/documents.css";
 @import "./styles/features/reports.css";
 @import "./styles/responsive/reports.css";
-@import "./styles/print.css";
-@import "./styles/responsive/mobile.css";
-
-/* Operación diaria */
 @import "./styles/features/customers.css";
 @import "./styles/features/delivery.css";
 @import "./styles/features/operations.css";
-
-/* Administración */
-@import "./styles/features/feedback.css";
-@import "./styles/features/order-cancel.css";
 @import "./styles/features/layaways.css";

@@ -7,9 +7,9 @@ import {
   PageResult,
 } from "../../../../core/services/inventory.service";
 import { EmployeePaymentInput, EmployeesApi } from "../employees.api";
-import { NotificationService } from "../../../../core/services/notification.service";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
+import { NotificationService } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
 
 interface PaymentForm {
   paymentDate: string;

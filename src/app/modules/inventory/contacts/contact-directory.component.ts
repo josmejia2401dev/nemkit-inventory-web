@@ -8,15 +8,15 @@ import {
   LoyaltyTier,
 } from "../../../core/services/inventory.service";
 import { ContactInput, ContactKind, ContactsApi } from "./contacts.api";
-import { NotificationService } from "../../../core/services/notification.service";
-import { ConfirmService } from "../../../core/services/confirm.service";
-import { LimitsService } from "../../../core/services/limits.service";
-import { BarcodeDispatcherService } from "../../../core/barcode/barcode-dispatcher.service";
-import { BarcodeScan } from "../../../core/barcode/barcode.types";
-import { BarcodeScanToolsComponent } from "../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
-import { formatCurrency } from "../../../shared/utils/currency.util";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
-import { PlanLimitBannerComponent } from "../../../shared/components/plan-limit-banner/plan-limit-banner.component";
+import { NotificationService } from "@nemkit/foundation-web";
+import { ConfirmService } from "@nemkit/foundation-web";
+import { LimitsService } from "@nemkit/foundation-web";
+import { BarcodeDispatcherService } from "@nemkit/foundation-web";
+import { BarcodeScan } from "@nemkit/foundation-web";
+import { BarcodeScanToolsComponent } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
+import { PlanLimitBannerComponent } from "@nemkit/foundation-web";
 import { CustomerLoyaltyGuideComponent } from "./loyalty-guide/customer-loyalty-guide.component";
 
 export type { ContactKind } from "./contacts.api";

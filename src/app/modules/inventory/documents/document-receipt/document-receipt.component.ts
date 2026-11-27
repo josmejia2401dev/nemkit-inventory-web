@@ -9,7 +9,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { InventoryDocument } from "../../../../core/services/inventory.service";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 import type { DocumentKind } from "../document.types";
 
 @Component({

@@ -4,7 +4,7 @@ import {
   InventoryCategory,
   InventoryProduct,
 } from "../../../../core/services/inventory.service";
-import { NotificationService } from "../../../../core/services/notification.service";
+import { NotificationService } from "@nemkit/foundation-web";
 import { ProductCatalogService } from "../product-catalog.service";
 
 interface QuickProductForm {

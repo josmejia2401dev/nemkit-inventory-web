@@ -3,7 +3,7 @@ import { FormsModule } from "@angular/forms";
 import { LayawaysApi } from "../layaways.api";
 import { ContactsApi } from "../../contacts/contacts.api";
 import { ProductCatalogService } from "../../products/product-catalog.service";
-import { NotificationService } from "../../../../core/services/notification.service";
+import { NotificationService } from "@nemkit/foundation-web";
 import {
   InventoryContact,
   InventoryProduct,
@@ -12,7 +12,7 @@ import {
   LayawayPaymentMethod,
   LayawaySettings,
 } from "../../../../core/models/inventory";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 
 interface DraftItem {
   product: InventoryProduct;

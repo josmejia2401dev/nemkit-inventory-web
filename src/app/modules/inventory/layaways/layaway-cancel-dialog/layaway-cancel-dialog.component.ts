@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { LayawaysApi } from "../layaways.api";
-import { NotificationService } from "../../../../core/services/notification.service";
+import { NotificationService } from "@nemkit/foundation-web";
 import {
   Layaway,
   LayawayPaymentMethod,
   LayawayReturnCondition,
   LayawaySettings,
 } from "../../../../core/models/inventory";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 
 @Component({
   selector: "app-layaway-cancel-dialog",

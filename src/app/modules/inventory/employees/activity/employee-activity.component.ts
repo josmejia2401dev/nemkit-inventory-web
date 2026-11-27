@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from "
 import { FormsModule } from "@angular/forms";
 import { InventorySalesByEmployeeRow } from "../../../../core/services/inventory.service";
 import { ReportsApi } from "../../reports/reports.api";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 
 @Component({
   selector: "app-employee-activity",

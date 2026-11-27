@@ -1,17 +1,17 @@
 import { Component, DestroyRef, inject, Input, OnInit, signal } from "@angular/core";
 import { InventoryDocument } from "../../../../core/services/inventory.service";
-import { NotificationService } from "../../../../core/services/notification.service";
-import { ConfirmService } from "../../../../core/services/confirm.service";
-import { AuthStore } from "../../../../core/store/auth.store";
-import { BarcodeDispatcherService } from "../../../../core/barcode/barcode-dispatcher.service";
-import { BarcodeScan } from "../../../../core/barcode/barcode.types";
-import { EMPTY_SCAN, ScanRequest, nextScan } from "../../../../shared/barcode/scan-request";
-import { DEFAULT_PAGE_SIZE } from "../../../../shared/components/pagination/pagination.component";
+import { NotificationService } from "@nemkit/foundation-web";
+import { ConfirmService } from "@nemkit/foundation-web";
+import { AuthStore } from "@nemkit/foundation-web";
+import { BarcodeDispatcherService } from "@nemkit/foundation-web";
+import { BarcodeScan } from "@nemkit/foundation-web";
+import { EMPTY_SCAN, ScanRequest, nextScan } from "@nemkit/foundation-web";
+import { DEFAULT_PAGE_SIZE } from "@nemkit/foundation-web";
 import {
   CancelOrderDialogComponent,
   CancelOrderResult,
-} from "../../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+} from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
 import { DocumentsApi } from "../documents.api";
 import { DocumentListComponent } from "../document-list/document-list.component";
 import { DocumentDraftFormComponent } from "../document-draft-form/document-draft-form.component";

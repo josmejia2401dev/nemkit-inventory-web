@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal, untracked } from "@angular/core";
 import { RouterLink } from "@angular/router";
 import { CashFlowReport } from "../../../../core/services/cash-withdrawals.service";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 import { ReportsApi } from "../reports.api";
 
 @Component({

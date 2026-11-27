@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ToastComponent } from '../shared/components/toast/toast.component';
-import { LoadingBarComponent } from '../shared/components/loading-bar/loading-bar.component';
-import { ConfirmDialogComponent } from '../shared/components/confirm-dialog/confirm-dialog.component';
+import { ToastComponent } from '@nemkit/foundation-web';
+import { LoadingBarComponent } from '@nemkit/foundation-web';
+import { ConfirmDialogComponent } from '@nemkit/foundation-web';
 
 @Component({
   selector: 'app-root',

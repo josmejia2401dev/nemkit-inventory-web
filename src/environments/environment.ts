@@ -1,4 +1,4 @@
-import { ApiEndpointConfig } from "../app/core/http/backend-endpoint.policy";
+import { ApiEndpointConfig } from "@nemkit/foundation-web";
 
 const LOCAL_ORIGIN = "http://localhost:4000";
 

@@ -3,9 +3,9 @@ import { Component, inject, OnInit, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { InventoryCategory } from "../../../core/services/inventory.service";
 import { CategoriesApi } from "./categories.api";
-import { NotificationService } from "../../../core/services/notification.service";
-import { ConfirmService } from "../../../core/services/confirm.service";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { NotificationService } from "@nemkit/foundation-web";
+import { ConfirmService } from "@nemkit/foundation-web";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
 
 @Component({
   selector: "app-categories",

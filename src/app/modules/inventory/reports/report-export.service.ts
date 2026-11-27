@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as XLSX from "xlsx";
 import type { InventorySalesByEmployeeReport } from "../../../core/models/inventory";
-import { formatCurrency } from "../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 import type { InventoryReport } from "./report.types";
 
 /** Exportación de reportes a Excel y a PDF (impresión del navegador). */

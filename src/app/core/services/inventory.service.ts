@@ -1,7 +1,7 @@
 import { HttpClient, HttpContext, HttpParams } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { EMPTY, Observable, Subject, expand, map, reduce, tap } from "rxjs";
-import { BackendEndpointService } from "./backend-endpoint.service";
+import { BackendEndpointService } from "@nemkit/foundation-web";
 import type { PageResult } from "../models/inventory";
 
 // Los modelos viven en `core/models/inventory`; se reexportan aquí para no

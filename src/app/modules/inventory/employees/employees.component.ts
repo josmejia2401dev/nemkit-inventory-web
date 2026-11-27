@@ -7,11 +7,11 @@ import {
   InventoryEmployee,
 } from "../../../core/services/inventory.service";
 import { EmployeeInput, EmployeesApi } from "./employees.api";
-import { NotificationService } from "../../../core/services/notification.service";
-import { ConfirmService } from "../../../core/services/confirm.service";
-import { LimitsService, LimitStatus } from "../../../core/services/limits.service";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
-import { PlanLimitBannerComponent } from "../../../shared/components/plan-limit-banner/plan-limit-banner.component";
+import { NotificationService } from "@nemkit/foundation-web";
+import { ConfirmService } from "@nemkit/foundation-web";
+import { LimitsService, LimitStatus } from "@nemkit/foundation-web";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
+import { PlanLimitBannerComponent } from "@nemkit/foundation-web";
 import { EmployeeActivityComponent } from "./activity/employee-activity.component";
 
 interface EmployeeForm {

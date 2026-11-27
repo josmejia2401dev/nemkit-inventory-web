@@ -14,13 +14,13 @@ import { FormsModule } from "@angular/forms";
 import { InventoryEmployee, InventoryProduct } from "../../../../core/services/inventory.service";
 import { EmployeesApi } from "../../employees/employees.api";
 import { ProductCatalogService } from "../../products/product-catalog.service";
-import { NotificationService } from "../../../../core/services/notification.service";
-import { AuthStore } from "../../../../core/store/auth.store";
-import { LimitsService } from "../../../../core/services/limits.service";
-import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
+import { NotificationService } from "@nemkit/foundation-web";
+import { AuthStore } from "@nemkit/foundation-web";
+import { LimitsService } from "@nemkit/foundation-web";
+import { BarcodeScanToolsComponent } from "@nemkit/foundation-web";
 import { ProductBarcodeService } from "../../products/product-barcode.service";
 import { ProductQuickCreateDialogComponent } from "../../products/product-quick-create-dialog/product-quick-create-dialog.component";
-import { ScanRequest } from "../../../../shared/barcode/scan-request";
+import { ScanRequest } from "@nemkit/foundation-web";
 
 export type MovementDirection = "in" | "out";
 

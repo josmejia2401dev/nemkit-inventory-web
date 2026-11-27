@@ -7,16 +7,16 @@ import { LayawayDetailDialogComponent } from "../layaway-detail-dialog/layaway-d
 import { LayawayPaymentDialogComponent } from "../layaway-payment-dialog/layaway-payment-dialog.component";
 import { LayawayCancelDialogComponent } from "../layaway-cancel-dialog/layaway-cancel-dialog.component";
 import { LayawaySettingsDialogComponent } from "../layaway-settings-dialog/layaway-settings-dialog.component";
-import { PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
-import { NotificationService } from "../../../../core/services/notification.service";
-import { ConfirmService } from "../../../../core/services/confirm.service";
-import { AuthStore } from "../../../../core/store/auth.store";
+import { PaginationComponent } from "@nemkit/foundation-web";
+import { NotificationService } from "@nemkit/foundation-web";
+import { ConfirmService } from "@nemkit/foundation-web";
+import { AuthStore } from "@nemkit/foundation-web";
 import {
   Layaway,
   LayawaySettings,
   LayawaySummary,
 } from "../../../../core/models/inventory";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 
 const PAGE_SIZE = 10;
 

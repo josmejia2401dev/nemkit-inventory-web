@@ -19,10 +19,10 @@ import {
   CashWithdrawalSummary,
   CashWithdrawalsService,
 } from "../../../core/services/cash-withdrawals.service";
-import { ConfirmService } from "../../../core/services/confirm.service";
-import { NotificationService } from "../../../core/services/notification.service";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
-import { formatCurrency } from "../../../shared/utils/currency.util";
+import { ConfirmService } from "@nemkit/foundation-web";
+import { NotificationService } from "@nemkit/foundation-web";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
 
 @Component({
   selector: "app-cash-withdrawals",

@@ -1,4 +1,4 @@
-import { ApiEndpointConfig } from "../app/core/http/backend-endpoint.policy";
+import { ApiEndpointConfig } from "@nemkit/foundation-web";
 
 /**
  * Servidor de casa expuesto por Tailscale Funnel.

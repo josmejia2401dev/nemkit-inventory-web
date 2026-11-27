@@ -3,7 +3,7 @@ import { Component, OnInit, inject, signal } from "@angular/core";
 import { Router, RouterLink } from "@angular/router";
 import { InventoryStockAlerts } from "../../../core/services/inventory.service";
 import { DashboardApi } from "../dashboard/dashboard.api";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
 
 @Component({
   selector: "app-inventory-alerts",

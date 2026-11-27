@@ -1,10 +1,10 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
 import { InventoryDocument } from "../../../../core/services/inventory.service";
-import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
-import { PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
-import { cancelReasonLabel } from "../../../../shared/cancel-reasons";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { BarcodeScanToolsComponent } from "@nemkit/foundation-web";
+import { PaginationComponent } from "@nemkit/foundation-web";
+import { cancelReasonLabel } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
 import { ORDER_STATUS_LABELS, OrderStatus } from "../../order-status.constants";
 
 @Component({

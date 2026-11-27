@@ -16,10 +16,10 @@ import {
   ProductType,
 } from "../../../../../core/services/inventory.service";
 import { ProductCatalogService } from "../../product-catalog.service";
-import { NotificationService } from "../../../../../core/services/notification.service";
-import { BarcodeCameraBarComponent } from "../../../../../shared/barcode/barcode-camera-bar/barcode-camera-bar.component";
+import { NotificationService } from "@nemkit/foundation-web";
+import { BarcodeCameraBarComponent } from "@nemkit/foundation-web";
 import { ProductBarcodeService } from "../../product-barcode.service";
-import { ScanRequest } from "../../../../../shared/barcode/scan-request";
+import { ScanRequest } from "@nemkit/foundation-web";
 
 /** Cuerpo ya validado que la pantalla envía a `POST` o `PUT /products`. */
 export interface ProductDraft {

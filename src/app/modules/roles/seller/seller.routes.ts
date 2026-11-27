@@ -1,8 +1,8 @@
 import { Routes } from "@angular/router";
 import { SellerShellComponent } from "./shell/seller-shell.component";
-import { roleGuard } from "../../../core/guards/role.guard";
-import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
-import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
+import { roleGuard } from "@nemkit/foundation-web";
+import { foundationProfileRoutes } from "@nemkit/foundation-web";
+import { foundationFeedbackRoutes } from "@nemkit/foundation-web";
 import { productCatalogRoute } from "../../inventory/products/products.routes";
 import { customerDirectoryRoute } from "../../inventory/contacts/contacts.routes";
 import { salesRoute } from "../../inventory/documents/documents.routes";

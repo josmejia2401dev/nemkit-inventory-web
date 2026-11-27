@@ -11,7 +11,7 @@ import {
 } from "../../../core/services/inventory.service";
 import { EmployeesApi } from "../employees/employees.api";
 import { ProductCatalogService } from "../products/product-catalog.service";
-import type { CancelOrderResult } from "../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
+import type { CancelOrderResult } from "@nemkit/foundation-web";
 import type { CustomerDraft } from "./customer-create-form/customer-create-form.component";
 import type { DocumentKind } from "./document.types";
 

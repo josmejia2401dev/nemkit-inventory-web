@@ -2,8 +2,8 @@ import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import type { InventorySalesReport } from "../../../../core/models/inventory";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
 import { ReportsApi } from "../reports.api";
 
 export type SalesGroupBy = "day" | "week" | "month";

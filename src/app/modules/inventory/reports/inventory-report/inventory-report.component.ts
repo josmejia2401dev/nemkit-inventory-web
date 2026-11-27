@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from "@angular/core";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
 import { ReportExportService } from "../report-export.service";
 import type { InventoryReport } from "../report.types";
 import { ReportsApi } from "../reports.api";

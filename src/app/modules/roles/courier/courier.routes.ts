@@ -1,8 +1,8 @@
 import { Routes } from "@angular/router";
 import { CourierShellComponent } from "./shell/courier-shell.component";
-import { roleGuard } from "../../../core/guards/role.guard";
-import { foundationProfileRoutes } from "../../../foundation/profile/profile.routes";
-import { foundationFeedbackRoutes } from "../../../foundation/feedback/feedback.routes";
+import { roleGuard } from "@nemkit/foundation-web";
+import { foundationProfileRoutes } from "@nemkit/foundation-web";
+import { foundationFeedbackRoutes } from "@nemkit/foundation-web";
 import { courierDeliveriesRoute } from "../../inventory/deliveries/deliveries.routes";
 
 export const courierRoutes: Routes = [

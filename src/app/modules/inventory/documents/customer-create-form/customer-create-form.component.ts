@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { NotificationService } from "../../../../core/services/notification.service";
+import { NotificationService } from "@nemkit/foundation-web";
 
 /** Datos mínimos del cliente que la pantalla envía a `POST /customers`. */
 export interface CustomerDraft {

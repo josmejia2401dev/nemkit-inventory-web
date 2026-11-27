@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef } from "@angular/core";
 import { InventoryCategory, InventoryProduct } from "../../../../../core/services/inventory.service";
-import { formatCurrency } from "../../../../../shared/utils/currency.util";
+import { formatCurrency } from "@nemkit/foundation-web";
 
 @Component({
   selector: "app-product-table",

@@ -13,10 +13,10 @@ import {
   InventoryCategory,
   InventoryProduct,
 } from "../../../../core/services/inventory.service";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../../shared/components/pagination/pagination.component";
-import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
-import { BarcodeDispatcherService } from "../../../../core/barcode/barcode-dispatcher.service";
-import { BarcodeScan } from "../../../../core/barcode/barcode.types";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
+import { BarcodeScanToolsComponent } from "@nemkit/foundation-web";
+import { BarcodeDispatcherService } from "@nemkit/foundation-web";
+import { BarcodeScan } from "@nemkit/foundation-web";
 import { ProductFilterBarComponent } from "../components/product-filter-bar/product-filter-bar.component";
 import { ProductTableComponent } from "../components/product-table/product-table.component";
 import { ProductCatalogService } from "../product-catalog.service";

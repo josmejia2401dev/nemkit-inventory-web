@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, output, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { LayawaysApi } from "../layaways.api";
-import { NotificationService } from "../../../../core/services/notification.service";
+import { NotificationService } from "@nemkit/foundation-web";
 import { LayawaySettings } from "../../../../core/models/inventory";
 
 @Component({

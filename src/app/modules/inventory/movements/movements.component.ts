@@ -4,11 +4,11 @@ import { FormsModule } from "@angular/forms";
 import { InventoryMovement, InventoryProduct } from "../../../core/services/inventory.service";
 import { ProductCatalogService } from "../products/product-catalog.service";
 import { MovementsApi } from "./movements.api";
-import { NotificationService } from "../../../core/services/notification.service";
-import { BarcodeDispatcherService } from "../../../core/barcode/barcode-dispatcher.service";
-import { BarcodeScan } from "../../../core/barcode/barcode.types";
-import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
-import { EMPTY_SCAN, ScanRequest, nextScan } from "../../../shared/barcode/scan-request";
+import { NotificationService } from "@nemkit/foundation-web";
+import { BarcodeDispatcherService } from "@nemkit/foundation-web";
+import { BarcodeScan } from "@nemkit/foundation-web";
+import { DEFAULT_PAGE_SIZE, PaginationComponent } from "@nemkit/foundation-web";
+import { EMPTY_SCAN, ScanRequest, nextScan } from "@nemkit/foundation-web";
 import {
   MovementDraft,
   MovementFormDialogComponent,

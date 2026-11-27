@@ -2,7 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { HttpContext } from "@angular/common/http";
 import { Observable, catchError, map, of, throwError } from "rxjs";
 import { InventoryProduct, InventoryService } from "../../../core/services/inventory.service";
-import { SKIP_ERROR_TOAST } from "../../../core/http/http-context.tokens";
+import { SKIP_ERROR_TOAST } from "@nemkit/foundation-web";
 
 /**
  * Puente entre el escaneo genérico y el dominio de productos. Es el único

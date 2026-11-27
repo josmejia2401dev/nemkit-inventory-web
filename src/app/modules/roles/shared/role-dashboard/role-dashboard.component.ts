@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Component, inject, Input } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { AuthStore } from "../../../../core/store/auth.store";
+import { AuthStore } from "@nemkit/foundation-web";
 
 export interface RoleShortcut {
   path: string;

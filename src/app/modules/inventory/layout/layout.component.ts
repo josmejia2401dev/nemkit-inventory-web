@@ -6,7 +6,7 @@ import { filter } from "rxjs";
 import {
   AppNavItem,
   ApplicationShellComponent,
-} from "../../../foundation/layout/application-shell.component";
+} from "@nemkit/foundation-web";
 import { InventoryService } from "../../../core/services/inventory.service";
 import { DashboardApi } from "../dashboard/dashboard.api";
 

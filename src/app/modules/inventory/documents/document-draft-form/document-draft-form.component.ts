@@ -7,12 +7,12 @@ import {
   InventoryEmployee,
   InventoryProduct,
 } from "../../../../core/services/inventory.service";
-import { NotificationService } from "../../../../core/services/notification.service";
-import { AuthStore } from "../../../../core/store/auth.store";
-import { LimitsService } from "../../../../core/services/limits.service";
-import { BarcodeScanToolsComponent } from "../../../../shared/barcode/barcode-scan-tools/barcode-scan-tools.component";
-import { EMPTY_SCAN, ScanRequest } from "../../../../shared/barcode/scan-request";
-import { formatCurrency } from "../../../../shared/utils/currency.util";
+import { NotificationService } from "@nemkit/foundation-web";
+import { AuthStore } from "@nemkit/foundation-web";
+import { LimitsService } from "@nemkit/foundation-web";
+import { BarcodeScanToolsComponent } from "@nemkit/foundation-web";
+import { EMPTY_SCAN, ScanRequest } from "@nemkit/foundation-web";
+import { formatCurrency } from "@nemkit/foundation-web";
 import { CustomerSaleSummaryComponent } from "../customer-sale-summary/customer-sale-summary.component";
 import { CustomerCreateFormComponent, CustomerDraft } from "../customer-create-form/customer-create-form.component";
 import { DocumentsApi } from "../documents.api";
