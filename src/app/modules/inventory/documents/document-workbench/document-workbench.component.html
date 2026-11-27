@@ -20,39 +20,6 @@
   <span class="document-banner-tag"><i class="pi pi-lock"></i> REGISTRO SEGURO</span>
 </section>
 
-@if (isSale) {
-  <section class="sales-flow-guide" aria-label="Flujos de estados de venta">
-    <div class="sales-flow-guide-heading">
-      <span class="sales-flow-guide-icon"><i class="pi pi-share-alt"></i></span>
-      <div>
-        <strong>Seguimiento del pedido</strong>
-        <small>El mismo flujo para tiendas y restaurantes</small>
-      </div>
-    </div>
-    <div class="sales-flow-options">
-      <div class="sales-flow-option">
-        <span class="sales-flow-mode">En sitio</span>
-        <div class="sales-flow-steps" aria-label="Pendiente, Preparando, Listo, Entregado">
-          <span>Pendiente</span><i class="pi pi-angle-right"></i>
-          <span>Preparando</span><i class="pi pi-angle-right"></i>
-          <span>Listo</span><i class="pi pi-angle-right"></i>
-          <span>Entregado</span>
-        </div>
-      </div>
-      <div class="sales-flow-option">
-        <span class="sales-flow-mode sales-flow-mode--delivery">A domicilio</span>
-        <div class="sales-flow-steps" aria-label="Pendiente, Preparando, Listo, En camino, Entregado">
-          <span>Pendiente</span><i class="pi pi-angle-right"></i>
-          <span>Preparando</span><i class="pi pi-angle-right"></i>
-          <span>Listo</span><i class="pi pi-angle-right"></i>
-          <span>En camino</span><i class="pi pi-angle-right"></i>
-          <span>Entregado</span>
-        </div>
-      </div>
-    </div>
-  </section>
-}
-
 <app-document-list
   [documents]="documents()"
   [loading]="loading()"

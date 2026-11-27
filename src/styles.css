@@ -18,3 +18,6 @@
 @import "./styles/features/delivery.css";
 @import "./styles/features/operations.css";
 @import "./styles/features/layaways.css";
+
+/* Overrides responsive al final de la cascada */
+@import "@nemkit/foundation-web/styles/responsive.css";
