@@ -11,7 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "@nemkit/foundation-web": "git+https://github.com/josmejia2401dev/nemkit-foundation-web.git#add9428021916bfc888bb5cd8fb5263129f13321",
+    "@nemkit/foundation-web": "git+https://github.com/josmejia2401dev/nemkit-foundation-web.git#b44b347f7d38762f79009b9e8f04640135d61535",
     "@angular/animations": "^19.2.25",
     "@angular/cdk": "^19.2.19",
     "@angular/common": "^19.2.0",
