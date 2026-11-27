@@ -55,7 +55,6 @@
               <td class="row-actions-cell">
                 <div class="row-actions">
                   <button class="button button-small" title="Ver ventas y actividad" (click)="openActivity(employee)"><i class="pi pi-chart-line" aria-hidden="true"></i> Actividad</button>
-                  <button class="button button-small" title="Ver historial de pagos" (click)="openPayments(employee)"><i class="pi pi-wallet" aria-hidden="true"></i> Pagos</button>
                   <button class="icon-button" title="Editar" (click)="openEdit(employee)"><i class="pi pi-pencil"></i></button>
                   <button class="button button-small employee-password-action" title="Restablecer contraseña" (click)="openPasswordReset(employee)"><i class="pi pi-key" aria-hidden="true"></i> Clave</button>
                   <button
@@ -140,15 +139,7 @@
   </div>
 }
 
-@if (paymentEmployee(); as employee) {
-  @if (employee.id || employee._id) {
-    <app-employee-payments
-      [employeeId]="employee.id || employee._id!"
-      [employeeName]="employee.name"
-      (closed)="paymentEmployee.set(null)"
-    />
-  }
-}
+
 
 @if (activityEmployee(); as employee) {
   @if (employee.id || employee._id) {

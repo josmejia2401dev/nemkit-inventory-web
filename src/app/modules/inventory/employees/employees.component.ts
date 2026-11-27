@@ -12,7 +12,6 @@ import { ConfirmService } from "../../../core/services/confirm.service";
 import { LimitsService, LimitStatus } from "../../../core/services/limits.service";
 import { DEFAULT_PAGE_SIZE, PaginationComponent } from "../../../shared/components/pagination/pagination.component";
 import { PlanLimitBannerComponent } from "../../../shared/components/plan-limit-banner/plan-limit-banner.component";
-import { EmployeePaymentsComponent } from "./payments/employee-payments.component";
 import { EmployeeActivityComponent } from "./activity/employee-activity.component";
 
 interface EmployeeForm {
@@ -31,7 +30,7 @@ interface EmployeeForm {
 @Component({
   selector: "app-inventory-employees",
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginationComponent, PlanLimitBannerComponent, EmployeePaymentsComponent, EmployeeActivityComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent, PlanLimitBannerComponent, EmployeeActivityComponent],
   templateUrl: "./employees.component.html",
   styleUrls: ["./employees.component.css"],
 })
@@ -67,7 +66,6 @@ export class EmployeesComponent implements OnInit {
   passwordDialogOpen = signal(false);
   resettingPassword = signal(false);
   passwordEmployee = signal<InventoryEmployee | null>(null);
-  paymentEmployee = signal<InventoryEmployee | null>(null);
   activityEmployee = signal<InventoryEmployee | null>(null);
   dialogOpen = signal(false);
   editingId: number | null = null;
@@ -256,10 +254,6 @@ export class EmployeesComponent implements OnInit {
     this.newPassword = "";
     this.confirmNewPassword = "";
     this.passwordDialogOpen.set(true);
-  }
-
-  openPayments(employee: InventoryEmployee): void {
-    this.paymentEmployee.set(employee);
   }
 
   openActivity(employee: InventoryEmployee): void {

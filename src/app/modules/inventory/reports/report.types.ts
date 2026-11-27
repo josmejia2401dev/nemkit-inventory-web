@@ -4,7 +4,6 @@ export type ReportKind =
   | "inventory"
   | "movements"
   | "sales"
-  | "employees"
   | "cancellations"
   | "cashflow";
 
