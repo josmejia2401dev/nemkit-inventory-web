@@ -408,11 +408,8 @@ export class DocumentDraftFormComponent implements OnInit {
       );
       return;
     }
-    if (!this.selectedContactId) {
-      this.notifications.warn(
-        this.isSale ? "Falta el cliente" : "Falta el proveedor",
-        `Selecciona ${this.isSale ? "un cliente" : "un proveedor"} para registrar ${this.isSale ? "la venta" : "la compra"}.`,
-      );
+    if (!this.isSale && !this.selectedContactId) {
+      this.notifications.warn("Falta el proveedor", "Selecciona un proveedor para registrar la compra.");
       return;
     }
 
@@ -425,7 +422,9 @@ export class DocumentDraftFormComponent implements OnInit {
         [this.isSale ? "unitPrice" : "unitCost"]: Number(item.amount),
       })),
     };
-    body[this.isSale ? "customerId" : "supplierId"] = Number(this.selectedContactId);
+    if (this.selectedContactId) {
+      body[this.isSale ? "customerId" : "supplierId"] = Number(this.selectedContactId);
+    }
     if (this.selectedEmployeeId) body["employeeId"] = Number(this.selectedEmployeeId);
 
     if (this.isSale && this.isDelivery) {
