@@ -94,26 +94,26 @@ export class PlatformService {
   private api = inject(ApiService);
 
   overview(): Observable<ApiResponse<PlatformOverview>> {
-    return this.api.get<PlatformOverview>("/sys/overview");
+    return this.api.get<PlatformOverview>("/foundation/sys/overview");
   }
 
   listUsers(params?: Record<string, unknown>): Observable<PaginatedResponse<PlatformUser>> {
-    return this.api.get<PlatformUser[]>("/sys/users", params) as unknown as Observable<PaginatedResponse<PlatformUser>>;
+    return this.api.get<PlatformUser[]>("/foundation/sys/users", params) as unknown as Observable<PaginatedResponse<PlatformUser>>;
   }
 
   getUser(id: number): Observable<ApiResponse<PlatformUser>> {
-    return this.api.get<PlatformUser>(`/sys/users/${id}`);
+    return this.api.get<PlatformUser>(`/foundation/sys/users/${id}`);
   }
 
   listCompanies(params?: Record<string, unknown>): Observable<PaginatedResponse<PlatformCompany>> {
-    return this.api.get<PlatformCompany[]>("/sys/companies", params) as unknown as Observable<PaginatedResponse<PlatformCompany>>;
+    return this.api.get<PlatformCompany[]>("/foundation/sys/companies", params) as unknown as Observable<PaginatedResponse<PlatformCompany>>;
   }
 
   getCompany(id: number): Observable<ApiResponse<PlatformCompanyDetail>> {
-    return this.api.get<PlatformCompanyDetail>(`/sys/companies/${id}`);
+    return this.api.get<PlatformCompanyDetail>(`/foundation/sys/companies/${id}`);
   }
 
   listEmployees(params?: Record<string, unknown>): Observable<PaginatedResponse<PlatformEmployee>> {
-    return this.api.get<PlatformEmployee[]>("/sys/employees", params) as unknown as Observable<PaginatedResponse<PlatformEmployee>>;
+    return this.api.get<PlatformEmployee[]>("/foundation/sys/employees", params) as unknown as Observable<PaginatedResponse<PlatformEmployee>>;
   }
 }

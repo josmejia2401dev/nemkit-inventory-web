@@ -1,13 +1,11 @@
-import type { DeliveryStatus, KitchenStatus, OrderStatus } from "../../../modules/inventory/order-status.constants";
+import type { DeliveryStatus, OrderStatus } from "../../../modules/inventory/order-status.constants";
 import type { InventoryContact } from "./contact.model";
 
 export interface InventoryDelivery {
   id: number;
   _id?: number;
   saleId?: number | null;
-  // Restaurante: el pedido pasa por cocina (solo se recoge cuando está "listo").
-  fromKitchen?: boolean;
-  customerId: number;
+  customerId: number | null;
   customerSnapshot: { name: string; phone?: string };
   address: string;
   location?: { lat?: number | null; lng?: number | null };
@@ -25,7 +23,6 @@ export interface InventoryDelivery {
   courierId?: number | null;
   courierSnapshot?: { name?: string };
   timeline?: {
-    readyAt?: string | null;
     pickedUpAt?: string | null;
     dispatchedAt?: string | null;
     deliveredAt?: string | null;
@@ -61,7 +58,7 @@ export interface InventoryDocument {
   movementId: number;
   date: string;
   status: "completed" | "void";
-  orderStatus?: OrderStatus | "served" | "picked_up" | null;
+  orderStatus?: OrderStatus | null;
   orderChannel?: "delivery" | "on_site";
   deliveryStatus?: DeliveryStatus;
   deliveryCourierName?: string;
@@ -72,8 +69,6 @@ export interface InventoryDocument {
   voidReason?: string;
   voidNote?: string;
   voidedAt?: string | null;
-  kitchenStatus?: KitchenStatus | "served" | null;
-  tableNumber?: string;
   notes?: string;
   items: InventoryDocumentItem[];
   total: number;

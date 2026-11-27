@@ -13,7 +13,6 @@ import {
   LayawaySettings,
 } from "../../../../core/models/inventory";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
-import { LayawayAuthorizationDialogComponent } from "../layaway-authorization-dialog/layaway-authorization-dialog.component";
 
 interface DraftItem {
   product: InventoryProduct;
@@ -24,7 +23,7 @@ interface DraftItem {
 @Component({
   selector: "app-layaway-create-dialog",
   standalone: true,
-  imports: [FormsModule, LayawayAuthorizationDialogComponent],
+  imports: [FormsModule],
   templateUrl: "./layaway-create-dialog.component.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -43,8 +42,6 @@ export class LayawayCreateDialogComponent implements OnInit {
   readonly products = signal<InventoryProduct[]>([]);
   readonly selectedCustomer = signal<InventoryContact | null>(null);
   readonly items = signal<DraftItem[]>([]);
-  readonly showAuthorization = signal(false);
-  readonly authorizationToken = signal<string | null>(null);
   readonly showNewCustomer = signal(false);
   readonly customerSearch = signal("");
   readonly productSearch = signal("");
@@ -149,26 +146,6 @@ export class LayawayCreateDialogComponent implements OnInit {
     this.items.update((list) => list.map((item, i) => (i === index ? { ...item, unitPrice: next } : item)));
   }
 
-  get needsAuthorization(): boolean {
-    const settings = this.settings();
-    return this.form.handoverMode === "immediate"
-      && Number(this.form.initialPayment) === 0
-      && settings?.zeroDownImmediatePolicy === "admin_authorization"
-      && !this.authorizationToken();
-  }
-
-  get zeroDownBlocked(): boolean {
-    return this.form.handoverMode === "immediate"
-      && Number(this.form.initialPayment) === 0
-      && this.settings()?.zeroDownImmediatePolicy === "blocked";
-  }
-
-  onAuthorized(token: string): void {
-    this.authorizationToken.set(token);
-    this.showAuthorization.set(false);
-    this.submit();
-  }
-
   submit(): void {
     const customer = this.selectedCustomer();
     if (!customer?.id) {
@@ -177,14 +154,6 @@ export class LayawayCreateDialogComponent implements OnInit {
     }
     if (!this.items().length) {
       this.notifications.warn("Falta el producto", "Agrega al menos un producto.");
-      return;
-    }
-    if (this.zeroDownBlocked) {
-      this.notifications.warn("Entrega inmediata bloqueada", "La empresa no permite entregar sin abono.");
-      return;
-    }
-    if (this.needsAuthorization) {
-      this.showAuthorization.set(true);
       return;
     }
     const initialPayment = Number(this.form.initialPayment) || 0;
@@ -211,7 +180,6 @@ export class LayawayCreateDialogComponent implements OnInit {
         ? { address: this.form.deliveryAddress.trim() }
         : null,
       notes: this.form.notes.trim(),
-      authorizationToken: this.authorizationToken(),
     }).subscribe({
       next: () => {
         this.saving.set(false);
@@ -220,10 +188,7 @@ export class LayawayCreateDialogComponent implements OnInit {
       },
       error: (error) => {
         this.saving.set(false);
-        if (error?.error?.code === "ZERO_DOWN_AUTHORIZATION_REQUIRED") {
-          this.authorizationToken.set(null);
-          this.showAuthorization.set(true);
-        }
+        this.notifications.error("No se pudo crear el plan", error?.error?.message || "Intenta nuevamente.");
       },
     });
   }

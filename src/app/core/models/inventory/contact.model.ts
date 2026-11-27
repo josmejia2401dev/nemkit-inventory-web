@@ -50,8 +50,6 @@ export interface CustomerProfile {
       employeeSnapshot?: { name?: string };
       paymentStatus?: "paid" | "pending";
       orderStatus?: string | null;
-      kitchenStatus?: string | null;
-      tableNumber?: string;
       status?: "completed" | "void";
       voidReason?: string;
       voidNote?: string;

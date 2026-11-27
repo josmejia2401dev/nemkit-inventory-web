@@ -7,12 +7,6 @@ import { cancelReasonLabel } from "../../../../shared/cancel-reasons";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
 import { ORDER_STATUS_LABELS, OrderStatus } from "../../order-status.constants";
 
-/** Avance de estado pedido desde la tabla; la pantalla ejecuta el `PUT`. */
-export interface DocumentAdvanceEvent {
-  document: InventoryDocument;
-  orderStatus: OrderStatus;
-}
-
 @Component({
   selector: "app-document-list",
   standalone: true,
@@ -32,7 +26,6 @@ export class DocumentListComponent {
   readonly pageSize = input(10);
   readonly totalItems = input(0);
   readonly canRegisterPayment = input(false);
-  readonly canAdvanceOnSiteOrders = input(false);
 
   readonly refreshed = output<void>();
   readonly create = output<void>();
@@ -40,21 +33,18 @@ export class DocumentListComponent {
   readonly opened = output<InventoryDocument>();
   readonly paid = output<InventoryDocument>();
   readonly cancelled = output<InventoryDocument>();
-  readonly advanced = output<DocumentAdvanceEvent>();
   readonly pageChange = output<number>();
 
   currentOrderStatus(document: InventoryDocument): OrderStatus | null {
     if (document.status === "void") return "cancelled";
-    const rawStatus = document.deliveryStatus ?? document.orderStatus ?? document.kitchenStatus;
-    if (rawStatus === "served") return "delivered";
-    if (rawStatus === "picked_up") return "on_route";
+    const rawStatus = document.deliveryStatus ?? document.orderStatus;
     return rawStatus && rawStatus in ORDER_STATUS_LABELS ? rawStatus as OrderStatus : null;
   }
 
   orderStages(document: InventoryDocument): OrderStatus[] {
     return document.orderChannel === "delivery"
-      ? ["pending", "preparing", "ready", "on_route", "delivered"]
-      : ["pending", "preparing", "ready", "delivered"];
+      ? ["pending", "on_route", "delivered"]
+      : ["pending", "delivered"];
   }
 
   orderProgressIndex(document: InventoryDocument): number {
@@ -65,21 +55,6 @@ export class DocumentListComponent {
   orderProgressLabel(document: InventoryDocument): string {
     const status = this.currentOrderStatus(document);
     return status ? ORDER_STATUS_LABELS[status] : "Pendiente";
-  }
-
-  nextOnSiteOrderStatus(document: InventoryDocument): OrderStatus | null {
-    if (!this.isSale() || !this.canAdvanceOnSiteOrders() || document.orderChannel === "delivery" || document.status === "void") return null;
-    const currentStatus = document.orderStatus ?? document.kitchenStatus ?? "pending";
-    if (currentStatus === "pending") return "preparing";
-    if (currentStatus === "preparing") return "ready";
-    if (currentStatus === "ready") return "delivered";
-    return null;
-  }
-
-  advance(document: InventoryDocument): void {
-    const orderStatus = this.nextOnSiteOrderStatus(document);
-    if (!orderStatus) return;
-    this.advanced.emit({ document, orderStatus });
   }
 
   documentContact(document: InventoryDocument): string {

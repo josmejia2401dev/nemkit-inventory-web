@@ -49,9 +49,7 @@ export class ProductFormDialogComponent implements OnInit {
 
   readonly ingredients = signal<InventoryProduct[]>([]);
   readonly typeOptions: Array<{ value: ProductType; label: string; hint: string }> = [
-    { value: "simple", label: "Simple", hint: "Se compra y se vende (tiendas)" },
-    { value: "ingredient", label: "Insumo", hint: "Se compra, no se vende suelto" },
-    { value: "prepared", label: "Plato / preparado", hint: "Se vende con receta de insumos" },
+    { value: "simple", label: "Simple", hint: "Se compra y se vende" },
   ];
 
   form = this.emptyForm();

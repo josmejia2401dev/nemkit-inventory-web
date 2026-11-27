@@ -2,10 +2,7 @@ export type EmployeeRole =
   | "admin"
   | "cashier"
   | "seller"
-  | "courier"
-  | "warehouse"
-  | "waiter"
-  | "cook";
+  | "courier";
 
 export type DocumentType = "CC" | "CE" | "NIT" | "PAS" | "TI";
 

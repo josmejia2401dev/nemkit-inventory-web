@@ -27,7 +27,6 @@ export class LayawaySettingsDialogComponent implements OnInit {
     cancellationPolicy: "manual",
     retentionPercent: 0,
     allowImmediateHandover: true,
-    zeroDownImmediatePolicy: "admin_authorization",
   };
 
   ngOnInit(): void {
@@ -43,7 +42,6 @@ export class LayawaySettingsDialogComponent implements OnInit {
       cancellationPolicy: this.form.cancellationPolicy,
       retentionPercent: Number(this.form.retentionPercent) || 0,
       allowImmediateHandover: this.form.allowImmediateHandover,
-      zeroDownImmediatePolicy: this.form.zeroDownImmediatePolicy,
     }).subscribe({
       next: (response) => {
         this.saving.set(false);

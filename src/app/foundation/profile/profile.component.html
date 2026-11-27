@@ -86,7 +86,6 @@
         @if (showBusinessSettings && user.companyName && user.businessType) {
           <app-business-profile-section
             [companyName]="user.companyName"
-            [businessType]="user.businessType"
             [saving]="savingBusinessProfile()"
             (saveChanges)="saveBusinessProfile($event)"
           />

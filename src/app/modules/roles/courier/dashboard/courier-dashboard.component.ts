@@ -14,13 +14,13 @@ export class CourierDashboardComponent implements OnInit {
 
   loading = signal(true);
   name = signal("");
-  counts = signal({ pending: 0, preparing: 0, on_route: 0, delivered: 0 });
+  counts = signal({ pending: 0, on_route: 0, delivered: 0, cancelled: 0 });
 
   ngOnInit(): void {
     this.deliveriesApi.list({ limit: 100 }).subscribe({
       next: (response) => {
         const mine = response.data ?? [];
-        const c = { pending: 0, preparing: 0, on_route: 0, delivered: 0 };
+        const c = { pending: 0, on_route: 0, delivered: 0, cancelled: 0 };
         for (const d of mine) {
           if (d.status in c) (c as Record<string, number>)[d.status]++;
         }

@@ -64,14 +64,12 @@
   [pageSize]="pageSize"
   [totalItems]="documentCount()"
   [canRegisterPayment]="canRegisterPayment"
-  [canAdvanceOnSiteOrders]="canAdvanceOnSiteOrders"
   (refreshed)="load()"
   (scanned)="applyBarcode($event)"
   (create)="openCreate()"
   (opened)="openDocument($event)"
   (paid)="pay($event)"
   (cancelled)="openCancel($event)"
-  (advanced)="advanceOnSiteOrder($event)"
   (pageChange)="goToPage($event)"
 />
 

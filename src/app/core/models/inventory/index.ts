@@ -8,4 +8,3 @@ export * from "./page-result.model";
 export * from "./payment.model";
 export * from "./product.model";
 export * from "./report.model";
-export * from "./table.model";

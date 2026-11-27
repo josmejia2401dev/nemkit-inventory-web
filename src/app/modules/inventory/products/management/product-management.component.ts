@@ -71,16 +71,14 @@ export class ProductManagementComponent implements OnInit {
 
   search = "";
   categoryFilter: number | "" = "";
-  typeFilter: "" | "simple" | "ingredient" | "prepared" = "";
+  typeFilter: "" | "simple" = "";
   statusFilter = "";
   stockState: "" | "out_of_stock" | "low_stock" = "";
   specificProductId: number | "" = "";
 
-  readonly typeFilters: Array<{ value: "" | "simple" | "ingredient" | "prepared"; label: string }> = [
+  readonly typeFilters: Array<{ value: "" | "simple"; label: string }> = [
     { value: "", label: "Todos" },
     { value: "simple", label: "Simples" },
-    { value: "ingredient", label: "Insumos" },
-    { value: "prepared", label: "Platos" },
   ];
 
   ngOnInit(): void {
@@ -247,7 +245,7 @@ export class ProductManagementComponent implements OnInit {
     );
   }
 
-  applyTypeFilter(value: "" | "simple" | "ingredient" | "prepared"): void {
+  applyTypeFilter(value: "" | "simple"): void {
     this.typeFilter = value;
     this.page.set(1);
     this.loadProducts();

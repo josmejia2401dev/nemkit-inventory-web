@@ -90,7 +90,7 @@ export class MovementFormDialogComponent implements OnInit {
 
   loadProducts(): void {
     this.catalog
-      .lookup({ types: "simple,ingredient", search: this.productSearch() })
+      .lookup({ types: "simple", search: this.productSearch() })
       .subscribe({
         next: (response) => {
           const selectedIds = new Set(this.items().map((item) => Number(item.productId)).filter(Boolean));

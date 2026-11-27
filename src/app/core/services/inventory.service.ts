@@ -7,7 +7,7 @@ import type { PageResult } from "../models/inventory";
 // Los modelos viven en `core/models/inventory`; se reexportan aquí para no
 // romper los imports históricos desde `core/services/inventory.service`.
 export * from "../models/inventory";
-export type { DeliveryStatus, KitchenStatus, OrderStatus } from "../../modules/inventory/order-status.constants";
+export type { DeliveryStatus, OrderStatus } from "../../modules/inventory/order-status.constants";
 
 @Injectable({ providedIn: "root" })
 export class InventoryService {

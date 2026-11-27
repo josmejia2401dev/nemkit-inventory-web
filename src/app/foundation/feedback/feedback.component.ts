@@ -45,7 +45,7 @@ export class FeedbackComponent {
     }
 
     this.saving.set(true);
-    this.api.post("/feedback", { type: this.type, title, description }).subscribe({
+    this.api.post("/foundation/feedback", { type: this.type, title, description }).subscribe({
       next: () => {
         this.saving.set(false);
         this.sent.set(true);

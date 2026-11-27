@@ -65,7 +65,7 @@ export class FeedbackInboxComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.errorMessage.set("");
-    this.api.get<FeedbackItem[]>("/feedback", {
+    this.api.get<FeedbackItem[]>("/foundation/feedback", {
       page: this.page(),
       status: this.statusFilter || undefined,
       type: this.typeFilter || undefined,
@@ -113,7 +113,7 @@ export class FeedbackInboxComponent implements OnInit {
 
   changeStatus(item: FeedbackItem, status: FeedbackStatus): void {
     if (item.status === status) return;
-    this.api.put<FeedbackItem>(`/feedback/${item.id || item._id}/status`, { status }).subscribe({
+    this.api.put<FeedbackItem>(`/foundation/feedback/${item.id || item._id}/status`, { status }).subscribe({
       next: () => {
         this.notifications.success("Estado actualizado", `Ahora: ${STATUS_LABELS[status]}.`);
         this.items.update((list) =>

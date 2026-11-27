@@ -56,7 +56,7 @@ export class ProfileComponent implements OnInit {
 
   /** Base del endpoint de perfil según el tipo de sesión (empresa o empleado). */
   private get base(): string {
-    return this.authStore.sessionType() === "employee" ? "/employees/profile" : "/users/profile";
+    return this.authStore.sessionType() === "employee" ? "/foundation/employees/profile" : "/foundation/users/profile";
   }
 
   editName = "";
@@ -193,7 +193,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.savingBusinessProfile.set(true);
-    this.api.put<Pick<UserProfile, "companyName" | "businessType">>("/users/profile", changes).subscribe({
+    this.api.put<Pick<UserProfile, "companyName">>("/foundation/users/profile", changes).subscribe({
       next: (response) => {
         const currentProfile = this.profile();
         if (currentProfile) this.profile.set({ ...currentProfile, ...response.data });
@@ -202,13 +202,13 @@ export class ProfileComponent implements OnInit {
         this.authStore.updateCompany({
           id: currentCompany?.id ?? currentProfile?.id ?? 0,
           name: changes.companyName,
-          businessType: changes.businessType,
+          businessType: currentCompany?.businessType ?? "retail",
         });
 
         this.savingBusinessProfile.set(false);
         this.notifications.success(
           "Negocio actualizado",
-          "Cierra sesión y vuelve a entrar para aplicar el nuevo modo de operación.",
+          "Los datos del negocio se guardaron correctamente.",
         );
       },
       error: () => this.savingBusinessProfile.set(false),

@@ -38,9 +38,6 @@ export class SuperadminDashboardComponent implements OnInit {
       cashier: "Cajero",
       seller: "Vendedor",
       courier: "Domiciliario",
-      warehouse: "Almacén",
-      waiter: "Mesero",
-      cook: "Cocina",
     };
     return labels[role] ?? role;
   }

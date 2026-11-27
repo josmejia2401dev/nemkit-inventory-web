@@ -35,7 +35,7 @@ export class AlertsComponent implements OnInit {
 
   get productsPath(): string {
     const rolePath = this.router.url.split("/").filter(Boolean)[0];
-    const productRoles = ["admin", "warehouse", "cashier", "seller", "waiter"];
+    const productRoles = ["admin"];
     return productRoles.includes(rolePath) ? `/${rolePath}/products` : "/products";
   }
 

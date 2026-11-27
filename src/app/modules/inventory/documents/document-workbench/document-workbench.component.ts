@@ -12,9 +12,8 @@ import {
   CancelOrderResult,
 } from "../../../../shared/components/cancel-order-dialog/cancel-order-dialog.component";
 import { formatCurrency } from "../../../../shared/utils/currency.util";
-import { ORDER_STATUS_LABELS } from "../../order-status.constants";
 import { DocumentsApi } from "../documents.api";
-import { DocumentAdvanceEvent, DocumentListComponent } from "../document-list/document-list.component";
+import { DocumentListComponent } from "../document-list/document-list.component";
 import { DocumentDraftFormComponent } from "../document-draft-form/document-draft-form.component";
 import { DocumentReceiptComponent } from "../document-receipt/document-receipt.component";
 import type { DocumentKind } from "../document.types";
@@ -52,18 +51,13 @@ export class DocumentWorkbenchComponent implements OnInit {
   readonly cancellingDocument = signal<InventoryDocument | null>(null);
   readonly scanRequest = signal<ScanRequest>(EMPTY_SCAN);
 
-  /** Modo restaurante: habilita el campo de mesa en la venta. */
-  get isRestaurant(): boolean {
-    return this.store.company()?.businessType === "restaurant";
-  }
-
   get isSale(): boolean {
     return this.kind === "sales";
   }
 
   get canRegisterPayment(): boolean {
     const roles = this.store.user()?.roles ?? [];
-    return roles.includes("ADMIN") || roles.includes("SELLER");
+    return roles.includes("ADMIN") || roles.includes("CASHIER") || roles.includes("SELLER");
   }
 
   get title(): string {
@@ -80,12 +74,6 @@ export class DocumentWorkbenchComponent implements OnInit {
 
   get employeeLabel(): string {
     return this.isSale ? "Vendedor" : "Quién recibe";
-  }
-
-  get canAdvanceOnSiteOrders(): boolean {
-    if (this.isRestaurant || !this.isSale) return false;
-    const roles = this.store.user()?.roles ?? [];
-    return roles.includes("ADMIN") || roles.includes("SELLER");
   }
 
   ngOnInit(): void {
@@ -141,16 +129,6 @@ export class DocumentWorkbenchComponent implements OnInit {
 
   closeDialog(): void {
     this.dialogOpen.set(false);
-  }
-
-  advanceOnSiteOrder({ document, orderStatus }: DocumentAdvanceEvent): void {
-    this.api.advanceSale(document.id || document._id!, orderStatus).subscribe({
-      next: () => {
-        this.notifications.success(`Pedido #${document.id || document._id}`, `Estado actualizado: ${ORDER_STATUS_LABELS[orderStatus]}.`);
-        this.load();
-      },
-      error: (err) => this.notifications.error("No se pudo actualizar", err?.error?.message || "Intenta nuevamente."),
-    });
   }
 
   openDocument(document: InventoryDocument): void {

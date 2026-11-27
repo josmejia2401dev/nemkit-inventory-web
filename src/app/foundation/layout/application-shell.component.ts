@@ -79,10 +79,7 @@ export class ApplicationShellComponent {
       ADMIN: "Administrador",
       CASHIER: "Cajero",
       SELLER: "Vendedor",
-      WAREHOUSE: "Bodeguero",
       COURIER: "Domiciliario",
-      WAITER: "Mesero",
-      COOK: "Cocinero",
     };
     return labels[role ?? ""] ?? "Usuario";
   }
@@ -90,7 +87,7 @@ export class ApplicationShellComponent {
   get effectiveReportPath(): string {
     if (this.reportPath) return this.reportPath;
     const rolePath = this.dashboardPath.split("/").filter(Boolean)[0];
-    return rolePath ? `/${rolePath}/feedback` : "/feedback";
+    return rolePath ? `/${rolePath}/feedback` : "/foundation/feedback";
   }
 
   toggleSidebar(): void {

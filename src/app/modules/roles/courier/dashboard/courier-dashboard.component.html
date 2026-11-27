@@ -12,8 +12,8 @@
 } @else {
   <div class="report-summary">
     <article><small>Pendientes</small><strong>{{ counts().pending }}</strong></article>
-    <article><small>Preparando</small><strong>{{ counts().preparing }}</strong></article>
     <article><small>En ruta</small><strong>{{ counts().on_route }}</strong></article>
     <article><small>Entregados</small><strong>{{ counts().delivered }}</strong></article>
+    <article><small>Cancelados</small><strong>{{ counts().cancelled }}</strong></article>
   </div>
 }

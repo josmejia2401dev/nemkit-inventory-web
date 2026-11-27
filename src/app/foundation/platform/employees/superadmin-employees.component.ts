@@ -36,9 +36,6 @@ export class SuperadminEmployeesComponent implements OnInit {
     { value: "cashier", label: "Cajero" },
     { value: "seller", label: "Vendedor" },
     { value: "courier", label: "Domiciliario" },
-    { value: "warehouse", label: "Almacén" },
-    { value: "waiter", label: "Mesero" },
-    { value: "cook", label: "Cocina" },
   ];
 
   ngOnInit(): void {

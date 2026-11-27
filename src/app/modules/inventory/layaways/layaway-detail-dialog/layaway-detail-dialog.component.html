@@ -30,9 +30,7 @@
           @if (plan.overdue) {
             <span class="layaway-overdue"><i class="pi pi-exclamation-triangle"></i> Vencido hace {{ plan.daysOverdue }} día(s)</span>
           }
-          @if (plan.authorization?.authorizedByName) {
-            <span class="layaway-authorized"><i class="pi pi-shield"></i> Autorizado por {{ plan.authorization?.authorizedByName }}</span>
-          }
+
         </p>
 
         <section class="layaway-form-block">

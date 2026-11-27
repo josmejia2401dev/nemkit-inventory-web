@@ -9,10 +9,7 @@ export type AppRole =
   | "ADMIN"
   | "CASHIER"
   | "SELLER"
-  | "WAREHOUSE"
   | "COURIER"
-  | "WAITER"
-  | "COOK"
   | "USER";
 
 const ROLE_HOME: Record<string, string> = {
@@ -20,21 +17,15 @@ const ROLE_HOME: Record<string, string> = {
   ADMIN: "/admin",
   CASHIER: "/cashier",
   SELLER: "/seller",
-  WAREHOUSE: "/warehouse",
   COURIER: "/courier",
-  WAITER: "/waiter",
-  COOK: "/cook",
 };
 
 // Prioridad cuando un usuario tuviera varios roles (el más privilegiado gana).
 const ROLE_PRIORITY: string[] = [
   "SUPERADMIN",
   "ADMIN",
-  "WAREHOUSE",
   "CASHIER",
   "SELLER",
-  "WAITER",
-  "COOK",
   "COURIER",
 ];
 

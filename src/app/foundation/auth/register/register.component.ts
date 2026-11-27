@@ -29,7 +29,6 @@ export class RegisterComponent {
 
   fullName = "";
   companyName = "";
-  businessType: "retail" | "restaurant" = "retail";
   email = "";
   password = "";
   error = signal<string | null>(null);
@@ -39,12 +38,12 @@ export class RegisterComponent {
     this.error.set(null);
     this.loading.set(true);
     this.api
-      .post<any>("/auth/users/register", {
+      .post<any>("/foundation/auth/users/register", {
         fullName: this.fullName,
         companyName: this.companyName,
-        businessType: this.businessType,
         email: this.email,
         password: this.password,
+        businessType: "retail",
       })
       .subscribe({
         next: (response) => {

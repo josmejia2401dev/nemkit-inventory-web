@@ -40,14 +40,6 @@
           <input type="number" min="0" max="100" [(ngModel)]="form.retentionPercent" name="retentionPercent" />
           <small class="form-hint">Solo aplica si la política es “Retener un porcentaje”.</small>
         </label>
-        <label class="form-field">
-          <span>Entrega inmediata con 0 %</span>
-          <select [(ngModel)]="form.zeroDownImmediatePolicy" name="zeroDownImmediatePolicy">
-            <option value="blocked">Bloqueada</option>
-            <option value="admin_authorization">Requiere autorización de ADMIN</option>
-            <option value="allowed">Permitida sin autorización</option>
-          </select>
-        </label>
         <label class="form-field form-field--wide layaway-check">
           <input type="checkbox" [(ngModel)]="form.allowImmediateHandover" name="allowImmediateHandover" />
           <span>Permitir entrega inmediata (el cliente se lleva el producto con la cuota inicial)</span>

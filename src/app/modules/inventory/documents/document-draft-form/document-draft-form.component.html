@@ -42,21 +42,6 @@
         }
         <label class="form-field"><span>Fecha <b>*</b></span><input type="date" [(ngModel)]="date" name="date" required /></label>
         <label class="form-field"><span>{{ employeeLabel }}</span><select [(ngModel)]="selectedEmployeeId" name="employeeId"><option value="">Sin asignar</option>@for (employee of employees(); track employee.id || employee._id) { <option [ngValue]="employee.id || employee._id">{{ employee.name }}</option> }</select></label>
-        @if (isSale && isRestaurant) {
-          <label class="form-field"><span>Mesa</span>
-            @if (tables().length) {
-              <select [(ngModel)]="tableNumber" name="tableNumber">
-                <option value="">Sin mesa / para llevar</option>
-                @for (table of tables(); track table.id || table._id) {
-                  <option [value]="table.name">{{ table.name }}{{ table.occupied ? " · en uso (puedes agregar)" : " · libre" }}</option>
-                }
-              </select>
-            } @else {
-              <input [(ngModel)]="tableNumber" name="tableNumber" maxlength="20" placeholder="Ej. Mesa 1" />
-            }
-            <small class="field-hint-inline">Opcional · puedes agregar más pedidos a una mesa en uso</small>
-          </label>
-        }
       </div>
 
       @if (isSale && selectedContactId) {

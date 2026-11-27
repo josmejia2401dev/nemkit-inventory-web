@@ -6,7 +6,6 @@ import {
 } from "../../../core/services/inventory.service";
 import {
   Layaway,
-  LayawayAuthorizationResult,
   LayawayCancelDraft,
   LayawayDraft,
   LayawayPaymentDraft,
@@ -66,16 +65,6 @@ export class LayawaysApi {
 
   cancel(id: number, body: LayawayCancelDraft): ApiResponse<Layaway> {
     return this.inventory.post<Layaway>(`/layaways/${id}/cancel`, body);
-  }
-
-  authorize(body: {
-    adminEmail: string;
-    adminPassword: string;
-    customerId: number;
-    total: number;
-    reason?: string;
-  }): ApiResponse<LayawayAuthorizationResult> {
-    return this.inventory.post<LayawayAuthorizationResult>("/layaways/authorizations", body);
   }
 
   settings(): ApiResponse<LayawaySettings> {

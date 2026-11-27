@@ -50,14 +50,6 @@
           </td>
           <td data-label="Acciones" class="document-actions-cell">
             <div class="document-actions">
-            @if (canAdvanceOnSiteOrders()) {
-              @if (nextOnSiteOrderStatus(document); as nextStatus) {
-                <button class="button button-secondary button-small document-advance-button" title="Avanzar estado del pedido" (click)="advance(document)">
-                  <i class="pi pi-arrow-right"></i>
-                  <span>{{ nextStatus === "preparing" ? "Preparar" : nextStatus === "ready" ? "Marcar listo" : "Entregar" }}</span>
-                </button>
-              }
-            }
             @if (isPending(document)) {
               <button class="button button-primary button-small" title="Registrar cobro" (click)="paid.emit(document)"><i class="pi pi-dollar"></i> Cobrar</button>
             }

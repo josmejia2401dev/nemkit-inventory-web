@@ -11,7 +11,6 @@ export type LayawayPaymentMethod =
   | "daviplata"
   | "other";
 export type LayawayCancellationPolicy = "refund_all" | "retain_percent" | "manual";
-export type LayawayZeroDownPolicy = "blocked" | "admin_authorization" | "allowed";
 export type LayawayReturnCondition = "resellable" | "damaged" | "not_returned";
 
 export interface LayawayItem {
@@ -38,16 +37,6 @@ export interface LayawayPayment {
   employeeSnapshot?: { name?: string };
 }
 
-export interface LayawayAuthorization {
-  required: boolean;
-  authorizedBy?: number | null;
-  authorizedByName?: string;
-  authorizedAt?: string | null;
-  method?: "password" | "pin" | "remote";
-  note?: string;
-  requestId?: number | null;
-}
-
 export interface LayawayDelivery {
   address: string;
   location?: { lat?: number | null; lng?: number | null };
@@ -62,7 +51,6 @@ export interface LayawaySettings {
   cancellationPolicy: LayawayCancellationPolicy;
   retentionPercent: number;
   allowImmediateHandover: boolean;
-  zeroDownImmediatePolicy: LayawayZeroDownPolicy;
 }
 
 export interface LayawaySummary {
@@ -97,7 +85,6 @@ export interface Layaway {
   handoverStatus: LayawayHandoverStatus;
   deliveredAt?: string | null;
   delivery?: LayawayDelivery | null;
-  authorization?: LayawayAuthorization | null;
   saleId?: number | null;
   notes?: string;
   payments?: LayawayPayment[];
@@ -127,7 +114,6 @@ export interface LayawayDraft {
   delivery?: LayawayDelivery | null;
   notes?: string;
   employeeId?: number;
-  authorizationToken?: string | null;
 }
 
 export interface LayawayPaymentDraft {
@@ -146,10 +132,4 @@ export interface LayawayCancelDraft {
   returnCondition?: LayawayReturnCondition;
   refundAmount?: number;
   refundMethod?: LayawayPaymentMethod;
-}
-
-export interface LayawayAuthorizationResult {
-  authorizationId: number;
-  token: string;
-  expiresAt: string;
 }

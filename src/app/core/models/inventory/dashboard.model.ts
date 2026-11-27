@@ -21,7 +21,6 @@ export interface InventoryDashboardSummary {
   }>;
   deliveries?: {
     pending: number;
-    preparing: number;
     onRoute: number;
     delivered: number;
     cancelled: number;

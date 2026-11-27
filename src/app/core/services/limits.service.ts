@@ -45,7 +45,7 @@ export class LimitsService {
     if (cached && !force) return of(cached);
 
     return this.inventory
-      .get<LimitUsage>("/limits")
+      .get<LimitUsage>("/foundation/limits")
       .pipe(
         map((response) => response.data),
         tap((usage) => this.usage.set(usage)),
@@ -58,7 +58,7 @@ export class LimitsService {
     if (cached.length && !force) return of(cached);
 
     return this.inventory
-      .get<PlanCatalogEntry[]>("/limits/plans")
+      .get<PlanCatalogEntry[]>("/foundation/limits/plans")
       .pipe(
         map((response) => response.data ?? []),
         tap((plans) => this.plans.set(plans)),

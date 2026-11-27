@@ -47,9 +47,6 @@ export class EmployeesComponent implements OnInit {
     { value: "cashier", label: "Cajero" },
     { value: "seller", label: "Vendedor" },
     { value: "courier", label: "Domiciliario" },
-    { value: "warehouse", label: "Bodeguero" },
-    { value: "waiter", label: "Mesero" },
-    { value: "cook", label: "Cocinero" },
   ];
 
   readonly documentTypeOptions: Array<{ value: DocumentType; label: string }> = [

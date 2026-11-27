@@ -6,7 +6,6 @@ import {
   InventoryContact,
   InventoryEmployee,
   InventoryProduct,
-  InventoryTable,
 } from "../../../../core/services/inventory.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 import { AuthStore } from "../../../../core/store/auth.store";
@@ -59,7 +58,6 @@ export class DocumentDraftFormComponent implements OnInit {
   readonly products = signal<InventoryProduct[]>([]);
   readonly contacts = signal<InventoryContact[]>([]);
   readonly employees = signal<InventoryEmployee[]>([]);
-  readonly tables = signal<InventoryTable[]>([]);
   readonly couriers = signal<InventoryEmployee[]>([]);
   readonly customerProfile = signal<CustomerProfile | null>(null);
   readonly customerProfileLoading = signal(false);
@@ -69,7 +67,6 @@ export class DocumentDraftFormComponent implements OnInit {
 
   selectedContactId: number | "" = "";
   selectedEmployeeId: number | "" = "";
-  tableNumber = "";
   isDelivery = false;
   selectedCourierId: number | "" = "";
   deliveryAddress = "";
@@ -94,10 +91,6 @@ export class DocumentDraftFormComponent implements OnInit {
     return this.kind() === "sales";
   }
 
-  get isRestaurant(): boolean {
-    return this.store.company()?.businessType === "restaurant";
-  }
-
   get singular(): string {
     return this.isSale ? "venta" : "compra";
   }
@@ -111,15 +104,7 @@ export class DocumentDraftFormComponent implements OnInit {
     this.loadProducts();
     this.loadContacts();
     this.loadEmployees();
-    if (this.isSale) {
-      this.loadCouriers();
-      if (this.isRestaurant) this.loadTables();
-    }
-  }
-
-  loadTables(): void {
-    this.api.tablesOccupancy()
-      .subscribe({ next: (response) => this.tables.set(response.data ?? []) });
+    if (this.isSale) this.loadCouriers();
   }
 
   loadProducts(search = ""): void {
@@ -442,9 +427,6 @@ export class DocumentDraftFormComponent implements OnInit {
     };
     body[this.isSale ? "customerId" : "supplierId"] = Number(this.selectedContactId);
     if (this.selectedEmployeeId) body["employeeId"] = Number(this.selectedEmployeeId);
-    if (this.isSale && this.isRestaurant && this.tableNumber.trim()) {
-      body["tableNumber"] = this.tableNumber.trim();
-    }
 
     if (this.isSale && this.isDelivery) {
       if (!this.deliveryAddress.trim()) {

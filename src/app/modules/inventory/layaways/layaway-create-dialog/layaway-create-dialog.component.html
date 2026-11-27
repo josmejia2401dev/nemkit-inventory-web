@@ -133,12 +133,6 @@
             <input [(ngModel)]="form.notes" name="notes" maxlength="1000" placeholder="Opcional" />
           </label>
         </div>
-
-        @if (zeroDownBlocked) {
-          <p class="layaway-alert layaway-alert--danger"><i class="pi pi-ban"></i> La empresa no permite entrega inmediata con 0 %.</p>
-        } @else if (needsAuthorization) {
-          <p class="layaway-alert"><i class="pi pi-shield"></i> La entrega inmediata con 0 % requiere autorización de un administrador.</p>
-        }
       </section>
 
       <div class="layaway-summary-bar">
@@ -149,21 +143,11 @@
 
       <div class="dialog-actions">
         <button type="button" class="button button-secondary" (click)="closed.emit()">Cancelar</button>
-        <button type="button" class="button button-primary" [disabled]="saving() || zeroDownBlocked" (click)="submit()">
+        <button type="button" class="button button-primary" [disabled]="saving()" (click)="submit()">
           <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"></i>
           {{ saving() ? "Creando…" : "Crear plan separe" }}
         </button>
       </div>
     </div>
   </section>
-
-  @if (showAuthorization()) {
-    <app-layaway-authorization-dialog
-      [customerId]="selectedCustomer()?.id || 0"
-      [customerName]="selectedCustomer()?.name || ''"
-      [total]="total()"
-      (authorized)="onAuthorized($event)"
-      (closed)="showAuthorization.set(false)"
-    />
-  }
 </div>
