@@ -5,6 +5,5 @@ export * from "./employee.model";
 export * from "./layaway.model";
 export * from "./movement.model";
 export * from "./page-result.model";
-export * from "./payment.model";
 export * from "./product.model";
 export * from "./report.model";

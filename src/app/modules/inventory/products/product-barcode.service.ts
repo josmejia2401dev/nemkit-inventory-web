@@ -66,7 +66,7 @@ export class ProductBarcodeService {
 
   /** Roles con permiso de escritura de productos en el backend. */
   canManageProducts(roles: string[] | null | undefined): boolean {
-    return Boolean(roles?.includes("ADMIN") || roles?.includes("WAREHOUSE"));
+    return Boolean(roles?.includes("ADMIN"));
   }
 
   /** Un producto inactivo no se usa en ventas, compras ni movimientos. */
@@ -74,13 +74,12 @@ export class ProductBarcodeService {
     return product?.status === "active";
   }
 
-  /** Un insumo no se vende suelto; todo lo demás sí. */
+  /** Todo producto simple activo se puede vender y comprar. */
   isSellable(product: InventoryProduct | null | undefined): boolean {
-    return Boolean(product) && product?.type !== "ingredient";
+    return Boolean(product);
   }
 
-  /** Un plato preparado no se compra; simples e insumos sí. */
   isPurchasable(product: InventoryProduct | null | undefined): boolean {
-    return Boolean(product) && product?.type !== "prepared";
+    return Boolean(product);
   }
 }

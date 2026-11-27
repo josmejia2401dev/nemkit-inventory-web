@@ -4,8 +4,6 @@ import {
   DocumentType,
   EmployeeRole,
   InventoryEmployee,
-  InventoryEmployeePayment,
-  InventoryEmployeePaymentSummary,
   InventoryService,
   PageResult,
 } from "../../../core/services/inventory.service";
@@ -28,18 +26,6 @@ export interface EmployeeInput {
   status?: "active" | "inactive";
   email?: string;
   password?: string;
-}
-
-export interface EmployeePaymentInput {
-  employeeId: number;
-  paymentDate: string;
-  periodStart?: string;
-  periodEnd?: string;
-  type: InventoryEmployeePayment["type"];
-  amount: number;
-  method: InventoryEmployeePayment["method"];
-  reference?: string;
-  notes?: string;
 }
 
 type ApiResponse<T> = Observable<{ success: boolean; data: T }>;
@@ -79,24 +65,5 @@ export class EmployeesApi {
 
   couriers(): Observable<{ success: boolean; data: InventoryEmployee[] }> {
     return this.options("courier");
-  }
-
-  payments(employeeId: number, page: number, limit: number): Observable<PageResult<InventoryEmployeePayment>> {
-    return this.inventory.list<InventoryEmployeePayment>("/employee-payments", {
-      employeeId,
-      page,
-      limit,
-    });
-  }
-
-  paymentSummary(employeeId: number): ApiResponse<InventoryEmployeePaymentSummary> {
-    return this.inventory.get<InventoryEmployeePaymentSummary>(
-      "/statistics/employees/payments",
-      { employeeId },
-    );
-  }
-
-  createPayment(body: EmployeePaymentInput): ApiResponse<InventoryEmployeePayment> {
-    return this.inventory.post<InventoryEmployeePayment>("/employee-payments", body);
   }
 }

@@ -19,14 +19,6 @@
     <form (ngSubmit)="save()" class="dialog-form">
       <div class="form-grid">
         <label class="form-field form-field--wide"
-          ><span>Tipo de producto</span
-          ><select [(ngModel)]="form.type" name="type">
-            @for (option of typeOptions; track option.value) {
-              <option [value]="option.value">{{ option.label }} — {{ option.hint }}</option>
-            }
-          </select>
-        </label>
-        <label class="form-field form-field--wide"
           ><span>Nombre del producto <b>*</b></span
           ><input [(ngModel)]="form.name" name="name" maxlength="100" placeholder="Ej. Café molido 500 g" required
         /></label>
@@ -68,10 +60,7 @@
           <div class="money-input">
             <span>$</span
             ><input type="number" min="0" step="1" [(ngModel)]="form.purchasePrice" name="purchasePrice" /></div>
-          @if (isPrepared) {
-            <small class="field-hint-inline">Los platos no se compran: su costo sale de la receta.</small>
-          }</label
-        >
+        </label>
         <label class="form-field"
           ><span>Precio de venta <b>*</b></span>
           <div class="money-input">
@@ -105,56 +94,10 @@
         </label>
       </div>
 
-      @if (isPrepared) {
-        <div class="recipe-editor">
-          <div class="items-heading">
-            <div><span class="eyebrow">RECETA · OPCIONAL</span><strong>Insumos del plato</strong></div>
-            <button type="button" class="button button-secondary button-small" (click)="addRecipeItem()">
-              <i class="pi pi-plus"></i> Agregar insumo
-            </button>
-          </div>
-          @if (!form.recipe.length) {
-            <p class="form-hint">
-              <i class="pi pi-info-circle"></i> Opcional. Si agregas insumos, al vender el plato se
-              descontarán del stock. Si lo dejas vacío, el plato se vende sin descontar insumos.
-            </p>
-          }
-          @for (item of form.recipe; track $index) {
-            <div class="recipe-row">
-              <label class="form-field recipe-ingredient"
-                ><span>Insumo</span>
-                <select [(ngModel)]="item.ingredientId" [name]="'ingredient-' + $index" required>
-                  <option value="">Selecciona un insumo</option>
-                  @for (ingredient of ingredients(); track ingredient.id || ingredient._id) {
-                    <option [ngValue]="ingredient.id || ingredient._id">
-                      {{ ingredient.name }}{{ ingredient.sku ? " · " + ingredient.sku : "" }}
-                    </option>
-                  }
-                </select>
-              </label>
-              <label class="form-field recipe-qty"
-                ><span>Cantidad</span>
-                <input type="number" min="0" step="any" [(ngModel)]="item.quantity" [name]="'recipe-qty-' + $index" required />
-              </label>
-              <button
-                type="button"
-                class="icon-button icon-button--danger recipe-remove"
-                title="Quitar insumo"
-                (click)="removeRecipeItem($index)"
-              >
-                <i class="pi pi-times"></i>
-              </button>
-            </div>
-          }
-        </div>
-      }
-
-      @if (!isPrepared) {
-        <p class="form-hint">
-          <i class="pi pi-info-circle"></i> Las existencias se inicializan en cero. Registra una
-          entrada para agregar stock.
-        </p>
-      }
+      <p class="form-hint">
+        <i class="pi pi-info-circle"></i> Las existencias se inicializan en cero. Registra una
+        entrada para agregar stock.
+      </p>
       <div class="dialog-actions">
         <button type="button" class="button button-secondary" (click)="closed.emit()">Cancelar</button
         ><button type="submit" class="button button-primary" [disabled]="saving()">

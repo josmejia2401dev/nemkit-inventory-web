@@ -97,8 +97,8 @@
               <select [(ngModel)]="item.productId" [name]="'product-' + $index" (ngModelChange)="productChanged(item)" required>
                 <option value="">Selecciona producto</option>
                 @for (product of products(); track product.id || product._id) {
-                  <option [ngValue]="product.id || product._id" [disabled]="isSale && product.type !== 'prepared' && product.stock < 1">
-                    {{ product.name }} · {{ product.sku }}{{ product.type === "prepared" ? " · Plato" : " · " + product.stock + " disp." }}
+                  <option [ngValue]="product.id || product._id" [disabled]="isSale && product.stock < 1">
+                    {{ product.name }} · {{ product.sku }} · {{ product.stock }} disp.
                   </option>
                 }
               </select>
@@ -107,7 +107,7 @@
               <span>Cantidad</span>
               <input type="number" min="1" step="1" [max]="maxSaleQuantity(item)" [(ngModel)]="item.quantity" [name]="'quantity-' + $index" required />
               @if (isSale && productFor(item); as product) {
-                <small class="quantity-availability">{{ product.type === "prepared" ? "Plato preparado" : (product.stock + " disponibles") }}</small>
+                <small class="quantity-availability">{{ product.stock }} disponibles</small>
               }
             </label>
             <label class="form-field transaction-price">

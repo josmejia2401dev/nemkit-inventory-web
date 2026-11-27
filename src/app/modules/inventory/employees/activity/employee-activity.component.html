@@ -24,7 +24,6 @@
         <article><small>Recaudado en período</small><strong>{{ money(data.collectedInPeriod) }}</strong><span>{{ data.collectionsCount }} cobros registrados</span></article>
         <article class="employee-activity-card--alert"><small>Cancelaciones</small><strong>{{ data.cancellationCount | number }}</strong><span>{{ money(data.cancelledValue) }} en pedidos cancelados</span></article>
         <article><small>Utilidad bruta estimada</small><strong>{{ money(data.grossProfit) }}</strong><span>Según costo registrado</span></article>
-        <article class="employee-activity-card--paid"><small>Pagado al empleado</small><strong>{{ money(data.paymentsMade) }}</strong><span>{{ data.paymentCount }} pagos registrados en el período</span></article>
       </div>
       <p class="employee-activity-note"><i class="pi pi-info-circle"></i> Las ventas se agrupan por fecha de venta; los cobros y pagos al empleado, por fecha de registro. El valor de ventas no determina el pago del empleado.</p>
       } @else {

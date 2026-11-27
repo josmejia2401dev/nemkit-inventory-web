@@ -13,9 +13,7 @@ import { FormsModule } from "@angular/forms";
 import {
   InventoryCategory,
   InventoryProduct,
-  ProductType,
 } from "../../../../../core/services/inventory.service";
-import { ProductCatalogService } from "../../product-catalog.service";
 import { NotificationService } from "@nemkit/foundation-web";
 import { BarcodeCameraBarComponent } from "@nemkit/foundation-web";
 import { ProductBarcodeService } from "../../product-barcode.service";
@@ -36,7 +34,6 @@ export interface ProductDraft {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductFormDialogComponent implements OnInit {
-  private readonly catalog = inject(ProductCatalogService);
   private readonly notifications = inject(NotificationService);
   private readonly productBarcode = inject(ProductBarcodeService);
 
@@ -46,11 +43,6 @@ export class ProductFormDialogComponent implements OnInit {
   readonly scan = input<ScanRequest>({ code: "", seq: 0 });
   readonly submitted = output<ProductDraft>();
   readonly closed = output<void>();
-
-  readonly ingredients = signal<InventoryProduct[]>([]);
-  readonly typeOptions: Array<{ value: ProductType; label: string; hint: string }> = [
-    { value: "simple", label: "Simple", hint: "Se compra y se vende" },
-  ];
 
   form = this.emptyForm();
 
@@ -66,22 +58,10 @@ export class ProductFormDialogComponent implements OnInit {
   ngOnInit(): void {
     const product = this.product();
     if (product) this.form = this.fromProduct(product);
-    this.loadIngredients();
   }
 
   get isEditing(): boolean {
     return !!this.product();
-  }
-
-  get isPrepared(): boolean {
-    return this.form.type === "prepared";
-  }
-
-  private loadIngredients(): void {
-    // Insumos y simples activos, aptos para formar parte de una receta.
-    this.catalog
-      .lookupAll({ types: "ingredient,simple" })
-      .subscribe({ next: (products) => this.ingredients.set(products) });
   }
 
   /** El lector llena el campo y avisa si el código ya pertenece a otro producto. */
@@ -102,32 +82,15 @@ export class ProductFormDialogComponent implements OnInit {
     });
   }
 
-  addRecipeItem(): void {
-    this.form.recipe = [...this.form.recipe, { ingredientId: "", quantity: 1 }];
-  }
-
-  removeRecipeItem(index: number): void {
-    this.form.recipe = this.form.recipe.filter((_item, itemIndex) => itemIndex !== index);
-  }
-
   save(): void {
     if (!this.form.categoryId || !this.form.sku.trim() || !this.form.name.trim()) {
       this.notifications.warn("Faltan datos", "Completa el nombre, SKU y categoría.");
       return;
     }
 
-    let recipe: Array<{ ingredientId: number; quantity: number }> | undefined;
-    if (this.isPrepared) {
-      // La receta es opcional: si el restaurante no define insumos, el plato se
-      // guarda igual (la venta no descontará insumos). Solo enviamos los válidos.
-      recipe = this.form.recipe
-        .filter((item) => item.ingredientId && Number(item.quantity) > 0)
-        .map((item) => ({ ingredientId: Number(item.ingredientId), quantity: Number(item.quantity) }));
-    }
-
     const body: Record<string, unknown> = {
       categoryId: Number(this.form.categoryId),
-      type: this.form.type,
+      type: "simple",
       sku: this.form.sku.trim(),
       barcode: this.form.barcode.trim(),
       name: this.form.name.trim(),
@@ -139,15 +102,12 @@ export class ProductFormDialogComponent implements OnInit {
       status: this.form.status,
       image: this.form.image.trim() ? { url: this.form.image.trim() } : undefined,
     };
-    if (this.isPrepared) body["recipe"] = recipe;
-
     this.submitted.emit({ body, isCreate: !this.isEditing });
   }
 
   private fromProduct(product: InventoryProduct) {
     return {
       categoryId: product.categoryId as number | "",
-      type: product.type ?? "simple",
       sku: product.sku,
       barcode: product.barcode ?? "",
       name: product.name,
@@ -157,17 +117,12 @@ export class ProductFormDialogComponent implements OnInit {
       minimumStock: product.minimumStock ?? 0,
       status: product.status,
       image: product.image?.url ?? "",
-      recipe: (product.recipe ?? []).map((item) => ({
-        ingredientId: item.ingredientId as number | "",
-        quantity: item.quantity,
-      })),
     };
   }
 
   private emptyForm() {
     return {
       categoryId: "" as number | "",
-      type: "simple" as ProductType,
       sku: "",
       barcode: "",
       name: "",
@@ -177,7 +132,6 @@ export class ProductFormDialogComponent implements OnInit {
       minimumStock: 0,
       status: "active" as "active" | "inactive",
       image: "",
-      recipe: [] as Array<{ ingredientId: number | ""; quantity: number }>,
     };
   }
 }

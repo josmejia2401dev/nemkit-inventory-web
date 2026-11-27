@@ -21,11 +21,7 @@
                 @else { <i class="pi pi-box" aria-hidden="true"></i> }
               </span>
               <span>
-                <strong>
-                  {{ product.name }}
-                  @if (product.type === "ingredient") { <span class="type-chip type-chip--ingredient">Insumo</span> }
-                  @else if (product.type === "prepared") { <span class="type-chip type-chip--prepared">Plato</span> }
-                </strong>
+                <strong>{{ product.name }}</strong>
                 <small>{{ product.description || "Sin descripción" }}</small>
               </span>
             </div>

@@ -46,8 +46,6 @@ export interface CashFlowReport {
   outflows: {
     purchases: number;
     purchasesCount: number;
-    employeePayments: number;
-    employeePaymentsCount: number;
     withdrawals: number;
     withdrawalsCount: number;
     layawayRefunds: number;

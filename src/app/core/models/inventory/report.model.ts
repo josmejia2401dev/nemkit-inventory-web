@@ -1,5 +1,4 @@
 import type { InventoryMovement } from "./movement.model";
-import type { InventoryEmployeePaymentSummary } from "./payment.model";
 
 export interface InventoryReportProduct {
   id: number;
@@ -74,8 +73,6 @@ export interface InventorySalesByEmployeeRow {
   cancellationCount: number;
   cancelledValue: number;
   grossProfit: number;
-  paymentsMade: number;
-  paymentCount: number;
 }
 
 export interface InventorySalesByEmployeeReport {
@@ -92,9 +89,6 @@ export interface InventorySalesByEmployeeReport {
     cancellationCount: number;
     cancelledValue: number;
     grossProfit: number;
-    paymentsMade: number;
-    paymentCount: number;
   };
   employees: InventorySalesByEmployeeRow[];
-  payments: InventoryEmployeePaymentSummary;
 }

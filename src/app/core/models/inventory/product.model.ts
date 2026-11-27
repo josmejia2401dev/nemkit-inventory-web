@@ -1,9 +1,4 @@
-export type ProductType = "simple" | "ingredient" | "prepared";
-
-export interface RecipeItem {
-  ingredientId: number;
-  quantity: number;
-}
+export type ProductType = "simple";
 
 export interface InventoryProduct {
   id: number;
@@ -20,7 +15,6 @@ export interface InventoryProduct {
   stock: number;
   minimumStock: number;
   status: "active" | "inactive";
-  recipe?: RecipeItem[];
   image?: { url?: string; storageKey?: string };
 }
 

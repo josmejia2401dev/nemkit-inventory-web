@@ -54,8 +54,6 @@ export class ReportExportService {
       Cancelaciones: employee.cancellationCount,
       "Valor cancelado": employee.cancelledValue,
       "Utilidad bruta estimada": employee.grossProfit,
-      "Pagos registrados": employee.paymentCount,
-      "Total pagado al empleado": employee.paymentsMade,
     }));
     rows.push({
       Empleado: "TOTALES",
@@ -67,8 +65,6 @@ export class ReportExportService {
       Cancelaciones: report.totals.cancellationCount,
       "Valor cancelado": report.totals.cancelledValue,
       "Utilidad bruta estimada": report.totals.grossProfit,
-      "Pagos registrados": report.totals.paymentCount,
-      "Total pagado al empleado": report.totals.paymentsMade,
     });
 
     const worksheet = XLSX.utils.json_to_sheet(rows);

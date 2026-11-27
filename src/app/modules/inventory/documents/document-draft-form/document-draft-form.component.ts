@@ -234,7 +234,7 @@ export class DocumentDraftFormComponent implements OnInit {
         : [...this.items, nextItem];
     }
 
-    if (this.isSale && product.type !== "prepared" && product.stock < 1) {
+    if (this.isSale && product.stock < 1) {
       this.notifications.warn(
         "Producto sin stock",
         `${product.name} se agregó con 0 unidades. Registra una entrada antes de cobrar.`,
@@ -359,7 +359,7 @@ export class DocumentDraftFormComponent implements OnInit {
 
   maxSaleQuantity(item: DraftItem): number | null {
     const product = this.productFor(item);
-    return this.isSale && product && product.type !== "prepared" ? product.stock : null;
+    return this.isSale && product ? product.stock : null;
   }
 
   margin(item: DraftItem): number | null {
@@ -398,7 +398,7 @@ export class DocumentDraftFormComponent implements OnInit {
     }
     const itemExceedingStock = this.isSale && this.items.find((item) => {
       const product = this.productFor(item);
-      return product && product.type !== "prepared" && Number(item.quantity) > product.stock;
+      return product && Number(item.quantity) > product.stock;
     });
     if (itemExceedingStock) {
       const product = this.productFor(itemExceedingStock);
